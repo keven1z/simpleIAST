@@ -22,7 +22,7 @@ simpleIAST是一种交互式应用程序安全测试工具。
 
 ```shell
 # clone安装包
-wget 
+wget https://github.com/keven1z/simpleIAST/archive/refs/heads/master.zip
 
 ```
 
