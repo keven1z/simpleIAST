@@ -1,0 +1,10 @@
+dependency-reduced-pom.xml
+*/test/
+*.class
+*.lst
+*/target/*
+/.idea/
+*.jar
+/agent/target/*
+/engine/target/*
+.idea
