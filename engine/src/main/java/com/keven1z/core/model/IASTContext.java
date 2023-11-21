@@ -31,7 +31,7 @@ public class IASTContext {
      * 启动模式
      */
     private String mode;
-
+    private String token;
     public PolicyContainer getPolicy() {
         return policyContainer;
     }
@@ -92,5 +92,13 @@ public class IASTContext {
             }
         }
         return false;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -3,7 +3,9 @@ package com.keven1z.core.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 
+import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.Api;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
@@ -58,12 +60,16 @@ public class HttpClientUtils {
 
     private static CloseableHttpResponse get(String url) throws IOException {
         HttpGet request = new HttpGet(url);
+        String token = EngineController.context.getToken();
+        if (token != null) {
+            request.addHeader("Authorization", token);
+        }
         CloseableHttpResponse response = client.execute(request);
         return response;
     }
 
-    private static String post(String url, String payload) throws IOException {
-        HttpResponse response = postNormal(url, payload);
+    private static String post(String payload) throws IOException {
+        HttpResponse response = postNormal(Api.AGENT_REGISTER_URL, payload);
         HttpEntity entity = response.getEntity();
         String responseString = null;
         if (entity != null) {
@@ -86,6 +92,10 @@ public class HttpClientUtils {
 
     private static CloseableHttpResponse postNormal(String url, String payload) throws IOException {
         HttpPost request = new HttpPost(url);
+        String token = EngineController.context.getToken();
+        if (token != null) {
+            request.addHeader("Authorization", token);
+        }
         request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
         return client.execute(request);
     }
@@ -124,10 +134,16 @@ public class HttpClientUtils {
      * @param information 注册信息
      */
     public static boolean register(String information) throws IOException {
-        String response = post(Api.AGENT_REGISTER_URL, information);
-        ResponseDTO<String> responseDTO = JsonUtils.toObject(response, ResponseDTO.class);
+        String response = post(information);
+        ResponseDTO<LinkedHashMap<String, String>> responseDTO = JsonUtils.toObject(response, ResponseDTO.class);
         if (responseDTO.isFlag()) {
-            ApplicationModel.setAgentId(responseDTO.getData());
+            LinkedHashMap<String, String> data = responseDTO.getData();
+            if (data == null) {
+                return false;
+            }
+            ApplicationModel.setAgentId(data.get("agentId"));
+            String token = data.get("token");
+            EngineController.context.setToken(token);
         }
         return responseDTO.isFlag();
     }
@@ -135,16 +151,15 @@ public class HttpClientUtils {
     /**
      * 向服务器解绑agent
      */
-    public static boolean deregister()  {
+    public static boolean deregister() {
         CloseableHttpResponse response = null;
         try {
             response = get(Api.AGENT_DEREGISTER_URL + "?agentId=" + ApplicationModel.getAgentId());
             return response.getStatusLine().getStatusCode() == 200;
 
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
-        }
-        finally {
+        } finally {
             if (response != null) {
                 try {
                     response.close();

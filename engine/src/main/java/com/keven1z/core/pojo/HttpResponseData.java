@@ -3,6 +3,7 @@ package com.keven1z.core.pojo;
 import java.util.Map;
 
 public class HttpResponseData {
+    private int statusCode;
 
     private Map<String,String> headers;
 
@@ -18,5 +19,11 @@ public class HttpResponseData {
         this.headers = headers;
     }
 
+    public int getStatusCode() {
+        return statusCode;
+    }
 
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
 }

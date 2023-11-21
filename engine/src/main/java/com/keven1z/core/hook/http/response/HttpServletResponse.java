@@ -11,6 +11,8 @@ import java.util.Map;
 public class HttpServletResponse {
     private final WeakReference<Object> responseObject;
     private Map<String, String> headers;
+    private int statusCode;
+    private String protocol;
 
     public HttpServletResponse(Object responseObject) {
         this.responseObject = new WeakReference<>(responseObject);
@@ -39,6 +41,29 @@ public class HttpServletResponse {
             }
         }
         return headers;
+    }
+
+    /**
+     * @return 获取状态码
+     */
+    public int getStatusCode() {
+        if (this.statusCode == 0) {
+            Object response = responseObject.get();
+            Object status = ReflectionUtils.invokeMethod(response, "getStatus", new Class[0]);
+            this.statusCode = status == null ? 0 : (int) status;
+        }
+        return statusCode;
+    }
+
+    /**
+     * @return 获取HTTP协议类型
+     */
+    public String getProtocol() {
+        if (this.protocol == null) {
+            Object response = responseObject.get();
+            this.protocol = ReflectionUtils.invokeStringMethod(response, "getProtocol", new Class[]{});
+        }
+        return protocol;
     }
 
     public String getResponseBody() {

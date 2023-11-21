@@ -32,18 +32,6 @@ public class SinkClassResolver implements HandlerHookClassResolver {
             }
             return;
         }
-        /*
-         * 如果该sink点为单一漏洞hook点，直接加入，作为待检测
-         */
-//        if (!policy.isFlowed()) {
-//            TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
-//            taintData.setVulnType(policyName);
-//            taintData.setParameters(parameters);
-//            TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-//            isSuspectedTaint.set(true);
-//            taintGraph.addNode(taintData);
-//            return;
-//        }
 
         String from = policy.getFrom();
         List<Object> formList = PolicyUtils.getPositionObject(from, parameters, returnObject, thisObject);
@@ -59,6 +47,8 @@ public class SinkClassResolver implements HandlerHookClassResolver {
         }
 
         TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
+        taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
+        taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
         taintData.setVulnType(policyName);
         taintData.setFromValue(fromObject.toString());
         taintData.setStackList(StackUtils.getStackTraceArray(true, true));

@@ -14,7 +14,7 @@ public class TaintUtils {
     public static List<TaintNode> findSourceInTaintNodes(LinkedList<TaintNode> taintNodes) {
         List<TaintNode> sourceNodes = new ArrayList<>();
         for (TaintNode taintNode : taintNodes) {
-            if (PolicyTypeEnum.SOURCE.equals(taintNode.getTaintData().getType())) {
+            if (PolicyTypeEnum.SOURCE.name().equals(taintNode.getTaintData().getStage())) {
                 sourceNodes.add(taintNode);
             } else {
                 /*
@@ -74,7 +74,7 @@ public class TaintUtils {
     public static List<TaintData> getSourceList(LinkedList<TaintData> taintDataLinkedList) {
         ArrayList<TaintData> sourceDataList = new ArrayList<>();
         for (TaintData taintData : taintDataLinkedList) {
-            if (PolicyTypeEnum.SOURCE.equals(taintData.getType())) {
+            if (PolicyTypeEnum.SOURCE.name().equals(taintData.getStage())) {
                 sourceDataList.add(taintData);
             }
         }
@@ -95,7 +95,7 @@ public class TaintUtils {
                 return null;
             case "java.util.ArrayList":
                 for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.equals(data.getType())) {
+                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
                         if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
                             String className = data.getClassName();
                             String method = data.getMethod();
@@ -107,7 +107,7 @@ public class TaintUtils {
                 }
             case "java.util.Map":
                 for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.equals(data.getType())) {
+                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
                         if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
                             String className = data.getClassName();
                             String method = data.getMethod();
@@ -130,7 +130,7 @@ public class TaintUtils {
     public static boolean isContainSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum) {
         for (TaintData taintData : taintDataList) {
             List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
-            if (PolicyTypeEnum.SANITIZER.equals(taintData.getType())) {
+            if (PolicyTypeEnum.SANITIZER.name().equals(taintData.getStage())) {
                 if (sanitizerTypeEnum.name().equals(taintData.getName())) {
                     return true;
                 }

@@ -142,7 +142,7 @@ public class EngineController {
             return true;
         }
         if (LogTool.isDebugEnabled()) {
-            Logger.getLogger(EngineController.class).info("Register failed,agentId:" + ApplicationModel.getAgentId());
+            Logger.getLogger(EngineController.class).info("Register failed,Server url:" + Config.IAST_SERVER);
         }
         return false;
     }

@@ -55,6 +55,8 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
             if (toObject instanceof String) {
                 taintData.setToValue(toObject.toString());
             }
+            taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
+            taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
             taintData.setFromValue(fromObject.toString());
             taintData.setFromObjectHashCode(System.identityHashCode(fromObject));
             taintData.setToValue(toObject.toString());

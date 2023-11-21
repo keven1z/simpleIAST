@@ -832,6 +832,46 @@
       "exit": 0
     },
     {
+      "name": "deserialization",
+      "className": "com/fasterxml/jackson/databind/ObjectMapper",
+      "method": "readValue",
+      "desc": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "deserialization",
+      "className": "com/fasterxml/jackson/databind/ObjectMapper",
+      "method": "readValue",
+      "desc": "(Ljava/io/Reader;Ljava/lang/Class;)Ljava/lang/Object;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "deserialization",
+      "className": "com/fasterxml/jackson/databind/ObjectMapper",
+      "method": "readValue",
+      "desc": "(Ljava/io/InputStream;Ljava/lang/Class;)Ljava/lang/Object;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "com/fasterxml/jackson/databind/ObjectMapper",
+      "method": "readValue",
+      "desc": "(Ljava/io/DataInput;Ljava/lang/Class;)Ljava/lang/Object;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
       "name": "url_redirect",
       "className": "org/apache/catalina/connector/ResponseFacade",
       "method": "sendRedirect",
@@ -854,36 +894,6 @@
         "org/codehaus/stax2/XMLInputFactory2"
       ],
       "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/io/Reader;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/io/InputStream;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
     },
     {
       "name": "xxe",
@@ -910,16 +920,6 @@
       "className": "org/jdom2/input/SAXBuilder",
       "method": "build",
       "desc": "(Lorg/xml/sax/InputSource;)Lorg/jdom2/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/io/DataInput;Ljava/lang/Class;)Ljava/lang/Object;",
       "state": 1,
       "from": "P1",
       "enter": 1,

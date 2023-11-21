@@ -22,7 +22,7 @@ public class VulnConst {
      * XXE漏洞
      */
     public static final String XXE = "xxe";
-    /**
+    /**1
      * URL跳转
      */
     public static final String URL_REDIRECT = "url_redirect";
@@ -49,6 +49,6 @@ public class VulnConst {
     /**
      * POST请求表单弱密码
      */
-    public static final String WEAK_PASSWORD_IN_POST = "Spring_Expression_injection";
+    public static final String WEAK_PASSWORD_IN_POST = "weak_password_in_post";
 
 }

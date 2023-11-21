@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class HttpRequestData {
     private String url;
+    private String uri;
+    private String protocol;
     private String method;
     private Map<String, String> headers;
     private String requestBody;
@@ -48,5 +50,21 @@ public class HttpRequestData {
         if (requestBody != null) {
             this.requestBody = new String(Base64.getEncoder().encode(requestBody.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
         }
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }

@@ -34,7 +34,7 @@ public class TaintData {
     /**
      * 该hook点所属的阶段，污染源、传播、污染汇聚点等阶段
      */
-    private PolicyTypeEnum type;
+    private String stage;
     /**
      * 若是漏洞，标记其漏洞名称
      */
@@ -53,9 +53,13 @@ public class TaintData {
      */
     private String toValue;
     /**
-     * 返回值
+     * 返回值字符串
      */
-    private String returnValue;
+    private String returnObjectString;
+    /**
+     *
+     */
+    private String returnObjectType;
     /**
      * 过滤条件值
      */
@@ -72,7 +76,7 @@ public class TaintData {
         this.className = className;
         this.method = method;
         this.desc = desc;
-        this.type = policyType;
+        this.stage = policyType.name();
         this.invokeId = INVOKE_ID.getAndIncrement();
     }
 
@@ -128,12 +132,12 @@ public class TaintData {
         this.toObjectHashCode = toObjectHashCode;
     }
 
-    public PolicyTypeEnum getType() {
-        return type;
+    public String getStage() {
+        return stage;
     }
 
-    public void setType(PolicyTypeEnum type) {
-        this.type = type;
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 
     public String getVulnType() {
@@ -145,12 +149,20 @@ public class TaintData {
     }
 
 
-    public String getReturnValue() {
-        return returnValue;
+    public String getReturnObjectString() {
+        return returnObjectString;
     }
 
-    public void setReturnValue(String returnValue) {
-        this.returnValue = TaintUtils.format(returnValue);
+    public void setReturnObjectString(String returnObjectString) {
+        this.returnObjectString = returnObjectString;
+    }
+
+    public String getReturnObjectType() {
+        return returnObjectType;
+    }
+
+    public void setReturnObjectType(String returnObjectType) {
+        this.returnObjectType = returnObjectType;
     }
 
     public String getConditions() {
@@ -190,7 +202,7 @@ public class TaintData {
     }
 
     public void setFromValue(String fromValue) {
-        if (PolicyTypeEnum.SINK.equals(this.type)) {
+        if (PolicyTypeEnum.SINK.name().equals(this.stage)) {
             this.fromValue = fromValue;
         } else {
             this.fromValue = TaintUtils.format(fromValue);
@@ -223,7 +235,7 @@ public class TaintData {
         return "TaintData{" +
                 "invokeId=" + invokeId +
                 ", sign='" + className + "." + method +
-                ", " + type +
+                ", " + stage +
                 '}';
     }
 

@@ -60,8 +60,8 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
         TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);
         taintData.setConditions(conditions);
         taintData.setName(policyName);
-        taintData.setReturnValue(returnObject == null ? null : returnObject.toString());
-
+        taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
+        taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
         List<Object> toList = PolicyUtils.getPositionObject(policy.getTo(), parameters, returnObject, thisObject);
         if (!toList.isEmpty()) {
             taintData.setToObjectHashCode(System.identityHashCode(toList.get(0)));

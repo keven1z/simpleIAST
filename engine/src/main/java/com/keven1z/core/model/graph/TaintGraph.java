@@ -38,22 +38,29 @@ public class TaintGraph {
         this.taintCache = new HashSet<>(1024);
     }
 
-    public TaintNode addNode(TaintData taintData) {
+    /**
+     * 添加taint node
+     */
+    public void addNode(TaintData taintData) {
         TaintNode node = new TaintNode(taintData);
         addNode(node);
         this.taintCache.add(taintData.getToObjectHashCode());
         if (LogTool.isDebugEnabled()) {
             taintLogger.info("Add taint:" + taintData);
         }
-        return node;
     }
 
+    /**
+     * 判定是否是污点，通过与之前缓存的污点比较
+     * @param systemCode 对象的hashcode
+     *
+     */
     public boolean isTaint(int systemCode) {
         return taintCache.contains(systemCode);
     }
 
     public void addNode(TaintNode node) {
-        if (PolicyTypeEnum.SINK.equals(node.getTaintData().getType())) {
+        if (PolicyTypeEnum.SINK.name().equals(node.getTaintData().getStage())) {
             this.sinkNode.add(node);
         }
         // 直接加入到集合中
@@ -116,34 +123,6 @@ public class TaintGraph {
         }
 
         return null;
-    }
-
-
-    /**
-     * 获取className当前class节点
-     *
-     * @param className 类名
-     */
-    public TaintNode getNode(String className) {
-        for (TaintNode node : nodeSet) {
-            TaintData vertex = node.getTaintData();
-            if (vertex != null) {
-                if (vertex.getClassName().equals(className)) return node;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 获取className当前class頂點
-     *
-     * @param className 类名
-     */
-    public TaintData getVertex(String className) {
-
-        TaintNode nodeByClassName = getNode(className);
-        if (nodeByClassName == null) return null;
-        return nodeByClassName.getTaintData();
     }
 
 
@@ -275,7 +254,7 @@ public class TaintGraph {
             for (TaintEdge edge : fromEdges) {
                 TaintData to = edge.getTo();
                 //如果污点的去向为SANITIZER并且没有包含在污点传播流程中
-                if (PolicyTypeEnum.SANITIZER.equals(to.getType()) && !taintDataList.contains(to)) {
+                if (PolicyTypeEnum.SANITIZER.name().equals(to.getStage()) && !taintDataList.contains(to)) {
                     queue.add(to);
                     linkedList.add(to);
                 }

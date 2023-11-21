@@ -95,6 +95,8 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         //Source的to只允许一个
         Object taintObject = taintObjects.get(0);
         TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+        taintData.setReturnObjectString(returnObject.toString());
+        taintData.setReturnObjectType(returnObject.getClass().getName());
         taintData.setStackList(StackUtils.getStackTraceArray(true, true));
         taintData.setToObjectHashCode(System.identityHashCode(taintObject));
         taintData.setToValue(taintObject.toString());
