@@ -9,9 +9,9 @@ import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.utils.PolicyUtils;
-import com.keven1z.core.utils.StackUtils;
+import com.keven1z.core.utils.TaintUtils;
 
-import java.util.List;
+import java.util.Map;
 
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
@@ -34,26 +34,27 @@ public class SinkClassResolver implements HandlerHookClassResolver {
         }
 
         String from = policy.getFrom();
-        List<Object> formList = PolicyUtils.getPositionObject(from, parameters, returnObject, thisObject);
-        if (formList.isEmpty()) {
+        Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
+        if (fromMap.isEmpty()) {
             return;
         }
 
-        Object fromObject = formList.get(0);
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-        TaintNode node = PolicyUtils.searchFromNode(fromObject, taintGraph);
-        if (node == null) {
-            return;
+        TaintData taintData = null;
+        for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
+            Object fromObject = entry.getValue();
+            TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
+            if (parentNode == null) {
+                continue;
+            }
+            if (taintData == null) {
+                taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
+                taintData.setVulnType(policyName);
+            }
+            taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
         }
-
-        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
-        taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
-        taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
-        taintData.setVulnType(policyName);
-        taintData.setFromValue(fromObject.toString());
-        taintData.setStackList(StackUtils.getStackTraceArray(true, true));
-        taintData.setTaintValueType(fromObject.getClass().getTypeName());
-        taintGraph.addNode(taintData);
-        taintGraph.addEdge(node.getTaintData(), taintData);
+        if (taintData != null) {
+            TaintUtils.buildTaint(returnObject, taintData, null, true);
+        }
     }
 }

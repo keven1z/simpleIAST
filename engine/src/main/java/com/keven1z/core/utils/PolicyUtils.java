@@ -188,40 +188,50 @@ public class PolicyUtils {
      * @param thisObject   hook类当前对象
      * @return 对应的对象List
      */
-    public static List<Object> getPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
-        ArrayList<Object> list = new ArrayList<>();
+    public static Map<String, Object> getFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
+        Map<String, Object> map = new HashMap<>();
         if (position == null) {
-            return list;
+            return map;
         }
         String[] paths = position.split(PolicyConst.PATH_SPLIT_SEPARATOR);
         for (String path : paths) {
-            if (PolicyConst.R.equals(path)) {
-                if (returnObject != null) {
-                    list.add(returnObject);
-                }
-            } else if (PolicyConst.O.equals(path)) {
-                if (thisObject != null) {
-                    list.add(thisObject);
-                }
-            } else if (path.startsWith(PolicyConst.P)) {
-                int index = Integer.parseInt(path.substring(path.indexOf(PolicyConst.P) + 1));
-                //策略按照1，2，3表示顺序，list按照0,1,2
-                Object parameter = parameters[index - 1];
-                if (parameter != null) {
-                    list.add(parameters[index - 1]);
-                }
-            } else {
-                LogTool.warn(ErrorType.POLICY_ERROR, "Failed to find position,path is " + path);
-
+            Object pathObject = getPathObject(path, parameters, returnObject, thisObject);
+            if (pathObject != null) {
+                map.put(path, pathObject);
             }
         }
-        return list;
+        return map;
+    }
+    public static  Object getToPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
+        if (position == null) {
+            return null;
+        }
+        return getPathObject(position, parameters, returnObject, thisObject);
+    }
+
+    private static Object getPathObject(String path, Object[] parameters, Object returnObject, Object thisObject) {
+        if (PolicyConst.R.equals(path)) {
+            return returnObject;
+        } else if (PolicyConst.O.equals(path)) {
+            return thisObject;
+        } else if (path.startsWith(PolicyConst.P)) {
+            int index = Integer.parseInt(path.substring(path.indexOf(PolicyConst.P) + 1));
+            //策略按照1，2，3表示顺序，list按照0,1,2
+            Object parameter = parameters[index - 1];
+            if (parameter != null) {
+                return parameters[index - 1];
+            }
+        } else {
+            LogTool.warn(ErrorType.POLICY_ERROR, "Failed to find position,path is " + path);
+            return null;
+        }
+        return null;
     }
 
     /**
      * 查找来源的节点,来源不仅仅是source阶段的节点
      */
-    public static TaintNode searchFromNode(Object fromObject, TaintGraph taintGraph) {
+    public static TaintNode searchParentNode(Object fromObject, TaintGraph taintGraph) {
         int fromObjectHashCode = System.identityHashCode(fromObject);
         if (!taintGraph.isTaint(fromObjectHashCode)) {
             return null;

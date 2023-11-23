@@ -20,12 +20,17 @@ public class TaintEdge {
      * @since 0.0.2
      */
     private TaintData to;
+    /**
+     * 污点流出的方向
+     */
+    private String direction;
 
 
 
-    public TaintEdge(TaintData from, TaintData to) {
+    public TaintEdge(TaintData from, TaintData to, String direction) {
         this.from = from;
         this.to = to;
+        this.direction = direction;
     }
 
     public TaintData getFrom() {
@@ -68,5 +73,13 @@ public class TaintEdge {
     @Override
     public int hashCode() {
         return Objects.hash(from, to);
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }

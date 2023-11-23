@@ -52,8 +52,8 @@ public class TaintGraph {
 
     /**
      * 判定是否是污点，通过与之前缓存的污点比较
-     * @param systemCode 对象的hashcode
      *
+     * @param systemCode 对象的hashcode
      */
     public boolean isTaint(int systemCode) {
         return taintCache.contains(systemCode);
@@ -184,9 +184,9 @@ public class TaintGraph {
         this.taintCache.clear();
     }
 
-    public void addEdge(TaintData from, TaintData to) {
+    public void addEdge(TaintData from, TaintData to, String direction) {
         if (from == null || to == null) return;
-        TaintEdge classInfoTaintEdge = new TaintEdge(from, to);
+        TaintEdge classInfoTaintEdge = new TaintEdge(from, to, direction);
         this.addEdge(classInfoTaintEdge);
     }
 

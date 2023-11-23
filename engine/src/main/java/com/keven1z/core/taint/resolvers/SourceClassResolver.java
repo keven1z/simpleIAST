@@ -10,10 +10,7 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.policy.PolicyTypeEnum;
-import com.keven1z.core.utils.ClassUtils;
-import com.keven1z.core.utils.PolicyUtils;
-import com.keven1z.core.utils.StackUtils;
-import com.keven1z.core.utils.StringUtils;
+import com.keven1z.core.utils.*;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
@@ -21,12 +18,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 import static com.keven1z.core.consts.CommonConst.OFF;
 import static com.keven1z.core.consts.CommonConst.ON;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
-import static com.keven1z.core.utils.PolicyUtils.getPositionObject;
+import static com.keven1z.core.utils.PolicyUtils.getToPositionObject;
 
 /**
  * 污染源的解析器
@@ -53,62 +51,61 @@ public class SourceClassResolver implements HandlerHookClassResolver {
 
 
         String to = policy.getTo();
-        List<Object> taintObjects = getPositionObject(to, parameters, returnObject, thisObject);
-        if (taintObjects.isEmpty()) {
+        Object toObject = getToPositionObject(to, parameters, returnObject, thisObject);
+        if (toObject == null) {
             return;
         }
         String from = policy.getFrom();
-        List<Object> fromList = PolicyUtils.getPositionObject(from, parameters, returnObject, thisObject);
-        if (fromList.isEmpty()) {
+        Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
+        if (fromMap.isEmpty()) {
             return;
         }
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-
-        if (policy.isBeanHook()){
-            for (Object fromObject : fromList) {
-                TaintNode taintNode = PolicyUtils.searchFromNode(fromObject, taintGraph);
-                if (taintNode == null) {
+        TaintData taintData = null;
+        if (policy.isBeanHook()) {
+            for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
+                Object fromObject = entry.getValue();
+                TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
+                if (parentNode == null) {
                     continue;
                 }
-                TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
-
-                List<Object> toList = PolicyUtils.getPositionObject(policy.getTo(), parameters, returnObject, thisObject);
-                if (toList.isEmpty()) {
-                    return;
+                if (taintData == null) {
+                    taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
                 }
-                Object toObject = toList.get(0);
-                taintData.setToObjectHashCode(System.identityHashCode(toObject));
-
-                if (toObject instanceof String) {
-                    taintData.setToValue(toObject.toString());
-                }
-                taintData.setFromValue(fromObject.toString());
-                taintData.setFromObjectHashCode(System.identityHashCode(fromObject));
-                taintData.setStackList(StackUtils.getStackTraceArray(true, true));
-                taintData.setToValue(toObject.toString());
-                taintData.setTaintValueType(toObject.getClass().getTypeName());
-                taintGraph.addNode(taintData);
-                taintGraph.addEdge(taintNode.getTaintData(), taintData);
+                taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
+            }
+            if (taintData != null) {
+                TaintUtils.buildTaint(returnObject, taintData, toObject, true);
             }
             return;
         }
-        //Source的to只允许一个
-        Object taintObject = taintObjects.get(0);
-        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
-        taintData.setReturnObjectString(returnObject.toString());
-        taintData.setReturnObjectType(returnObject.getClass().getName());
-        taintData.setStackList(StackUtils.getStackTraceArray(true, true));
-        taintData.setToObjectHashCode(System.identityHashCode(taintObject));
-        taintData.setToValue(taintObject.toString());
-        taintData.setFromValue(fromList.get(0).toString());
-        taintData.setTaintValueType(taintObject.getClass().getTypeName());
-        taintGraph.addNode(taintData);
+
+        taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+        taintData.setToType(String.class.getTypeName());
+        taintData.setFromValue(getSourceFromName(fromMap));
+        TaintUtils.buildTaint(returnObject, taintData, toObject, true);
+
 
         //如果污染源为用户对象，则判断为bean对象，将其对象所有get方法加入hook策略
-        if (!StringUtils.isStartsWithElementInArray(taintObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
-            addBeanObjectPolicy(taintObject.getClass());
+        if (!StringUtils.isStartsWithElementInArray(toObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
+            addBeanObjectPolicy(toObject.getClass());
         }
 
+    }
+
+    /**
+     * 获取污染源的入参名，eg：id=1，入参名为id
+     */
+    private String getSourceFromName(Map<String, Object> fromMap) {
+        for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
+            Object fromObject = entry.getValue();
+            if ("org.springframework.web.method.HandlerMethod$HandlerMethodParameter".equals(fromObject.getClass().getName())) {
+                return ReflectionUtils.invokeStringMethod(fromObject, "getParameterName", new Class[]{});
+            }else {
+                return fromObject.toString();
+            }
+        }
+        return null;
     }
 
     /**

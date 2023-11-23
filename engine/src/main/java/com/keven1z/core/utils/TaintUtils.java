@@ -1,11 +1,14 @@
 package com.keven1z.core.utils;
 
 import com.keven1z.core.model.graph.TaintData;
+import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.model.graph.TaintNode;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.policy.SanitizerTypeEnum;
 
 import java.util.*;
+
+import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 public class TaintUtils {
     /**
@@ -87,45 +90,45 @@ public class TaintUtils {
      * @param taintData 污染源
      */
     private static String handlerSource(TaintData taintData, LinkedList<TaintData> taintDataLinkedList) {
-        String taintValueType = taintData.getTaintValueType();
+        String taintValueType = taintData.getToType();
         switch (taintValueType) {
             case "java.lang.String":
                 return taintData.getToValue();
             case "java.io.InputStream":
                 return null;
-            case "java.util.ArrayList":
-                for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-                        if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
-                            String className = data.getClassName();
-                            String method = data.getMethod();
-                            if (className.contains("List") && method.equals("get")) {
-                                return data.getToValue();
-                            }
-                        }
-                    }
-                }
-            case "java.util.Map":
-                for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-                        if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
-                            String className = data.getClassName();
-                            String method = data.getMethod();
-                            if (className.contains("Map") && method.equals("get")) {
-                                return data.getToValue();
-                            }
-                        }
-                    }
-                }
+//            case "java.util.ArrayList":
+//                for (TaintData data : taintDataLinkedList) {
+//                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
+//                        if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
+//                            String className = data.getClassName();
+//                            String method = data.getMethod();
+//                            if (className.contains("List") && method.equals("get")) {
+//                                return data.getToValue();
+//                            }
+//                        }
+//                    }
+//                }
+//            case "java.util.Map":
+//                for (TaintData data : taintDataLinkedList) {
+//                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
+//                        if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
+//                            String className = data.getClassName();
+//                            String method = data.getMethod();
+//                            if (className.contains("Map") && method.equals("get")) {
+//                                return data.getToValue();
+//                            }
+//                        }
+//                    }
+//                }
             default:
                 return null;
         }
     }
 
     /**
-     * @param taintDataList 污染链
+     * @param taintDataList     污染链
      * @param sanitizerTypeEnum 过滤类型
-     * 判定污染链中是否包含指定过滤类型
+     *                          判定污染链中是否包含指定过滤类型
      */
     public static boolean isContainSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum) {
         for (TaintData taintData : taintDataList) {
@@ -149,5 +152,36 @@ public class TaintUtils {
         return false;
 
     }
+
+    /**
+     * 添加命中的污点类
+     *
+     * @param isRecordStack 是否记录调用栈
+     */
+    public static void buildTaint(Object returnObject, TaintData taintData, Object toObject, boolean isRecordStack) {
+        TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
+        if (taintGraph == null) {
+            return;
+        }
+
+        if (taintData == null) {
+            return;
+        }
+
+        taintData.setToObjectHashCode(System.identityHashCode(toObject));
+        if (toObject != null) {
+            taintData.setToValue(toObject.toString());
+            taintData.setToType(toObject.getClass().getTypeName());
+        }
+
+        if (isRecordStack) {
+            taintData.setStackList(StackUtils.getStackTraceArray(true, true));
+        }
+        taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
+        taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
+
+        taintGraph.addNode(taintData);
+    }
+
 
 }

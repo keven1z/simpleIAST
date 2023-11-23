@@ -23,12 +23,6 @@ public class TaintData {
     private String method;
     private String desc;
     private String name;
-    /**
-     * 污点值的类型
-     */
-    private String taintValueType;
-    @JsonIgnore
-    private int fromObjectHashCode;
     @JsonIgnore
     private int toObjectHashCode;
     /**
@@ -44,6 +38,11 @@ public class TaintData {
      * 过滤节点信息表
      */
     private List<TaintData> sanitizerNodes;
+
+    /**
+     * 污点进入值类型
+     */
+    private String fromType;
     /**
      * 污点进入的值
      */
@@ -52,6 +51,11 @@ public class TaintData {
      * 污染传出的值
      */
     private String toValue;
+
+    /**
+     * 污染传出的值类型
+     */
+    private String toType;
     /**
      * 返回值字符串
      */
@@ -114,14 +118,6 @@ public class TaintData {
 
     public void setToValue(String toValue) {
         this.toValue = TaintUtils.format(toValue);
-    }
-
-    public int getFromObjectHashCode() {
-        return fromObjectHashCode;
-    }
-
-    public void setFromObjectHashCode(int fromObjectHashCode) {
-        this.fromObjectHashCode = fromObjectHashCode;
     }
 
     public int getToObjectHashCode() {
@@ -189,19 +185,15 @@ public class TaintData {
         this.sanitizerNodes = sanitizerNodes;
     }
 
-    public String getTaintValueType() {
-        return taintValueType;
-    }
-
-    public void setTaintValueType(String taintValueType) {
-        this.taintValueType = taintValueType;
-    }
-
     public String getFromValue() {
         return fromValue;
     }
 
     public void setFromValue(String fromValue) {
+        if (fromValue == null) {
+            return;
+        }
+
         if (PolicyTypeEnum.SINK.name().equals(this.stage)) {
             this.fromValue = fromValue;
         } else {
@@ -257,5 +249,21 @@ public class TaintData {
 
     public void setParameters(Object[] parameters) {
         this.parameters = parameters;
+    }
+
+    public String getFromType() {
+        return fromType;
+    }
+
+    public void setFromType(String fromType) {
+        this.fromType = fromType;
+    }
+
+    public String getToType() {
+        return toType;
+    }
+
+    public void setToType(String toType) {
+        this.toType = toType;
     }
 }

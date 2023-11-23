@@ -9,9 +9,11 @@ import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.utils.PolicyUtils;
+import com.keven1z.core.utils.TaintUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
@@ -33,42 +35,52 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
         }
 
         String from = policy.getFrom();
-        List<Object> fromList = PolicyUtils.getPositionObject(from, parameters, returnObject, thisObject);
+        Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
 
-        if (fromList.isEmpty()) {
+        if (fromMap.isEmpty()) {
             return;
         }
 
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-        Object fromObject = fromList.get(0);
-        TaintNode fromTaintNode = PolicyUtils.searchFromNode(fromObject, taintGraph);
-        if (fromTaintNode == null) {
-            return;
-        }
-        TaintData fromTaintData = fromTaintNode.getTaintData();
-        fromTaintData.setSanitizer(true);
-        //提取过滤条件值
-        String conditions = null;
-        List<Object> positionObjects = PolicyUtils.getPositionObject(policy.getConditions(), parameters, returnObject, thisObject);
-        if (!positionObjects.isEmpty()) {
-            List<String> listString = new ArrayList<>();
-            for (Object object : positionObjects) {
-                listString.add(String.valueOf(object));
+        TaintData taintData = null;
+        Object toObject = PolicyUtils.getToPositionObject(policy.getTo(), parameters, returnObject, thisObject);
+
+        for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
+            Object fromObject = entry.getValue();
+            TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
+            if (parentNode == null) {
+                continue;
             }
-            conditions = String.join(",", listString);
-        }
-        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);
-        taintData.setConditions(conditions);
-        taintData.setName(policyName);
-        taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
-        taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
-        List<Object> toList = PolicyUtils.getPositionObject(policy.getTo(), parameters, returnObject, thisObject);
-        if (!toList.isEmpty()) {
-            taintData.setToObjectHashCode(System.identityHashCode(toList.get(0)));
+            TaintData fromTaintData = parentNode.getTaintData();
+            fromTaintData.setSanitizer(true);
+
+            if (taintData == null) {
+                taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);
+                taintData.setName(policyName);
+                taintData.setConditions(getConditionString(policy.getConditions(), parameters, returnObject, thisObject));
+                if (toObject != null) {
+                    taintData.setToObjectHashCode(System.identityHashCode(toObject));
+                }
+            }
+            taintGraph.addEdge(fromTaintData, taintData, entry.getKey());
         }
 
-        taintData.setFromValue(fromObject.toString());
-        taintGraph.addNode(taintData);
-        taintGraph.addEdge(fromTaintData, taintData);
+        if (taintData != null) {
+            TaintUtils.buildTaint(returnObject, taintData, toObject, true);
+        }
+    }
+
+
+    private String getConditionString(String conditionString, Object[] parameters, Object returnObject, Object thisObject) {
+        Map<String, Object> fromPositionObject = PolicyUtils.getFromPositionObject(conditionString, parameters, returnObject, thisObject);
+        if (fromPositionObject.isEmpty()) {
+            return null;
+        }
+
+        List<String> listString = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : fromPositionObject.entrySet()) {
+            listString.add(String.valueOf(entry.getValue()));
+        }
+        return String.join(",", listString);
     }
 }

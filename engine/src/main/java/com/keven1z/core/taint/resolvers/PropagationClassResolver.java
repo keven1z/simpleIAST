@@ -9,9 +9,8 @@ import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.utils.PolicyUtils;
-
-import java.util.List;
-
+import com.keven1z.core.utils.TaintUtils;
+import java.util.Map;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 /**
@@ -32,36 +31,31 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
         }
 
         String from = policy.getFrom();
-        List<Object> fromList = PolicyUtils.getPositionObject(from, parameters, returnObject, thisObject);
-        if (fromList.isEmpty()) {
+        Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
+        if (fromMap.isEmpty()) {
             return;
         }
 
+        Object toObject = PolicyUtils.getToPositionObject(policy.getTo(), parameters, returnObject, thisObject);
+        if (toObject == null) {
+            return;
+        }
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-        for (Object fromObject : fromList) {
-            TaintNode taintNode = PolicyUtils.searchFromNode(fromObject, taintGraph);
-            if (taintNode == null) {
+        TaintData taintData = null;
+        for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
+            Object fromObject = entry.getValue();
+            TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
+            if (parentNode == null) {
                 continue;
             }
-            TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.PROPAGATION);
-
-            List<Object> toList = PolicyUtils.getPositionObject(policy.getTo(), parameters, returnObject, thisObject);
-            if (toList.isEmpty()) {
-                return;
+            if (taintData == null) {
+                taintData = new TaintData(className, method, desc, PolicyTypeEnum.PROPAGATION);
             }
-            Object toObject = toList.get(0);
-            taintData.setToObjectHashCode(System.identityHashCode(toObject));
-
-            if (toObject instanceof String) {
-                taintData.setToValue(toObject.toString());
-            }
-            taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
-            taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
-            taintData.setFromValue(fromObject.toString());
-            taintData.setFromObjectHashCode(System.identityHashCode(fromObject));
-            taintData.setToValue(toObject.toString());
-            taintGraph.addNode(taintData);
-            taintGraph.addEdge(taintNode.getTaintData(), taintData);
+            taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
         }
+        if (taintData != null) {
+            TaintUtils.buildTaint(returnObject, taintData, toObject, true);
+        }
+
     }
 }
