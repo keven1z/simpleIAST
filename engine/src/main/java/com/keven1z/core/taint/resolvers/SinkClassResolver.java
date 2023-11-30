@@ -25,7 +25,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
     @Override
     public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName) {
 
-        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.policyContainer.getSink());
+        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.getInstance().getPolicyContainer().getSink());
         if (policy == null) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.POLICY_ERROR, "Can't match the sink policy,className:" + className + ",method:" + method + ",desc:" + desc);
@@ -49,6 +49,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
             }
             if (taintData == null) {
                 taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
+                taintData.setFromValue(fromObject.toString());
                 taintData.setVulnType(policyName);
             }
             taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());

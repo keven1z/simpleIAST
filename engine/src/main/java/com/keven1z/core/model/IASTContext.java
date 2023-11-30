@@ -1,6 +1,6 @@
 package com.keven1z.core.model;
 
-import com.keven1z.core.consts.CommonConst;
+import com.keven1z.core.Config;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.policy.PolicyContainer;
 
@@ -27,10 +27,6 @@ public class IASTContext {
 
     private Instrumentation instrumentation;
     private List<String> blackList;
-    /**
-     * 启动模式
-     */
-    private String mode;
     private String token;
     public PolicyContainer getPolicy() {
         return policyContainer;
@@ -56,23 +52,16 @@ public class IASTContext {
         this.instrumentation = instrumentation;
     }
 
-    public String getMode() {
-        return mode;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
     public boolean isOfflineEnabled() {
-        return CommonConst.MODE_OFFLINE.equals(getMode());
+        return Config.getConfig().isDebug();
     }
 
     public void clear() {
         if (this.policyContainer != null) {
             this.policyContainer.clear();
         }
-        TaintSpy.clear();
+        TaintSpy.getInstance().clear();
+        ApplicationModel.clear();
     }
 
     public void setBlackList(List<String> blackList) {

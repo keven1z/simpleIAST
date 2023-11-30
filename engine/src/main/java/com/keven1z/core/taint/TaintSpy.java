@@ -10,14 +10,25 @@ import org.apache.log4j.Logger;
 import java.lang.spy.SimpleIASTSpy;
 
 import static com.keven1z.core.Config.MAX_REPORT_QUEUE_SIZE;
-import static com.keven1z.core.consts.VulnConst.WEAK_PASSWORD_IN_SQL;
+import static com.keven1z.core.consts.VulnEnum.WEAK_PASSWORD_IN_SQL;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 public class TaintSpy implements SimpleIASTSpy {
-    public static PolicyContainer policyContainer;
+    private  PolicyContainer policyContainer;
     private final TaintSpyHandler spyHandler = TaintSpyHandler.getInstance();
     private static final Logger LOGGER = Logger.getLogger(TaintSpy.class);
+    private TaintSpy(){}
+    public static TaintSpy getInstance(){
+        return Inner.taintSpy;
+    }
 
+    public PolicyContainer getPolicyContainer() {
+        return policyContainer;
+    }
+
+    private static class Inner{
+        public static final TaintSpy taintSpy = new TaintSpy();
+    }
     @Override
     public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName) {
         if (enableHookLock.get()) {
@@ -34,7 +45,7 @@ public class TaintSpy implements SimpleIASTSpy {
             }
 
             //如果没有流量，不进行hook
-            if (REQUEST_THREAD_LOCAL.get() == null && !WEAK_PASSWORD_IN_SQL.equals(policyName)) {
+            if (REQUEST_THREAD_LOCAL.get() == null && !WEAK_PASSWORD_IN_SQL.name().equals(policyName)) {
                 return;
             }
             if (isRequestEnd.get()) {
@@ -90,8 +101,10 @@ public class TaintSpy implements SimpleIASTSpy {
     public void $_onReadInvoked(Integer b, Object inputStream) {
     }
 
-    public static void clear() {
-        TAINT_GRAPH_THREAD_LOCAL.get().clear();
+    public  void clear() {
+        if (TAINT_GRAPH_THREAD_LOCAL.get() != null){
+            TAINT_GRAPH_THREAD_LOCAL.get().clear();
+        }
         TAINT_GRAPH_THREAD_LOCAL.remove();
         isRequestEnd.set(false);
         REQUEST_THREAD_LOCAL.remove();

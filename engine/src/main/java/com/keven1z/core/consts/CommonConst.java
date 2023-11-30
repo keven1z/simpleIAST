@@ -10,10 +10,4 @@ public class CommonConst {
      */
     public static final  int ON = 1;
     public static final  int OFF = 0;
-
-    public static final String MODE_NORMAL = "normal";
-    /**
-     * debug模式
-     */
-    public static final String MODE_OFFLINE = "offline";
 }

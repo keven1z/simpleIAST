@@ -1,13 +1,13 @@
 package com.keven1z.core.hook.normal;
 
 
-
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.SingleFindingData;
 import com.keven1z.core.vulnerability.NormalDetector;
 import com.keven1z.core.vulnerability.detectors.WeakPasswordInSqlDetector;
 import org.apache.log4j.Logger;
+
 import java.lang.spy.SimpleIASTSpy;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,9 @@ public class SingleSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
+            if (!ApplicationModel.isRunning()) {
+                return;
+            }
             doDetect(returnObject, thisObject, parameters, className, method, desc, type, policyName, isRequireHttp);
         } catch (Exception e) {
             logger.warn("Failed to handle " + className, e);
@@ -53,6 +56,7 @@ public class SingleSpy implements SimpleIASTSpy {
             Object reportDesc = normalDetector.getReportDesc();
             SingleFindingData singleFindingData = new SingleFindingData(className, method, desc, reportDesc);
             singleFindingData.setVulnerableType(policyName);
+            singleFindingData.setLevel(normalDetector.getLevel());
             //如果该漏洞不依赖HTTP流量则直接上报
             if (!isRequireHttp) {
                 ReportData reportMessage = new ReportData(ApplicationModel.getAgentId());

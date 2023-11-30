@@ -36,11 +36,11 @@ import java.util.List;
 public class EngineController {
     public static final IASTContext context = IASTContext.getContext();
 
-    public void start(String mode, Instrumentation inst) throws IOException {
+    public void start(Instrumentation inst) throws IOException {
 
         banner();
         loadLog();
-        boolean isInit = init(inst, mode);
+        boolean isInit = init(inst);
         /*
          * 如果初始化失败，退出agent
          */
@@ -49,7 +49,7 @@ public class EngineController {
             return;
         }
         if (LogTool.isDebugEnabled()) {
-            Logger.getLogger(getClass()).info(">>>>>>>Start Running, Mode:" + mode);
+            Logger.getLogger(getClass()).info(">>>>>>>Start Debug mode");
         }
 
         /*
@@ -73,7 +73,6 @@ public class EngineController {
                 return;
             }
         }
-        addShutdownHook();
         loadPolicy();
         loadBlackList();
         System.out.println("[SimpleIAST] SimpleIAST init successfully,hostName:" + ApplicationModel.getHostName());
@@ -84,40 +83,6 @@ public class EngineController {
         MonitorManager.start(new ReportMonitor(), new InstructionMonitor());
 
         Logger.getLogger(getClass()).info("Agent run successfully,hostName:" + ApplicationModel.getHostName());
-    }
-
-    /**
-     * 关闭agent
-     */
-    public void shutdown() {
-        if (HttpClientUtils.deregister()) {
-            Logger.getLogger(getClass()).info("Agent deregister successfully,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
-        } else {
-            Logger.getLogger(getClass()).warn("Agent deregister failed,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
-        }
-        ApplicationModel.stop();
-        System.out.println("[SimpleIAST] Stop Hook Successfully");
-        EngineController.context.clear();
-        System.out.println("[SimpleIAST] Clear Cache Successfully");
-        HttpClientUtils.close();
-        System.out.println("[SimpleIAST] Close HttpClient Successfully");
-        MonitorManager.clear();
-        try {
-            ClassUtils.closeSimpleIASTClassLoader();
-        } catch (Exception e) {
-            System.err.println("[SimpleIAST] Shutdown Failed,Reason:" + e.getMessage());
-        }
-        System.out.println("[SimpleIAST] Stop Running Successfully");
-
-    }
-
-    private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread("SimpleIAST-Deregister-Thread") {
-            @Override
-            public void run() {
-                shutdown();
-            }
-        });
     }
 
     private void loadTransform() {
@@ -152,9 +117,9 @@ public class EngineController {
      * @param mode 启动模式
      * @return 是否初始化成功
      */
-    private boolean init(Instrumentation inst, String mode) {
+    private boolean init(Instrumentation inst) {
         try {
-            initContext(inst, mode);
+            initContext(inst);
         } catch (Exception e) {
             return false;
         }
@@ -178,7 +143,7 @@ public class EngineController {
      */
     private void initSpy() {
         if (!SimpleIASTSpyManager.isInit()) {
-            SimpleIASTSpyManager.init(new TaintSpy(), new HttpSpy(), new SingleSpy());
+            SimpleIASTSpyManager.init(TaintSpy.getInstance(), new HttpSpy(), new SingleSpy());
         }
     }
 
@@ -188,9 +153,8 @@ public class EngineController {
      * @param inst Instrumentation
      * @param mode 启动模式
      */
-    private void initContext(Instrumentation inst, String mode) {
+    private void initContext(Instrumentation inst) {
         context.setInstrumentation(inst);
-        context.setMode(mode);
     }
 
     /**

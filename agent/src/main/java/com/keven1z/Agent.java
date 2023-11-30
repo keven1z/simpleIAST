@@ -20,20 +20,14 @@ public class Agent {
     public static String projectVersion;
     public static String buildTime;
     public static String gitCommit;
-    /*
-     * 启动模式.
-     *  START_MODE_OFFLINE:离线模式.
-     *  START_MODE_SERVER:服务器模式.
-     *
-     */
-    public static final String START_MODE = START_MODE_OFFLINE;
+
 
     public static void premain(String args, Instrumentation inst) {
-        init(START_MODE, START_ACTION_INSTALL, inst);
+        init(START_ACTION_INSTALL, inst);
     }
 
-    public static void agentmain(String args, Instrumentation inst) {
-        init(START_MODE, START_ACTION_INSTALL, inst);
+    public static void agentmain(String action, Instrumentation inst) {
+        init(action, inst);
     }
 
     /**
@@ -42,11 +36,11 @@ public class Agent {
      * @param mode 启动模式
      * @param inst {@link Instrumentation}
      */
-    public static synchronized void init(String mode, String action, Instrumentation inst) {
+    public static synchronized void init(String action, Instrumentation inst) {
         try {
             JarFileHelper.addJarToBootstrap(inst);
             readVersion();
-            ModuleLoader.load(mode, action, inst);
+            ModuleLoader.load(action, inst);
         } catch (Throwable e) {
             System.err.println("[SimpleIAST] Failed to initialize, will continue without security protection.");
             e.printStackTrace();

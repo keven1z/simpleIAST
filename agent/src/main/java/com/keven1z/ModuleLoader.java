@@ -18,10 +18,12 @@ public class ModuleLoader {
     public static String baseDirectory;
 
     private static ModuleLoader instance;
-    public static  SimpleIASTClassLoader classLoader;
+    public static SimpleIASTClassLoader classLoader;
     public static String projectVersion;
     public static String buildTime;
     public static String gitCommit;
+    private final ModuleContainer engineContainer;
+
 
     // ModuleLoader 为 classloader加载的，不能通过getProtectionDomain()的方法获得JAR路径
     static {
@@ -48,11 +50,21 @@ public class ModuleLoader {
         }
     }
 
-    private ModuleLoader(String mode, Instrumentation inst){
-        ModuleContainer engineContainer;
+    private ModuleLoader() {
+        engineContainer = new ModuleContainer(ENGINE_JAR);
+    }
+
+    public void start(Instrumentation inst) {
         try {
-            engineContainer = new ModuleContainer(ENGINE_JAR);
-            engineContainer.start(mode, inst);
+            engineContainer.start(inst);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void shutdown() {
+        try {
+            engineContainer.shutdown();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -98,14 +110,15 @@ public class ModuleLoader {
     /**
      * 加载所有 IAST 模块
      *
-     * @param mode 启动模式
-     * @param inst {@link java.lang.instrument.Instrumentation}
+     * @param action 启动模式
+     * @param inst   {@link java.lang.instrument.Instrumentation}
      */
-    public static synchronized void load(String mode, String action, Instrumentation inst) {
+    public static synchronized void load(String action, Instrumentation inst) {
         if (Module.START_ACTION_INSTALL.equals(action)) {
             if (instance == null) {
                 try {
-                    instance = new ModuleLoader(mode, inst);
+                    instance = new ModuleLoader();
+                    instance.start(inst);
                 } catch (Throwable t) {
                     instance = null;
                     throw t;
@@ -113,10 +126,25 @@ public class ModuleLoader {
             } else {
                 System.err.println("[SimpleIAST] The SimpleIAST has bean initialized and cannot be initialized again");
             }
-        }
-        else {
+        } else if (Module.START_ACTION_UNINSTALL.equals(action)) {
+            release();
+        } else {
             throw new IllegalStateException("[SimpleIAST] Can not support the action: " + action);
         }
 
+    }
+
+    public static synchronized void release() {
+        try {
+            if (instance != null) {
+                System.out.println("[SimpleIAST] Start to release SimpleIAST");
+                instance.shutdown();
+                instance = null;
+            } else {
+                System.out.println("[SimpleIAST] The SimpleIAST has not be bean initialized");
+            }
+        } catch (Throwable throwable) {
+            // ignore
+        }
     }
 }

@@ -41,8 +41,10 @@ java -javaagent:iast-agent.jar -jar [app.jar] #
 
 2. 应用启动后attach方式运行
 ```shell
-java -jar iast-engine.jar -p [PID] # attach方式运行
-
+# attach方式安装agent
+java -jar iast-engine.jar -m install -p [pid] 
+# attach方式卸载agent
+java -jar iast-engine.jar -m uninstall -p [pid] 
 ```
 ## 兼容
 ### 支持中间件
@@ -111,6 +113,6 @@ Config.java中增加服务器地址，默认漏洞上报api如下：
 参考[二次开发](./二次开发.md)
 
 ## 计划
-* 心跳包
-* API改造
-* 服务端交互界面（预计12月底）
+- [ ] 心跳包（预计12月底）
+- [x] API改造
+- [ ] 服务端交互界面（预计24年）

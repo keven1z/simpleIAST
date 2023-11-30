@@ -26,7 +26,7 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 public class SanitizerClassResolver implements HandlerHookClassResolver {
     @Override
     public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName) {
-        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.policyContainer.getSanitizers());
+        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.getInstance().getPolicyContainer().getSanitizers());
         if (policy == null) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.POLICY_ERROR, "Can't match the policy,className:" + className + ",method:" + method + ",desc:" + desc);

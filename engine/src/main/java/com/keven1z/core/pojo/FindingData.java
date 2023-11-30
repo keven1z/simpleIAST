@@ -1,15 +1,20 @@
 package com.keven1z.core.pojo;
 
-import com.keven1z.core.model.graph.TaintData;
-
-import java.util.LinkedList;
 
 public class FindingData {
     private String vulnerableType;
+    private int level;
     public FindingData(){
 
     }
 
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public String getVulnerableType() {
         return vulnerableType;

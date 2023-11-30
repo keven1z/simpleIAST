@@ -3,6 +3,7 @@ package com.keven1z;
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Method;
+
 import static com.keven1z.ModuleLoader.*;
 
 /**
@@ -13,33 +14,34 @@ import static com.keven1z.ModuleLoader.*;
 public class ModuleContainer implements Module {
 
     private static final String CLASS_OF_CORE_ENGINE = "com.keven1z.core.EngineBoot";
-    private final Object objectOfCoreConfigure;
-    public ModuleContainer(String jarName) throws Throwable {
+    private  Object engineObject;
+
+    public ModuleContainer(String jarName) {
         try {
             File originFile = new File(baseDirectory + File.separator + jarName);
-            ModuleLoader.classLoader = new SimpleIASTClassLoader(originFile.getAbsolutePath()) ;
+            ModuleLoader.classLoader = new SimpleIASTClassLoader(originFile.getAbsolutePath());
             Class<?> classOfEngine = classLoader.loadClass(CLASS_OF_CORE_ENGINE);
-            objectOfCoreConfigure = classOfEngine.getDeclaredConstructor().newInstance();
+            engineObject = classOfEngine.getDeclaredConstructor().newInstance();
         } catch (Throwable t) {
             System.err.println("[SimpleIAST] Failed to initialize module jar: " + jarName);
-            throw t;
         }
     }
 
-    public void start(String mode, Instrumentation inst) throws Throwable {
-        Method method = objectOfCoreConfigure.getClass().getMethod("start", String.class, Instrumentation.class);
-        method.invoke(objectOfCoreConfigure, mode, inst);
+    public void start(Instrumentation inst) throws Throwable {
+        Method method = engineObject.getClass().getMethod("start", Instrumentation.class);
+        method.invoke(engineObject, inst);
     }
 
-//    public void release(String mode) throws Throwable {
-//        try {
-//            if (iastCore != null) {
-//                iastCore.release(mode);
-//            }
-//        } catch (Throwable t) {
-//            System.err.println("[OpenRASP] Failed to release module: " + moduleName);
-//            throw t;
-//        }
-//    }
+    public void shutdown() throws Throwable {
+        try {
+            if (engineObject != null) {
+                Method method = engineObject.getClass().getMethod("shutdown");
+                method.invoke(engineObject);
+            }
+        } catch (Throwable t) {
+            System.err.println("[SimpleIAST] Failed to shutdown module");
+            throw t;
+        }
+    }
 
 }

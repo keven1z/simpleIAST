@@ -28,7 +28,7 @@ public class LogTool {
     }
 
     public static boolean isDebugEnabled() {
-        return Config.getConfig().isPrintDebugLog();
+        return Config.getConfig().isDebug();
     }
 
 }

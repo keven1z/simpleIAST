@@ -10,6 +10,7 @@ import com.keven1z.core.hook.http.response.HttpServletResponse;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
+import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.vulnerability.FlowProcessingStation;
 import org.apache.log4j.Logger;
 
@@ -20,7 +21,6 @@ import java.util.Objects;
 
 import static com.keven1z.core.hook.HookThreadLocal.*;
 import static com.keven1z.core.hook.HookThreadLocal.REQUEST_THREAD_LOCAL;
-import static com.keven1z.core.taint.TaintSpy.clear;
 
 public class HttpSpy implements SimpleIASTSpy {
     Logger logger = Logger.getLogger(HttpSpy.class);
@@ -34,6 +34,10 @@ public class HttpSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
+            if (!ApplicationModel.isRunning()) {
+                return;
+            }
+
             if (REQUEST_THREAD_LOCAL.get() != null) {
                 return;
             }
@@ -75,6 +79,9 @@ public class HttpSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
+            if (!ApplicationModel.isRunning()) {
+                return;
+            }
             if (isRequestEnd.get() || REQUEST_THREAD_LOCAL.get() == null) {
                 return;
             }
@@ -92,7 +99,7 @@ public class HttpSpy implements SimpleIASTSpy {
         } finally {
             enableHookLock.set(false);
             if (isRequestEnd.get()) {
-                clear();
+                TaintSpy.getInstance().clear();
             }
         }
     }
@@ -103,6 +110,9 @@ public class HttpSpy implements SimpleIASTSpy {
             return;
         } else {
             enableHookLock.set(true);
+        }
+        if (!ApplicationModel.isRunning()) {
+            return;
         }
         if (REQUEST_THREAD_LOCAL.get() == null) {
             return;
@@ -128,6 +138,10 @@ public class HttpSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
+            if (!ApplicationModel.isRunning()) {
+                return;
+            }
+
             ByteArrayOutputStream bodyOutputStream = getBodyOutputStreamAndSetLength(length, inputStream);
             if (bodyOutputStream != null) {
                 bodyOutputStream.write(bytes, off, len);
@@ -147,7 +161,12 @@ public class HttpSpy implements SimpleIASTSpy {
         } else {
             enableHookLock.set(true);
         }
+
         try {
+            if (!ApplicationModel.isRunning()) {
+                return;
+            }
+
             ByteArrayOutputStream bodyOutputStream = getBodyOutputStreamAndSetLength(length, inputStream);
             if (bodyOutputStream != null) {
                 bodyOutputStream.write(bytes);
@@ -167,6 +186,9 @@ public class HttpSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
+            if (!ApplicationModel.isRunning()) {
+                return;
+            }
             ByteArrayOutputStream bodyOutputStream = getBodyOutputStreamAndSetLength(1, inputStream);
             if (bodyOutputStream != null) {
                 bodyOutputStream.write(b);

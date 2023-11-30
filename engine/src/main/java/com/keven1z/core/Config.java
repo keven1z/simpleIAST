@@ -67,7 +67,7 @@ public class Config {
      */
     public static final int MAX_STACK_DEPTH = 5;
 
-    public boolean isPrintDebugLog() {
+    public boolean isDebug() {
 //        if (logDebugProperties == null) {
 //            return false;
 //        }

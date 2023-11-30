@@ -41,7 +41,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             return;
         }
 
-        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.policyContainer.getSource());
+        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.getInstance().getPolicyContainer().getSource());
         if (policy == null) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.POLICY_ERROR, "Can't match the policy,className:" + className + ",method:" + method + ",desc:" + desc);
@@ -135,7 +135,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             policy.setExit(ON);
             policy.setBeanHook(true);
             policy.setType(PolicyTypeEnum.SOURCE);
-            TaintSpy.policyContainer.addPolicy(policy);
+            TaintSpy.getInstance().getPolicyContainer().addPolicy(policy);
             reTransform(taintClassName, inst, loadedClasses);
         }
 
@@ -161,7 +161,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
                     continue;
                 }
 
-                if (!PolicyUtils.isExistInPolicy(taintClassName.replace(".", "/"), TaintSpy.policyContainer.getSource())) {
+                if (!PolicyUtils.isExistInPolicy(taintClassName.replace(".", "/"), TaintSpy.getInstance().getPolicyContainer().getSource())) {
                     toBeTransformedMethods.add(method);
                 }
             }
