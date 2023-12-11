@@ -99,6 +99,7 @@ public class EngineController {
         String os = ApplicationModel.getOS();
         String webServerPath = ApplicationModel.getWebServerPath();
         AgentDTO agentDTO = new AgentDTO(agentId, hostName, os, webServerPath, ApplicationModel.getWebClass());
+        agentDTO.setAppName(ApplicationModel.getAppNameInServer());
         boolean isSuccess = HttpClientUtils.register(JsonUtils.toString(agentDTO));
         if (isSuccess) {
             if (LogTool.isDebugEnabled()) {

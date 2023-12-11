@@ -6,6 +6,10 @@ public class AgentDTO {
     private String hostName;
     private String serverPath;
     private String webClass;
+    /**
+     * agent所在的应用名
+     */
+    private String appName;
 
     public AgentDTO(String agentId, String hostName, String os,String serverPath,String webClass) {
         this.agentId = agentId;
@@ -45,5 +49,13 @@ public class AgentDTO {
 
     public void setServerPath(String serverPath) {
         this.serverPath = serverPath;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }

@@ -5,7 +5,6 @@ import com.keven1z.core.EngineBoot;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.policy.PolicyTypeEnum;
-import com.keven1z.core.utils.JsonUtils;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -13,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * 负责资源文件加载
@@ -106,6 +106,17 @@ public class FileUtils {
             }
         }
         return arrayList;
+    }
+
+    public static String loadIASTProperties(ClassLoader classLoader, String key, String defaultValue){
+        Properties properties = new Properties();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(classLoader.getResourceAsStream(Config.IAST_PROPERTIES_FILE_PATH))))) {
+            properties.load(reader);
+            return properties.getProperty(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public static List<String> weakPasswordList;

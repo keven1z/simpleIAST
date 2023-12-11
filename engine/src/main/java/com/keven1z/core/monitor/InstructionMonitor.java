@@ -28,15 +28,15 @@ public class InstructionMonitor extends Monitor {
     public void doRun() throws Exception {
         String instruction = HttpClientUtils.getInstruction();
         if (instruction == null) {
-            //如果获取失败，60s后再请求
-            Thread.sleep(60 * 1000);
+            //如果获取失败，120s后再请求
+            Thread.sleep(120 * 1000);
             return;
         }
 
         List<InstructionDTO> instructions = JsonUtils.toList(instruction, new TypeReference<List<InstructionDTO>>() {
         });
         if (instructions.isEmpty()) {
-            Thread.sleep(1500);
+            Thread.sleep(30 * 1000);
             return;
         }
         if (LogTool.isDebugEnabled()) {
@@ -53,7 +53,7 @@ public class InstructionMonitor extends Monitor {
                 handlerAgentState(instructionDTO.getValue());
             }
         }
-        Thread.sleep(1500);
+        Thread.sleep(30 * 1000);
     }
 
     private void handlerAgentState(String value) throws Exception {

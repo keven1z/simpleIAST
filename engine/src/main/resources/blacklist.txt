@@ -226,7 +226,6 @@ jdk/internal/loader/URLClassPath$Loader$1
 jdk/internal/loader/BootLoader$PackageHelper
 org/slf4j/
 java/net/URLClassLoader$3
-java/net/URLClassLoader$3$1
 java/security/ProtectionDomain$JavaSecurityAccessImpl$1
 java/io/StreamTokenizer
 sun/nio/ch/
@@ -234,7 +233,6 @@ sun/security/util/PropertyExpander
 java/util/Vector$1
 java/util/PropertyPermission
 java/net/URLPermission
-java/net/URLPermission$Authority
 java/net/HostPortrange
 java/util/ComparableTimSort
 sun/security/util/PolicyUtil
@@ -546,7 +544,6 @@ org/springframework/context/support/EmbeddedValueResolutionSupport
 org/springframework/core/GenericTypeResolver
 org/springframework/data/keyvalue/core/query/KeyValueQuery
 org/springframework/core/$Proxy8
-java/net/
 org/apache/catalina/core/ContainerBase$StopChild
 org/apache/catalina/loader/JdbcLeakPrevention
 com/microsoft/sqlserver/jdbc/SQLServerDriver
@@ -584,12 +581,8 @@ java/util/concurrent/Semaphore
 java/util/concurrent/ConcurrentHashMap$
 java/util/concurrent/AbstractExecutorService
 java/util/concurrent/Executors
-java/util/concurrent/Executors$FinalizableDelegatedExecutorService
-java/util/concurrent/Executors$DelegatedExecutorService
 java/util/concurrent/FutureTask
-java/util/concurrent/FutureTask$WaitNode
-java/util/concurrent/ConcurrentLinkedDeque$Itr
-java/util/concurrent/ConcurrentLinkedDeque$AbstractItr
+java/util/concurrent/ConcurrentLinkedDeque$
 javax/naming/InitialContext
 java/util/Stack
 jdk/xml/internal/JdkXmlUtils

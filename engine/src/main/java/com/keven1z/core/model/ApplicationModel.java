@@ -1,15 +1,17 @@
 package com.keven1z.core.model;
 
-import org.apache.commons.io.FileUtils;
+import com.keven1z.core.EngineController;
+import com.keven1z.core.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.keven1z.core.consts.CommonConst.DEFAULT_APPLICATION_NAME;
 
 /**
  * 存储应用信息
@@ -26,6 +28,10 @@ public class ApplicationModel {
     public static final String PID = "pid";
     public static final String AGENT_ID = "agentId";
     public static final String WEB_CLASS = "web_class";
+    /**
+     * 该agent所注册的应用名,默认default
+     */
+    public static final String SERVER_APPLICATION_NAME = "app.name";
 
     private static final Map<String, String> applicationInfo;
 
@@ -61,6 +67,8 @@ public class ApplicationModel {
         applicationInfo.put(SERVER_PATH, getWebServerPath());
         applicationInfo.put(WEB_CLASS, getWebClass());
 
+        applicationInfo.put(SERVER_APPLICATION_NAME,
+                FileUtils.loadIASTProperties(EngineController.class.getClassLoader(), "iast.app.name", DEFAULT_APPLICATION_NAME));
     }
 
     public static String getOS() {
@@ -144,27 +152,28 @@ public class ApplicationModel {
         String result = applicationInfo.get("StandardStart");
         return Boolean.parseBoolean(result);
     }
+
     public static String getWebClass() {
         return System.getProperty("sun.java.command");
     }
 
-    public static String getVMType() {
-        String type = null;
-        if (isLinux()) {
-            File file = new File(SERVER_TYPE_PATH);
-            if (file.exists() && file.isFile() && file.canRead()) {
-                try {
-                    String content = FileUtils.readFileToString(file, "utf-8");
-                    if (StringUtils.contains(content, "docker")) {
-                        type = "docker";
-                    }
-                } catch (IOException e) {
+//    public static String getVMType() {
+//        String type = null;
+//        if (isLinux()) {
+//            File file = new File(SERVER_TYPE_PATH);
+//            if (file.exists() && file.isFile() && file.canRead()) {
+//                try {
+//                    String content = FileUtils.readFileToString(file, "utf-8");
+//                    if (StringUtils.contains(content, "docker")) {
+//                        type = "docker";
+//                    }
+//                } catch (IOException e) {
 //                    LogTool.warn(ErrorType.DETECT_SERVER_ERROR, "get VM type failed: " + e.getMessage(), e);
-                }
-            }
-        }
-        return type;
-    }
+//                }
+//            }
+//        }
+//        return type;
+//    }
 
     private static boolean isLinux() {
         String serverName = System.getProperty("os.name");
@@ -203,4 +212,10 @@ public class ApplicationModel {
         return APPLICATION_IS_RUNNING;
     }
 
+    /**
+     * @return agent在服务端应用的名称
+     */
+    public static String getAppNameInServer() {
+        return applicationInfo.get(SERVER_APPLICATION_NAME);
+    }
 }
