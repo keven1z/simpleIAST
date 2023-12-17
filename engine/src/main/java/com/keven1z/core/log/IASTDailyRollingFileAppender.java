@@ -21,7 +21,6 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;

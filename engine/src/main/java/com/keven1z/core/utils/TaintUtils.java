@@ -187,6 +187,4 @@ public class TaintUtils {
 
         taintGraph.addNode(taintData);
     }
-
-
 }

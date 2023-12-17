@@ -14,11 +14,14 @@ import static com.keven1z.core.consts.VulnEnum.WEAK_PASSWORD_IN_SQL;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 public class TaintSpy implements SimpleIASTSpy {
-    private  PolicyContainer policyContainer;
+    private PolicyContainer policyContainer;
     private final TaintSpyHandler spyHandler = TaintSpyHandler.getInstance();
     private static final Logger LOGGER = Logger.getLogger(TaintSpy.class);
-    private TaintSpy(){}
-    public static TaintSpy getInstance(){
+
+    private TaintSpy() {
+    }
+
+    public static TaintSpy getInstance() {
         return Inner.taintSpy;
     }
 
@@ -26,9 +29,10 @@ public class TaintSpy implements SimpleIASTSpy {
         return policyContainer;
     }
 
-    private static class Inner{
+    private static class Inner {
         public static final TaintSpy taintSpy = new TaintSpy();
     }
+
     @Override
     public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName) {
         if (enableHookLock.get()) {
@@ -73,7 +77,7 @@ public class TaintSpy implements SimpleIASTSpy {
     }
 
     @Override
-    public void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc,String type, String policyName,boolean isRequireHttp) {
+    public void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
 
     }
 
@@ -101,8 +105,8 @@ public class TaintSpy implements SimpleIASTSpy {
     public void $_onReadInvoked(Integer b, Object inputStream) {
     }
 
-    public  void clear() {
-        if (TAINT_GRAPH_THREAD_LOCAL.get() != null){
+    public void clear() {
+        if (TAINT_GRAPH_THREAD_LOCAL.get() != null) {
             TAINT_GRAPH_THREAD_LOCAL.get().clear();
         }
         TAINT_GRAPH_THREAD_LOCAL.remove();

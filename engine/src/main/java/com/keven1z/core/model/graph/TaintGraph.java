@@ -223,9 +223,9 @@ public class TaintGraph {
                 queue.add(from);
             }
         }
+        addSanitizer(taintDataList);
         //由于广度遍历由sink到source的，需要倒转顺序
         Collections.reverse(taintDataList);
-        addSanitizer(taintDataList);
         return taintDataList;
     }
 

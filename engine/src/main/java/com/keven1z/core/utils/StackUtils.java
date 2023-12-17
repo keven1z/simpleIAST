@@ -1,6 +1,7 @@
 package com.keven1z.core.utils;
 
 import com.keven1z.core.Config;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,18 +22,16 @@ public class StackUtils {
         StackTraceElement[] stackTraceElements = throwable.getStackTrace();
         StringBuilder retStack = new StringBuilder();
         if (isFilter) {
-            stackTraceElements = filter(stackTraceElements);
+            stackTraceElements = filter(stackTraceElements, Config.MAX_STACK_DEPTH);
         }
         //此处前几个调用栈都是插件中产生的所以跳过，只显示客户自己的调用栈
         if (stackTraceElements.length >= 3) {
             for (int i = 2; i < stackTraceElements.length; i++) {
-                retStack.append(stackTraceElements[i].getClassName() + "@" + stackTraceElements[i].getMethodName()
-                        + "(" + stackTraceElements[i].getLineNumber() + ")" + "\r\n");
+                retStack.append(stackTraceElements[i].getClassName()).append("@").append(stackTraceElements[i].getMethodName()).append("(").append(stackTraceElements[i].getLineNumber()).append(")").append("\r\n");
             }
         } else {
-            for (int i = 0; i < stackTraceElements.length; i++) {
-                retStack.append(stackTraceElements[i].getClassName() + "@" + stackTraceElements[i].getMethodName()
-                        + "(" + stackTraceElements[i].getLineNumber() + ")" + "\r\n");
+            for (StackTraceElement stackTraceElement : stackTraceElements) {
+                retStack.append(stackTraceElement.getClassName()).append("@").append(stackTraceElement.getMethodName()).append("(").append(stackTraceElement.getLineNumber()).append(")").append("\r\n");
             }
         }
 
@@ -50,13 +49,13 @@ public class StackUtils {
         StackTraceElement[] stack = throwable.getStackTrace();
         if (stack != null) {
             if (isFilter) {
-                stack = filter(stack);
+                stack = filter(stack, Config.MAX_STACK_DEPTH);
             }
-            for (int i = 0; i < stack.length; i++) {
+            for (StackTraceElement stackTraceElement : stack) {
                 if (hasLineNumber) {
-                    stackTrace.add(stack[i].toString());
+                    stackTrace.add(stackTraceElement.toString());
                 } else {
-                    stackTrace.add(stack[i].getClassName() + "." + stack[i].getMethodName());
+                    stackTrace.add(stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName());
                 }
             }
         }
@@ -75,13 +74,13 @@ public class StackUtils {
 
 
     //去掉包含rasp的堆栈
-    public static StackTraceElement[] filter(StackTraceElement[] trace) {
+    public static StackTraceElement[] filter(StackTraceElement[] trace, int maxStackDepth) {
         int i = 0;
         // 去除插件本身调用栈
         while (i < trace.length && (trace[i].getClassName().startsWith("com.keven1z") || trace[i].getClassName().startsWith("java.lang.spy")
                 || trace[i].getClassName().contains("reflect"))) {
             i++;
         }
-        return Arrays.copyOfRange(trace, i, Math.min(i + Config.MAX_STACK_DEPTH, trace.length));
+        return Arrays.copyOfRange(trace, i, Math.min(i + maxStackDepth, trace.length));
     }
 }

@@ -54,7 +54,7 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
             taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
         }
         if (taintData != null) {
-            TaintUtils.buildTaint(returnObject, taintData, toObject, true);
+            TaintUtils.buildTaint(returnObject, taintData, toObject, false);
         }
 
     }

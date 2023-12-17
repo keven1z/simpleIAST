@@ -388,11 +388,55 @@
       "exit": 1
     },
     {
+      "name": "Request.Get",
+      "className": "org/apache/http/client/fluent/Request",
+      "method": "Get",
+      "desc": "(Ljava/lang/String;)Lorg/apache/http/client/fluent/Request;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "HttpGet.<init>",
+      "className": "org/apache/http/client/methods/HttpGet",
+      "method": "<init>",
+      "desc": "(Ljava/lang/String;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "HttpPost.<init>",
+      "className": "org/apache/http/client/methods/HttpPost",
+      "method": "<init>",
+      "desc": "(Ljava/net/URI;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "HttpPost.<init>",
+      "className": "org/apache/http/client/methods/HttpPost",
+      "method": "<init>",
+      "desc": "(Ljava/lang/String;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
       "name": "url init1",
       "className": "java/net/URL",
       "method": "<init>",
       "desc": "(Ljava/net/URL;Ljava/lang/String;Ljava/net/URLStreamHandler;)V",
-      "state": 0,
+      "state": 1,
       "from": "P2",
       "to": "O",
       "enter": 0,
@@ -402,36 +446,48 @@
       "className": "java/net/URL",
       "method": "<init>",
       "desc": "(Ljava/lang/String;Ljava/lang/String;ILjava/net/URLStreamHandler;)V",
-      "state": 0,
+      "state": 1,
       "from": "P2",
       "to": "O",
       "enter": 0,
       "exit": 1
     },
     {
-      "name": "cmdi",
+      "name": "ProcessBuilder.<init>",
       "className": "java/lang/ProcessBuilder",
       "method": "<init>",
       "desc": "(Ljava/util/List;)V",
       "state": 1,
       "from": "P1",
-      "to": "R",
+      "to": "O",
       "enter": 0,
       "exit": 1
     },
     {
-      "name": "cmdi",
+      "name": "ProcessBuilder.<init>",
       "className": "java/lang/ProcessBuilder",
       "method": "<init>",
       "desc": "([Ljava/lang/String;)V",
       "state": 1,
       "from": "P1",
-      "to": "R",
+      "to": "O",
       "enter": 0,
       "exit": 1
     },
     {
-      "name": "list get",
+      "name": "iterator next",
+      "className": "java/util/Iterator",
+      "method": "next",
+      "desc": "()Ljava/lang/Object;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "enter": 0,
+      "exit": 1,
+      "inter": true
+    },
+    {
+      "name": "ArrayList get",
       "className": "java/util/ArrayList",
       "method": "get",
       "desc": "(I)Ljava/lang/Object;",
@@ -442,7 +498,29 @@
       "exit": 1
     },
     {
-      "name": "list get",
+      "name": "ArrayList add",
+      "className": "java/util/ArrayList",
+      "method": "add",
+      "desc": "(Ljava/lang/Object;)Z",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 1,
+      "exit":0
+    },
+    {
+      "name": "ArrayList iterator",
+      "className": "java/util/ArrayList",
+      "method": "iterator",
+      "desc": "()Ljava/util/Iterator;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "LinkedList get",
       "className": "java/util/LinkedList",
       "method": "get",
       "desc": "(I)Ljava/lang/Object;",
@@ -453,7 +531,7 @@
       "exit": 1
     },
     {
-      "name": "hashMap get",
+      "name": "HashMap get",
       "className": "java/util/HashMap",
       "method": "get",
       "desc": "(Ljava/lang/Object;)Ljava/lang/Object;",
@@ -530,7 +608,7 @@
       "exit": 1
     },
     {
-      "name": "Base64",
+      "name": "Base64$Decoder",
       "className": "java/util/Base64$Decoder",
       "method": "decode",
       "desc": "([B)[B",
@@ -802,10 +880,31 @@
       "exit": 0
     },
     {
+      "name": "ssrf",
+      "className": "org/apache/http/client/fluent/Request",
+      "method": "execute",
+      "desc": "()Lorg/apache/http/client/fluent/Response;",
+      "state": 1,
+      "from": "O",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "ssrf",
+      "className": "org/apache/http/impl/client/CloseableHttpClient",
+      "method": "doExecute",
+      "desc": "(Lorg/apache/http/HttpHost;Lorg/apache/http/HttpRequest;Lorg/apache/http/protocol/HttpContext;)Lorg/apache/http/client/methods/CloseableHttpResponse;",
+      "state": 1,
+      "from": "P2",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
       "name": "cmdi",
       "className": "java/lang/ProcessBuilder",
       "method": "start",
-      "desc": "()V",
+      "desc": "()Ljava/lang/Process;",
       "state": 1,
       "from": "O",
       "enter": 1,
@@ -920,6 +1019,46 @@
       "className": "org/jdom2/input/SAXBuilder",
       "method": "build",
       "desc": "(Lorg/xml/sax/InputSource;)Lorg/jdom2/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/parsers/DocumentBuilder",
+      "method": "parse",
+      "desc": "(Ljava/io/InputStream;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/parsers/DocumentBuilder",
+      "method": "parse",
+      "desc": "(Ljava/io/InputStream;Ljava/lang/String;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/parsers/DocumentBuilder",
+      "method": "parse",
+      "desc": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/parsers/DocumentBuilder",
+      "method": "parse",
+      "desc": "parse(Ljava/io/File;)Lorg/w3c/dom/Document;",
       "state": 1,
       "from": "P1",
       "enter": 1,
