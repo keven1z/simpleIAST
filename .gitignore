@@ -1,4 +1,5 @@
-dependency-reduced-pom.xml
+engine/dependency-reduced-pom.xml
+agent/dependency-reduced-pom.xml
 */test/
 *.class
 *.lst

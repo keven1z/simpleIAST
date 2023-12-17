@@ -2,7 +2,6 @@ package com.keven1z.core;
 
 
 import com.keven1z.JarFileHelper;
-
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.monitor.MonitorManager;
 import com.keven1z.core.utils.ClassUtils;
@@ -10,9 +9,7 @@ import com.keven1z.core.utils.HttpClientUtils;
 import net.bytebuddy.agent.VirtualMachine;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-
 import java.lang.instrument.Instrumentation;
-
 import static com.keven1z.Agent.*;
 
 /**
@@ -70,8 +67,7 @@ public class EngineBoot {
     /**
      * @param targetJvmPid 目标进程id
      * @param agentJarPath agent jar包路径
-     * @param cfg
-     * @throws Exception
+     * @param mode         运行模式
      */
     private static void attachAgent(final String targetJvmPid,
                                     final String agentJarPath,
@@ -86,9 +82,9 @@ public class EngineBoot {
                 machine.detach();
             }
         }
-        if (INSTALL.equals(mode)){
-            System.out.println("[SimpleIAST] Agent install successfully,Application pid:" + targetJvmPid );
-        }else {
+        if (INSTALL.equals(mode)) {
+            System.out.println("[SimpleIAST] Agent install successfully,Application pid:" + targetJvmPid);
+        } else {
             System.out.println("[SimpleIAST] Agent uninstall successfully.Application pid:" + targetJvmPid);
         }
 
@@ -134,6 +130,7 @@ public class EngineBoot {
 
     /**
      * 检测mode参数是否为 install 或者 uninstall
+     *
      * @param mode 运行模式
      */
     private static void checkMode(String mode) {

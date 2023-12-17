@@ -50,8 +50,6 @@ jdk/internal/reflect/
 org/aspectj/weaver/
 org/springframework/data/mongodb/
 org/hibernate/validator/internal/
-org/springframework/aop/aspectj/
-org/apache/http/
 org/springframework/util/
 javax/crypto/
 com/mysql/cj/protocol/ExportControlled
@@ -113,12 +111,6 @@ java/lang/ThreadDeath
 java/lang/Thread$State
 java/lang/Thread$UncaughtExceptionHandler
 java/lang/ThreadLocal
-java/lang/ThreadLocal$1
-java/lang/ThreadLocal$SuppliedThreadLocal
-java/lang/ThreadLocal$ThreadLocalMap
-java/lang/ThreadLocal$ThreadLocalMap$Entry
-java/lang/Throwable$PrintStreamOrWriter
-java/lang/Throwable$WrappedPrintStream
 java/lang/UNIXProcess
 java/lang/UnsatisfiedLinkError
 java/lang/UnsupportedClassVersionError
@@ -167,7 +159,6 @@ java/lang/Object
 java/lang/Override
 java/lang/Package$1
 java/lang/Package$1PackageInfoProxy
-java/lang/Process
 java/lang/ProcessBuilder$NullInputStream
 java/lang/ProcessBuilder$NullOutputStream
 java/lang/ProcessBuilder$Redirect
@@ -192,9 +183,6 @@ java/lang/Thread$State
 java/lang/ThreadDeath
 java/lang/ThreadGroup
 java/lang/Throwable
-java/lang/Throwable$PrintStreamOrWriter
-java/lang/Throwable$WrappedPrintStream
-java/lang/Throwable$WrappedPrintWriter
 java/lang/TypeNotPresentException
 java/lang/UNIXProcess
 java/lang/UNIXProcess
@@ -509,11 +497,9 @@ org/springframework/core/annotation/TypeMappedAnnotation
 org/springframework/context/event/SimpleApplicationEventMulticaster
 org/springframework/context/event/AbstractApplicationEventMulticaster
 org/springframework/context/event/AbstractApplicationEventMulticaster$DefaultListenerRetriever
-org/springframework/aop/framework/AopProxyUtils
 org/springframework/context/event/AbstractApplicationEventMulticaster$ListenerCacheKey
 org/springframework/context/event/AbstractApplicationEventMulticaster$CachedListenerRetriever
 org/springframework/context/event/GenericApplicationListenerAdapter
-org/springframework/aop/support/AopUtils
 org/springframework/context/event/ContextRefreshedEvent
 org/springframework/core/env/SimpleCommandLineArgsParser
 org/springframework/core/env/CommandLineArgs
@@ -967,7 +953,6 @@ org/springframework/context/annotation/BeanAnnotationHelper
 org/springframework/core/annotation/AnnotatedElementUtils
 org/springframework/http/MediaType$1
 javax/xml/bind/Binder
-org/springframework/aop/scope/ScopedProxyUtils
 org/springframework/context/support/PropertySourcesPlaceholderConfigurer
 org/springframework/beans/factory/config/PlaceholderConfigurerSupport
 org/springframework/beans/factory/config/PropertyResourceConfigurer
@@ -1203,9 +1188,7 @@ org/mybatis/spring/SqlSessionFactoryBean
 org/h2/server/web/WebServlet
 javax/servlet/GenericServlet
 org/springframework/dao/annotation/PersistenceExceptionTranslationPostProcessor
-org/springframework/aop/framework/AbstractAdvisingBeanPostProcessor
-org/springframework/aop/framework/ProxyProcessorSupport
-org/springframework/aop/framework/ProxyConfig
+org/springframework/aop/
 org/springframework/jdbc/datasource/embedded/EmbeddedDatabaseType
 org/springframework/jdbc/core/JdbcTemplate
 org/springframework/data/elasticsearch/core/ElasticsearchRestTemplate
@@ -1232,3 +1215,8 @@ org/springframework/cache/interceptor/AbstractCacheInvoker
 org/springframework/mail/javamail/JavaMailSenderImpl
 org/apache/catalina/startup/Tomcat
 org/apache/tomcat/websocket/server/WsSci
+com/zaxxer/hikari/pool/ProxyStatement
+com/zaxxer/hikari/pool/HikariProxyStatement
+com/jayway/
+net/minidev/
+org/springframework/transaction/annotation

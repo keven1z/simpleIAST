@@ -42,8 +42,7 @@ public class Agent {
             readVersion();
             ModuleLoader.load(action, inst);
         } catch (Throwable e) {
-            System.err.println("[SimpleIAST] Failed to initialize, will continue without security protection.");
-            e.printStackTrace();
+            System.err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
         }
     }
 
