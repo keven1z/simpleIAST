@@ -14,22 +14,26 @@ import static com.keven1z.ModuleLoader.*;
 public class ModuleContainer implements Module {
 
     private static final String CLASS_OF_CORE_ENGINE = "com.keven1z.core.EngineBoot";
-    private  Object engineObject;
+    private Object engineObject;
+    private String appName;
+    private boolean isDebug;
 
-    public ModuleContainer(String jarName) {
+    public ModuleContainer(String jarName, String appName, boolean isDebug) {
         try {
             File originFile = new File(baseDirectory + File.separator + jarName);
             ModuleLoader.classLoader = new SimpleIASTClassLoader(originFile.getAbsolutePath());
             Class<?> classOfEngine = classLoader.loadClass(CLASS_OF_CORE_ENGINE);
             engineObject = classOfEngine.getDeclaredConstructor().newInstance();
+            this.appName = appName;
+            this.isDebug = isDebug;
         } catch (Throwable t) {
             System.err.println("[SimpleIAST] Failed to initialize module jar: " + jarName);
         }
     }
 
     public void start(Instrumentation inst) throws Throwable {
-        Method method = engineObject.getClass().getMethod("start", Instrumentation.class);
-        method.invoke(engineObject, inst);
+        Method method = engineObject.getClass().getMethod("start", Instrumentation.class, String.class, Boolean.class);
+        method.invoke(engineObject, inst, appName, isDebug);
     }
 
     public void shutdown() throws Throwable {

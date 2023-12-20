@@ -16,7 +16,6 @@ import com.keven1z.core.monitor.ReportMonitor;
 import com.keven1z.core.pojo.AgentDTO;
 import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.utils.FileUtils;
-import com.keven1z.core.utils.ClassUtils;
 import com.keven1z.core.utils.HttpClientUtils;
 import com.keven1z.core.utils.JsonUtils;
 import org.apache.log4j.Logger;
@@ -35,22 +34,21 @@ import java.util.List;
  */
 public class EngineController {
     public static final IASTContext context = IASTContext.getContext();
+    private static final Logger logger = Logger.getLogger(EngineController.class);
 
-    public void start(Instrumentation inst) throws IOException {
-
-        banner();
-        loadLog();
-        boolean isInit = init(inst);
+    public void start(Instrumentation inst, String appName, boolean isDebug) throws IOException {
         /*
-         * 如果初始化失败，退出agent
+         * 打印banner
          */
-        if (!isInit) {
-            ApplicationModel.stop();
-            return;
-        }
-        if (LogTool.isDebugEnabled()) {
-            Logger.getLogger(getClass()).info(">>>>>>>Start Debug mode");
-        }
+        banner();
+        /*
+         * 构建agent上下文对象
+         */
+        buildContext(inst, appName, isDebug);
+        /*
+         * 加载日志
+         */
+        loadLog();
 
         /*
          * 判定是否为debug模式，若不为debug模式，则进行正常注册
@@ -65,24 +63,43 @@ public class EngineController {
                 }
             } catch (Exception e) {
                 LogTool.error(ErrorType.REGISTER_ERROR, "Register failed,hostName:" + ApplicationModel.getHostName(), e);
-                System.err.println("Register failed,hostName:" + ApplicationModel.getHostName());
-                try {
-                    ClassUtils.closeSimpleIASTClassLoader();
-                } catch (Exception ignore) {
-                }
-                return;
+                throw new RuntimeException("Register failed,hostName:" + ApplicationModel.getHostName());
             }
         }
+        /*
+         * 加载策略
+         */
         loadPolicy();
+        /*
+         * 加载hook黑名单
+         */
         loadBlackList();
-        System.out.println("[SimpleIAST] SimpleIAST init successfully,hostName:" + ApplicationModel.getHostName());
+        /*
+         * 加载转化类
+         */
         loadTransform();
+        /*
+         * 启动监控进程
+         */
+        MonitorManager.start(new ReportMonitor(), new InstructionMonitor());
+        /*
+         * agent设置为启动状态
+         */
         ApplicationModel.start();
 
-        //启动监控进程
-        MonitorManager.start(new ReportMonitor(), new InstructionMonitor());
-
-        Logger.getLogger(getClass()).info("Agent run successfully,hostName:" + ApplicationModel.getHostName());
+        System.out.println("[SimpleIAST] SimpleIAST run successfully");
+        Logger.getLogger(getClass()).info("SimpleIAST run successfully,hostName:" + ApplicationModel.getHostName());
+        if (LogTool.isDebugEnabled()){
+            logger.info("HostName:"+ApplicationModel.getHostName());
+            logger.info("OS:"+ApplicationModel.getOS());
+            logger.info("PID:"+ApplicationModel.getPID());
+            logger.info("Jdk version:"+ApplicationModel.getJdkVersion());
+            if (!context.isOfflineEnabled()){
+                logger.info("Bind app name:"+context.getBindApplicationName());
+            }
+            logger.info("The number of Policy:"+context.getPolicyContainer().getPolicySize());
+            logger.info("The number of hook black list:"+context.getBlackList().size());
+        }
     }
 
     private void loadTransform() {
@@ -97,9 +114,9 @@ public class EngineController {
         String agentId = ApplicationModel.getAgentId();
         String hostName = ApplicationModel.getHostName();
         String os = ApplicationModel.getOS();
-        String webServerPath = ApplicationModel.getWebServerPath();
+        String webServerPath = ApplicationModel.getPath();
         AgentDTO agentDTO = new AgentDTO(agentId, hostName, os, webServerPath, ApplicationModel.getWebClass());
-        agentDTO.setAppName(ApplicationModel.getAppNameInServer());
+        agentDTO.setAppName(context.getBindApplicationName());
         boolean isSuccess = HttpClientUtils.register(JsonUtils.toString(agentDTO));
         if (isSuccess) {
             if (LogTool.isDebugEnabled()) {
@@ -114,17 +131,13 @@ public class EngineController {
     }
 
     /**
-     * @param inst Instrumentation
-     * @param mode 启动模式
-     * @return 是否初始化成功
+     * @param inst    Instrumentation
+     * @param appName 绑定的应用名
      */
-    private boolean init(Instrumentation inst) {
-        try {
-            initContext(inst);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    private void buildContext(Instrumentation inst, String appName, boolean isDebug) {
+        context.setInstrumentation(inst);
+        context.setBindApplicationName(appName);
+        context.setDebug(isDebug);
     }
 
     /**
@@ -149,32 +162,18 @@ public class EngineController {
     }
 
     /**
-     * 初始化上下文对象
-     *
-     * @param inst Instrumentation
-     * @param mode 启动模式
-     */
-    private void initContext(Instrumentation inst) {
-        context.setInstrumentation(inst);
-    }
-
-    /**
      * 加载策略
      */
-    public void loadPolicy() throws IOException {
+    private void loadPolicy() throws IOException {
         PolicyContainer policyContainer = FileUtils.load(this.getClass().getClassLoader());
         if (policyContainer == null) {
             LogTool.error(ErrorType.POLICY_ERROR, "policyContainer is null");
             throw new RuntimeException("Policy load failed");
-        } else {
-            if (LogTool.isDebugEnabled()) {
-                Logger.getLogger(getClass()).info("Policy load count:" + policyContainer.getPolicySize());
-            }
         }
         context.setPolicyContainer(policyContainer);
     }
 
-    public void loadBlackList() throws IOException {
+    private void loadBlackList() throws IOException {
         List<String> blackList = FileUtils.loadBlackList(this.getClass().getClassLoader());
         context.setBlackList(blackList);
     }

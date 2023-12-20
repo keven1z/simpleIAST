@@ -1,6 +1,6 @@
 package com.keven1z.core.log;
 
-import com.keven1z.core.Config;
+import com.keven1z.core.EngineController;
 import org.apache.log4j.Logger;
 
 
@@ -28,7 +28,7 @@ public class LogTool {
     }
 
     public static boolean isDebugEnabled() {
-        return Config.getConfig().isDebug();
+        return EngineController.context.isDebug();
     }
 
 }

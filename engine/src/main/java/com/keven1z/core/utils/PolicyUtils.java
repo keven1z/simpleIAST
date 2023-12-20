@@ -147,17 +147,32 @@ public class PolicyUtils {
                     continue;
                 }
 
-                Policy clonePolicy = SerializationUtils.clone(hookPolicy);
-                clonePolicy.setClassName(className);
-                clonePolicy.setState(CommonConst.ON);
-                clonePolicy.setInter(false);
-                clonePolicy.setHooked(true);
-                clonePolicy.setOriginClassName(ancestor);
-                policyContainer.addPolicy(clonePolicy);
+                Policy childPolicy = createPolicy(className, hookPolicy, ancestor);
+
+                policyContainer.addPolicy(childPolicy);
                 isHit = true;
             }
         }
         return isHit;
+    }
+
+    private static Policy createPolicy(String className, Policy hookPolicy, String ancestor) {
+        Policy childPolicy = new Policy();
+        childPolicy.setConditions(hookPolicy.getConditions());
+        childPolicy.setClassName(className);
+        childPolicy.setMethod(hookPolicy.getMethod());
+        childPolicy.setDesc(hookPolicy.getDesc());
+        childPolicy.setEnter(hookPolicy.getEnter());
+        childPolicy.setFrom(hookPolicy.getFrom());
+        childPolicy.setName(hookPolicy.getName());
+        childPolicy.setExit(hookPolicy.getExit());
+        childPolicy.setType(hookPolicy.getType());
+        childPolicy.setState(CommonConst.ON);
+        childPolicy.setInter(false);
+        childPolicy.setHooked(true);
+        childPolicy.setOriginClassName(ancestor);
+        childPolicy.setTo(hookPolicy.getTo());
+        return childPolicy;
     }
 
     /**

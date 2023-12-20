@@ -50,8 +50,8 @@ public class ModuleLoader {
         }
     }
 
-    private ModuleLoader() {
-        engineContainer = new ModuleContainer(ENGINE_JAR);
+    private ModuleLoader(String appName, boolean isDebug) {
+        engineContainer = new ModuleContainer(ENGINE_JAR, appName, isDebug);
     }
 
     public void start(Instrumentation inst) {
@@ -113,16 +113,11 @@ public class ModuleLoader {
      * @param action 启动模式
      * @param inst   {@link java.lang.instrument.Instrumentation}
      */
-    public static synchronized void load(String action, Instrumentation inst) {
+    public static synchronized void load(String action, String appName, boolean isDebug, Instrumentation inst) {
         if (Module.START_ACTION_INSTALL.equals(action)) {
             if (instance == null) {
-                try {
-                    instance = new ModuleLoader();
-                    instance.start(inst);
-                } catch (Throwable t) {
-                    instance = null;
-                    throw t;
-                }
+                instance = new ModuleLoader(appName, isDebug);
+                instance.start(inst);
             } else {
                 System.err.println("[SimpleIAST] The SimpleIAST has bean initialized and cannot be initialized again");
             }

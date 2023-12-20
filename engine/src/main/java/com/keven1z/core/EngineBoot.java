@@ -9,7 +9,9 @@ import com.keven1z.core.utils.HttpClientUtils;
 import net.bytebuddy.agent.VirtualMachine;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+
 import java.lang.instrument.Instrumentation;
+
 import static com.keven1z.Agent.*;
 
 /**
@@ -19,14 +21,14 @@ import static com.keven1z.Agent.*;
 public class EngineBoot {
     EngineController engineController = null;
 
-    public void start(Instrumentation inst) {
+    public void start(Instrumentation inst, String appName, Boolean isDebug) {
 
         try {
             addShutdownHook();
             engineController = new EngineController();
-            engineController.start(inst);
-        } catch (Throwable e) {
-            System.err.println("[SimpleIAST] Engine load error,cause:" + e.getMessage());
+            engineController.start(inst, appName, isDebug);
+        } catch (Exception e) {
+            throw new RuntimeException("[SimpleIAST] Engine load error,cause:" + e.getMessage());
         }
     }
 
@@ -34,24 +36,27 @@ public class EngineBoot {
      * 关闭agent
      */
     public void shutdown() {
-        if (HttpClientUtils.deregister()) {
-            Logger.getLogger(getClass()).info("Agent deregister successfully,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
-        } else {
-            Logger.getLogger(getClass()).warn("Agent deregister failed,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
-        }
-        ApplicationModel.stop();
-        System.out.println("[SimpleIAST] Stop Hook Successfully");
-        EngineController.context.clear();
-        System.out.println("[SimpleIAST] Clear Cache Successfully");
-        HttpClientUtils.close();
-        System.out.println("[SimpleIAST] Close HttpClient Successfully");
-        MonitorManager.clear();
+        Logger logger = Logger.getLogger(getClass());
         try {
+            if (!EngineController.context.isOfflineEnabled()) {
+                if (HttpClientUtils.deregister()) {
+                    logger.info("Agent deregister successfully,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
+                } else {
+                    logger.warn("Agent deregister failed,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
+                }
+            }
+            ApplicationModel.stop();
+            logger.info("[SimpleIAST] Stop Hook Successfully");
+            EngineController.context.clear();
+            logger.info("[SimpleIAST] Clear Cache Successfully");
+            HttpClientUtils.close();
+            logger.info("[SimpleIAST] Close HttpClient Successfully");
+            MonitorManager.clear();
             ClassUtils.closeSimpleIASTClassLoader();
         } catch (Exception e) {
-            System.err.println("[SimpleIAST] Shutdown Failed,Reason:" + e.getMessage());
+            System.err.println("[SimpleIAST] SimpleIAST Stop Failed,Reason:" + e.getMessage());
         }
-        System.out.println("[SimpleIAST] Stop Running Successfully");
+        System.out.println("[SimpleIAST] SimpleIAST Stop Successfully");
 
     }
 
@@ -71,12 +76,15 @@ public class EngineBoot {
      */
     private static void attachAgent(final String targetJvmPid,
                                     final String agentJarPath,
-                                    final String mode) throws Exception {
+                                    final String mode,
+                                    final String app,
+                                    final String isDebug) throws Exception {
 
         VirtualMachine machine = null;
         try {
+            String stringBuilder = mode + "," + app + "," + isDebug;
             machine = VirtualMachine.ForHotSpot.attach(targetJvmPid);
-            machine.loadAgent(agentJarPath, mode);
+            machine.loadAgent(agentJarPath, stringBuilder);
         } finally {
             if (null != machine) {
                 machine.detach();
@@ -95,12 +103,7 @@ public class EngineBoot {
 
     public static void main(String[] args) {
         try {
-            Options options = new Options();
-            options.addOption("h", "help", false, "print options information");
-            options.addOption("v", "version", false, "print the version of iast");
-            options.addOption("m", "mode", true, "使用模式: install 和 uninstall");
-            options.addOption("p", "pid", true, "attach jvm pid");
-
+            Options options = createOptions();
             HelpFormatter helpFormatter = new HelpFormatter();
             CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args);
@@ -119,7 +122,9 @@ public class EngineBoot {
                     agentPath = agentPath.substring(1);
                     agentPath = agentPath.replace("/", "\\");
                 }
-                attachAgent(cmd.getOptionValue("p"), agentPath, mode);
+                String app = cmd.getOptionValue("a") == null ? "default" : cmd.getOptionValue("a");
+                String isDebug = cmd.hasOption("d") ? "true" : "false";
+                attachAgent(cmd.getOptionValue("p"), agentPath, mode, app, isDebug);
             } else {
                 helpFormatter.printHelp("java -jar iast-engine.jar", options, true);
             }
@@ -128,15 +133,24 @@ public class EngineBoot {
         }
     }
 
+    private static Options createOptions() {
+        Options options = new Options();
+        options.addOption("h", "help", false, "print options information");
+        options.addOption("v", "version", false, "print the version of iast");
+        options.addOption("m", "mode", true, "使用模式: install 和 uninstall");
+        options.addOption("p", "pid", true, "attach jvm pid");
+        options.addOption("a", "app", true, "Application of agent binding,default app name is default");
+        options.addOption("d", "debug", false, "Whether to start debug or not");
+        return options;
+    }
+
     /**
      * 检测mode参数是否为 install 或者 uninstall
      *
      * @param mode 运行模式
      */
     private static void checkMode(String mode) {
-        if (INSTALL.equals(mode) || UNINSTALL.equals(mode)) {
-            return;
-        } else {
+        if (!INSTALL.equals(mode) && !UNINSTALL.equals(mode)) {
             throw new RuntimeException("Illegal parameter mode，Please please add the parameter -m/--mode,only install or uninstall");
         }
     }

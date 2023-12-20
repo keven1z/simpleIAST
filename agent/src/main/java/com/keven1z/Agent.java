@@ -1,8 +1,6 @@
 package com.keven1z;
 
 
-
-
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.net.URL;
@@ -11,6 +9,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import static com.keven1z.Module.*;
+import static com.keven1z.ModuleLoader.release;
 
 /**
  * @author keven1z
@@ -23,26 +22,33 @@ public class Agent {
 
 
     public static void premain(String args, Instrumentation inst) {
-        init(START_ACTION_INSTALL, inst);
+        init(START_ACTION_INSTALL, getAgentBindAppName(), isDebugMode(), inst);
     }
 
-    public static void agentmain(String action, Instrumentation inst) {
-        init(action, inst);
+    public static void agentmain(String agentArgs, Instrumentation inst) {
+        String[] agentArgArr = agentArgs.split(",");
+        if (agentArgArr.length < 3) {
+            System.err.println("[SimpleIAST] Missing attach parameters,parameters length is" + agentArgArr.length);
+        }
+        init(agentArgArr[0], agentArgArr[1], Boolean.parseBoolean(agentArgArr[2]), inst);
     }
 
     /**
      * attack 机制加载 agent
      *
-     * @param mode 启动模式
-     * @param inst {@link Instrumentation}
+     * @param mode    启动模式
+     * @param appName 应用名称
+     * @param inst    {@link Instrumentation}
      */
-    public static synchronized void init(String action, Instrumentation inst) {
+    public static synchronized void init(String action, String appName, boolean isDebug, Instrumentation inst) {
         try {
             JarFileHelper.addJarToBootstrap(inst);
             readVersion();
-            ModuleLoader.load(action, inst);
+            ModuleLoader.load(action, appName, isDebug, inst);
         } catch (Throwable e) {
             System.err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
+            System.err.println("[SimpleIAST] Reason:" + e.getMessage());
+            release();
         }
     }
 
@@ -60,6 +66,14 @@ public class Agent {
         projectVersion = (projectVersion == null ? "UNKNOWN" : projectVersion);
         buildTime = (buildTime == null ? "UNKNOWN" : buildTime);
         gitCommit = (gitCommit == null ? "UNKNOWN" : gitCommit);
+    }
+
+    public static String getAgentBindAppName() {
+        return System.getProperty("iast.app.name", DEFAULT_APP_NAME);
+    }
+
+    public static boolean isDebugMode() {
+        return Boolean.parseBoolean(System.getProperty("iast.debug"));
     }
 
 }

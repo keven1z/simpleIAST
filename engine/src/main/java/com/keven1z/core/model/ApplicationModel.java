@@ -14,11 +14,11 @@ import java.util.Map;
 import static com.keven1z.core.consts.CommonConst.DEFAULT_APPLICATION_NAME;
 
 /**
- * 存储应用信息
+ * 检测的应用的信息
  */
 public class ApplicationModel {
     public static final String WINDOWS = "windows";
-    public static final String SERVER_PATH = "server_path";
+    public static final String SERVER_PATH = "path";
 
     public static final String LINUX = "linux";
     public static final String MAC = "MAC";
@@ -28,10 +28,6 @@ public class ApplicationModel {
     public static final String PID = "pid";
     public static final String AGENT_ID = "agentId";
     public static final String WEB_CLASS = "web_class";
-    /**
-     * 该agent所注册的应用名,默认default
-     */
-    public static final String SERVER_APPLICATION_NAME = "app.name";
 
     private static final Map<String, String> applicationInfo;
 
@@ -57,29 +53,27 @@ public class ApplicationModel {
             applicationInfo.put(OS, osName);
         }
         applicationInfo.put("language", "java");
-        applicationInfo.put("server", "");
-        applicationInfo.put("version", "");
+        applicationInfo.put("containerName", "");
+        applicationInfo.put("containerVersion", "");
         applicationInfo.put("extra", "");
         applicationInfo.put("StandardStart", "false");
         applicationInfo.put(HOST_NAME, getHostName());
         applicationInfo.put(PID, getPID());
         applicationInfo.put(AGENT_ID, getAgentId());
-        applicationInfo.put(SERVER_PATH, getWebServerPath());
+        applicationInfo.put(SERVER_PATH, getPath());
         applicationInfo.put(WEB_CLASS, getWebClass());
-
-        applicationInfo.put(SERVER_APPLICATION_NAME,
-                FileUtils.loadIASTProperties(EngineController.class.getClassLoader(), "iast.app.name", DEFAULT_APPLICATION_NAME));
+        applicationInfo.put("jdk", System.getProperty("java.version"));
     }
 
     public static String getOS() {
         return applicationInfo.get(OS);
     }
 
-    public static synchronized void setServerInfo(String serverName, String version) {
-        serverName = (serverName == null ? "" : serverName);
+    public static synchronized void setServerInfo(String containerName, String version) {
+        containerName = (containerName == null ? "" : containerName);
         version = (version == null ? "" : version);
-        applicationInfo.put("server", serverName);
-        applicationInfo.put("version", version);
+        applicationInfo.put("containerName", containerName);
+        applicationInfo.put("containerVersion", version);
     }
 
     public static String getAgentId() {
@@ -132,20 +126,32 @@ public class ApplicationModel {
         return systemEnvInfo;
     }
 
-    public static String getVersion() {
-        String result = applicationInfo.get("version");
+    /**
+     * 获取Servlet容器的版本
+     */
+    public static String getContainerVersion() {
+        String result = applicationInfo.get("containerVersion");
         if (StringUtils.isEmpty(result)) {
             result = applicationInfo.get("extraVersion");
         }
         return result;
     }
 
-    public static String getServerName() {
-        String result = applicationInfo.get("server");
+    /**
+     * Servlet容器的名称
+     */
+    public static String getContainerName() {
+        String result = applicationInfo.get("containerName");
         if (StringUtils.isEmpty(result)) {
             result = applicationInfo.get("extra");
         }
         return result;
+    }
+    /**
+     * jdk版本
+     */
+    public static String getJdkVersion() {
+        return applicationInfo.get("jdk");
     }
 
     public static boolean getStartUpInfo() {
@@ -187,7 +193,7 @@ public class ApplicationModel {
     /**
      * 获取应用绝对路径
      */
-    public static String getWebServerPath() {
+    public static String getPath() {
         String serverPath = applicationInfo.get(SERVER_PATH);
         if (serverPath != null) {
             return serverPath;
@@ -210,12 +216,5 @@ public class ApplicationModel {
 
     public static boolean isRunning() {
         return APPLICATION_IS_RUNNING;
-    }
-
-    /**
-     * @return agent在服务端应用的名称
-     */
-    public static String getAppNameInServer() {
-        return applicationInfo.get(SERVER_APPLICATION_NAME);
     }
 }

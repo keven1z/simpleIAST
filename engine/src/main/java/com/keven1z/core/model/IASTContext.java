@@ -8,6 +8,9 @@ import java.lang.instrument.Instrumentation;
 import java.util.List;
 
 
+/**
+ * Agent上下文对象
+ */
 public class IASTContext {
     private IASTContext() {
     }
@@ -27,7 +30,18 @@ public class IASTContext {
 
     private Instrumentation instrumentation;
     private List<String> blackList;
+    /**
+     * 与服务端通信的认证token
+     */
     private String token;
+    /**
+     * agent绑定的应用名称
+     */
+    private String bindApplicationName;
+    /**
+     * 是否启动debug日志
+     */
+    private boolean isDebug;
     public PolicyContainer getPolicy() {
         return policyContainer;
     }
@@ -50,6 +64,14 @@ public class IASTContext {
 
     public void setInstrumentation(Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
+    }
+
+    public String getBindApplicationName() {
+        return bindApplicationName;
+    }
+
+    public void setBindApplicationName(String bindApplicationName) {
+        this.bindApplicationName = bindApplicationName;
     }
 
     public boolean isOfflineEnabled() {
@@ -83,11 +105,23 @@ public class IASTContext {
         return false;
     }
 
+    public boolean isDebug() {
+        return isDebug;
+    }
+
+    public void setDebug(boolean debug) {
+        isDebug = debug;
+    }
+
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public List<String> getBlackList() {
+        return blackList;
     }
 }

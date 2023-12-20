@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.keven1z.core.Config.IS_DUMP_CLASS;
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
@@ -34,11 +36,14 @@ public class HookTransformer implements ClassFileTransformer {
      */
     private final static int MAX_TRANSFORM_COUNT = 1000;
     private final Logger hookLogger = Logger.getLogger("hook.info");
+    private final Logger logger = Logger.getLogger(HookTransformer.class);
+    private final Set<String> transformClasses;
 
     public HookTransformer(PolicyContainer policyContainer, Instrumentation instrumentation) {
         this.policy = policyContainer;
         this.instrumentation = instrumentation;
         this.instrumentation.addTransformer(this, true);
+        this.transformClasses = new HashSet<>();
     }
 
     @Override
@@ -116,6 +121,8 @@ public class HookTransformer implements ClassFileTransformer {
 
         //通过自定义classVisitor进行类的改造
         classReader.accept(new IASTClassVisitor(classWriter, className), ClassReader.EXPAND_FRAMES);
+
+        this.transformClasses.add(className);
         return dumpClassIfNecessary(className, classWriter.toByteArray());
     }
 
@@ -153,6 +160,12 @@ public class HookTransformer implements ClassFileTransformer {
         Instrumentation instrumentation = this.instrumentation;
         Class<?>[] loadedClasses = instrumentation.getAllLoadedClasses();
         for (Class<?> clazz : loadedClasses) {
+            if (this.transformClasses.contains(clazz.getName())) {
+                if (LogTool.isDebugEnabled()) {
+                    logger.info("Class has been transformed,class name is" + clazz.getName());
+                }
+                continue;
+            }
             if (instrumentation.isModifiableClass(clazz) && !EngineController.context.isInBlackList(clazz.getName()) && !clazz.getName().startsWith("java.lang.invoke.LambdaForm")) {
                 try {
                     if (PolicyUtils.isHook(this.policy, clazz)) {

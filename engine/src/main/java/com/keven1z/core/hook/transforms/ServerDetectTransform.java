@@ -32,7 +32,7 @@ public class ServerDetectTransform implements ClassFileTransformer {
                 boolean isDetect = hook.handleServerInfo(loader, protectionDomain);
                 if (isDetect) {
                     if (LogTool.isDebugEnabled()) {
-                        Logger.getLogger(getClass()).info("Detect server successfully,server type:" + ApplicationModel.getServerName());
+                        Logger.getLogger(getClass()).info("Detect server successfully,server type:" + ApplicationModel.getContainerName());
                     }
                 } else {
                     LogTool.warn(ErrorType.DETECT_SERVER_ERROR, "Failed to detect server type by " + hook);
