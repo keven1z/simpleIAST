@@ -54,12 +54,9 @@ public class ModuleLoader {
         engineContainer = new ModuleContainer(ENGINE_JAR, appName, isDebug);
     }
 
-    public void start(Instrumentation inst) {
-        try {
-            engineContainer.start(inst);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+    public void start(Instrumentation inst) throws Exception {
+        engineContainer.start(inst);
+
     }
 
     public void shutdown() {
@@ -113,7 +110,7 @@ public class ModuleLoader {
      * @param action 启动模式
      * @param inst   {@link java.lang.instrument.Instrumentation}
      */
-    public static synchronized void load(String action, String appName, boolean isDebug, Instrumentation inst) {
+    public static synchronized void load(String action, String appName, boolean isDebug, Instrumentation inst) throws Exception {
         if (Module.START_ACTION_INSTALL.equals(action)) {
             if (instance == null) {
                 instance = new ModuleLoader(appName, isDebug);
@@ -124,7 +121,7 @@ public class ModuleLoader {
         } else if (Module.START_ACTION_UNINSTALL.equals(action)) {
             release();
         } else {
-            throw new IllegalStateException("[SimpleIAST] Can not support the action: " + action);
+            throw new IllegalStateException("Can not support the action: " + action);
         }
 
     }

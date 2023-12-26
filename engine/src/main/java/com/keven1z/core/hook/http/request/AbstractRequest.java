@@ -349,6 +349,9 @@ public abstract class AbstractRequest {
             String parameter = this.getParameter(parameterName);
             sb.append(parameterName).append("=").append(parameter).append("&");
         }
+        if (sb.toString().endsWith("&")) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
         return sb;
     }
 

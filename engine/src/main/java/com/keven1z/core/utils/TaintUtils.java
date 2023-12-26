@@ -126,10 +126,11 @@ public class TaintUtils {
     }
 
     /**
+     * 判定污染链中是否包含指定过滤类型
+     *
      * @param taintDataList     污染链
      * @param sanitizerTypeEnum 过滤类型
      * @param occurrenceNum     过滤类型出现次数
-     *                          判定污染链中是否包含指定过滤类型
      */
     public static boolean isContainSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int occurrenceNum) {
         for (TaintData taintData : taintDataList) {
@@ -140,12 +141,11 @@ public class TaintUtils {
                 }
             }
 
-            if (sanitizerNodes == null || sanitizerNodes.isEmpty()) {
-                continue;
-            }
-            for (TaintData sanitizerNode : sanitizerNodes) {
-                if (sanitizerTypeEnum.name().equals(sanitizerNode.getName())) {
-                    occurrenceNum--;
+            if (sanitizerNodes != null) {
+                for (TaintData sanitizerNode : sanitizerNodes) {
+                    if (sanitizerTypeEnum.name().equals(sanitizerNode.getName())) {
+                        occurrenceNum--;
+                    }
                 }
             }
 

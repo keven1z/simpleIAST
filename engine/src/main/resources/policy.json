@@ -1073,6 +1073,7 @@
       "from": "P1",
       "enter": 1,
       "exit": 0,
+      "exclude": ["org/springframework/security/web/util/OnCommittedResponseWrapper$SaveContextServletOutputStream"],
       "inter": true
     },
     {

@@ -45,9 +45,9 @@ public class Agent {
             JarFileHelper.addJarToBootstrap(inst);
             readVersion();
             ModuleLoader.load(action, appName, isDebug, inst);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             System.err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
-            System.err.println("[SimpleIAST] Reason:" + e.getMessage());
+            System.err.println("[SimpleIAST] Reason:" + e.getCause().getMessage());
             release();
         }
     }

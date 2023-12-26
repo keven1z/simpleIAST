@@ -16,7 +16,7 @@ import com.keven1z.core.monitor.ReportMonitor;
 import com.keven1z.core.pojo.AgentDTO;
 import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.utils.FileUtils;
-import com.keven1z.core.utils.HttpClientUtils;
+import com.keven1z.core.utils.IASTHttpClient;
 import com.keven1z.core.utils.JsonUtils;
 import org.apache.log4j.Logger;
 
@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.lang.spy.SimpleIASTSpyManager;
 import java.lang.instrument.Instrumentation;
 import java.util.List;
+
+import static com.keven1z.core.consts.CommonConst.*;
 
 
 /**
@@ -36,7 +38,7 @@ public class EngineController {
     public static final IASTContext context = IASTContext.getContext();
     private static final Logger logger = Logger.getLogger(EngineController.class);
 
-    public void start(Instrumentation inst, String appName, boolean isDebug) throws IOException {
+    public void start(Instrumentation inst, String appName, boolean isDebug) throws Exception {
         /*
          * 打印banner
          */
@@ -55,15 +57,19 @@ public class EngineController {
          */
         if (!context.isOfflineEnabled()) {
             try {
+                /*
+                 * 设置服务器地址
+                 */
+                IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
                 if (!register()) {
                     System.err.println("[SimpleIAST] Register failed,hostName:" + ApplicationModel.getHostName());
-                    return;
+                    throw new RuntimeException("The failure occurred when registering,server url:" + context.getServerUrl());
                 } else {
-                    System.out.println("[SimpleIAST] Register successful,server:" + Config.IAST_SERVER);
+                    System.out.println("[SimpleIAST] Register successful,server url:" + context.getServerUrl());
                 }
             } catch (Exception e) {
                 LogTool.error(ErrorType.REGISTER_ERROR, "Register failed,hostName:" + ApplicationModel.getHostName(), e);
-                throw new RuntimeException("Register failed,hostName:" + ApplicationModel.getHostName());
+                throw new RuntimeException("Exception occurred during registration");
             }
         }
         /*
@@ -89,16 +95,16 @@ public class EngineController {
 
         System.out.println("[SimpleIAST] SimpleIAST run successfully");
         Logger.getLogger(getClass()).info("SimpleIAST run successfully,hostName:" + ApplicationModel.getHostName());
-        if (LogTool.isDebugEnabled()){
-            logger.info("HostName:"+ApplicationModel.getHostName());
-            logger.info("OS:"+ApplicationModel.getOS());
-            logger.info("PID:"+ApplicationModel.getPID());
-            logger.info("Jdk version:"+ApplicationModel.getJdkVersion());
-            if (!context.isOfflineEnabled()){
-                logger.info("Bind app name:"+context.getBindApplicationName());
+        if (LogTool.isDebugEnabled()) {
+            logger.info("HostName:" + ApplicationModel.getHostName());
+            logger.info("OS:" + ApplicationModel.getOS());
+            logger.info("PID:" + ApplicationModel.getPID());
+            logger.info("Jdk version:" + ApplicationModel.getJdkVersion());
+            if (!context.isOfflineEnabled()) {
+                logger.info("Bind app name:" + context.getBindApplicationName());
             }
-            logger.info("The number of Policy:"+context.getPolicyContainer().getPolicySize());
-            logger.info("The number of hook black list:"+context.getBlackList().size());
+            logger.info("The number of Policy:" + context.getPolicyContainer().getPolicySize());
+            logger.info("The number of hook black list:" + context.getBlackList().size());
         }
     }
 
@@ -117,7 +123,7 @@ public class EngineController {
         String webServerPath = ApplicationModel.getPath();
         AgentDTO agentDTO = new AgentDTO(agentId, hostName, os, webServerPath, ApplicationModel.getWebClass());
         agentDTO.setAppName(context.getBindApplicationName());
-        boolean isSuccess = HttpClientUtils.register(JsonUtils.toString(agentDTO));
+        boolean isSuccess = IASTHttpClient.getClient().register(JsonUtils.toString(agentDTO));
         if (isSuccess) {
             if (LogTool.isDebugEnabled()) {
                 Logger.getLogger(EngineController.class).info("Register successful,agentId:" + ApplicationModel.getAgentId());
@@ -125,7 +131,7 @@ public class EngineController {
             return true;
         }
         if (LogTool.isDebugEnabled()) {
-            Logger.getLogger(EngineController.class).info("Register failed,Server url:" + Config.IAST_SERVER);
+            Logger.getLogger(EngineController.class).info("Register failed,Server url:" + context.getServerUrl());
         }
         return false;
     }
@@ -135,9 +141,18 @@ public class EngineController {
      * @param appName 绑定的应用名
      */
     private void buildContext(Instrumentation inst, String appName, boolean isDebug) {
+        loadProperties();
         context.setInstrumentation(inst);
         context.setBindApplicationName(appName);
         context.setDebug(isDebug);
+    }
+
+    /**
+     * 加载iast.properties
+     */
+    private void loadProperties() {
+        String url = FileUtils.loadIASTProperties(EngineController.class.getClassLoader(), SERVER_URL_IAST_PROPERTIES, DEFAULT_SERVER_URL);
+        context.setServerUrl(url);
     }
 
     /**

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
-
 import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.Api;
 import com.keven1z.core.log.ErrorType;
@@ -28,13 +27,34 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 
-public class HttpClientUtils {
-    private static final CloseableHttpClient client = createHttpClient();
+public class IASTHttpClient {
+    private final CloseableHttpClient client;
+    private String requestHost;
     private static final int SOCKET_TIMEOUT = 3000;
     private static final int CONNECT_TIMEOUT = 3000;
     private static final int REQUEST_TIMEOUT = 3000;
 
-    private static String doGet(String url) throws IOException {
+    private IASTHttpClient() {
+        this.client = createHttpClient();
+    }
+
+    public static IASTHttpClient getClient() {
+        return Inner.client;
+    }
+
+    public void setRequestHost(String requestHost) {
+        this.requestHost = requestHost;
+    }
+
+    public String getRequestHost() {
+        return requestHost;
+    }
+
+    private static class Inner {
+        private static final IASTHttpClient client = new IASTHttpClient();
+    }
+
+    private String doGet(String url) throws IOException {
 
         CloseableHttpResponse response = get(url);
         InputStream inputStream = null;
@@ -58,18 +78,17 @@ public class HttpClientUtils {
         return responseString;
     }
 
-    private static CloseableHttpResponse get(String url) throws IOException {
+    private CloseableHttpResponse get(String url) throws IOException {
         HttpGet request = new HttpGet(url);
         String token = EngineController.context.getToken();
         if (token != null) {
             request.addHeader("Authorization", token);
         }
-        CloseableHttpResponse response = client.execute(request);
-        return response;
+        return client.execute(request);
     }
 
-    private static String post(String payload) throws IOException {
-        HttpResponse response = postNormal(Api.AGENT_REGISTER_URL, payload);
+    private String post(String url, String payload) throws IOException {
+        HttpResponse response = postNormal(url, payload);
         HttpEntity entity = response.getEntity();
         String responseString = null;
         if (entity != null) {
@@ -84,13 +103,13 @@ public class HttpClientUtils {
         return responseString;
     }
 
-    private static CloseableHttpResponse postGzipBody(String url, String payload) throws IOException {
+    private CloseableHttpResponse postGzipBody(String url, String payload) throws IOException {
         HttpPost request = new HttpPost(url);
         request.setEntity(new GzipCompressingEntity(new StringEntity(payload, ContentType.APPLICATION_JSON)));
         return client.execute(request);
     }
 
-    private static CloseableHttpResponse postNormal(String url, String payload) throws IOException {
+    private CloseableHttpResponse postNormal(String url, String payload) throws IOException {
         HttpPost request = new HttpPost(url);
         String token = EngineController.context.getToken();
         if (token != null) {
@@ -100,13 +119,13 @@ public class HttpClientUtils {
         return client.execute(request);
     }
 
-    private static CloseableHttpClient createHttpClient() {
+    private CloseableHttpClient createHttpClient() {
         HttpClientBuilder hcb = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier());
         hcb.setDefaultRequestConfig(createRequestConfig());
         return hcb.build();
     }
 
-    private static RequestConfig createRequestConfig() {
+    private RequestConfig createRequestConfig() {
         return RequestConfig.custom().setSocketTimeout(SOCKET_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT).setConnectionRequestTimeout(REQUEST_TIMEOUT).build();
     }
 
@@ -115,10 +134,13 @@ public class HttpClientUtils {
      *
      * @param payload 漏洞内容
      */
-    public static boolean sendReport(String payload) throws IOException {
+    public boolean sendReport(String payload) throws IOException {
+        if (requestHost == null) {
+            return false;
+        }
         CloseableHttpResponse response = null;
         try {
-            response = postGzipBody(Api.SEND_REPORT_URL, payload);
+            response = postGzipBody(getRequestHost() + Api.SEND_REPORT_URL, payload);
 
             return response.getStatusLine().getStatusCode() == 200;
         } finally {
@@ -133,8 +155,11 @@ public class HttpClientUtils {
      *
      * @param information 注册信息
      */
-    public static boolean register(String information) throws IOException {
-        String response = post(information);
+    public boolean register(String information) throws IOException {
+        if (requestHost == null) {
+            return false;
+        }
+        String response = post(getRequestHost() + Api.AGENT_REGISTER_URL, information);
         ResponseDTO<LinkedHashMap<String, String>> responseDTO = JsonUtils.toObject(response, ResponseDTO.class);
         if (responseDTO.isFlag()) {
             LinkedHashMap<String, String> data = responseDTO.getData();
@@ -151,10 +176,13 @@ public class HttpClientUtils {
     /**
      * 向服务器解绑agent
      */
-    public static boolean deregister() {
+    public boolean deregister() {
+        if (requestHost == null) {
+            return false;
+        }
         CloseableHttpResponse response = null;
         try {
-            response = get(Api.AGENT_DEREGISTER_URL + "?agentId=" + ApplicationModel.getAgentId());
+            response = get(getRequestHost() + Api.AGENT_DEREGISTER_URL + "?agentId=" + ApplicationModel.getAgentId());
             return response.getStatusLine().getStatusCode() == 200;
 
         } catch (Exception e) {
@@ -169,9 +197,12 @@ public class HttpClientUtils {
         }
     }
 
-    public static String getInstruction() throws IOException {
+    public String getInstruction() {
+        if (requestHost == null) {
+            return null;
+        }
         try {
-            return doGet(Api.INSTRUCTION_GET_URL + "?agentId=" + ApplicationModel.getAgentId());
+            return doGet(getRequestHost() + Api.INSTRUCTION_GET_URL + "?agentId=" + ApplicationModel.getAgentId());
         } catch (Exception e) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.error(ErrorType.REQUEST_ERROR, "Failed to get instruction", e);
@@ -180,7 +211,7 @@ public class HttpClientUtils {
         return null;
     }
 
-    public static void close() {
+    public void close() {
         if (client != null) {
             try {
                 client.close();

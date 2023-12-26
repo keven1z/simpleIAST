@@ -5,7 +5,7 @@ import com.keven1z.JarFileHelper;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.monitor.MonitorManager;
 import com.keven1z.core.utils.ClassUtils;
-import com.keven1z.core.utils.HttpClientUtils;
+import com.keven1z.core.utils.IASTHttpClient;
 import net.bytebuddy.agent.VirtualMachine;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
@@ -28,7 +28,7 @@ public class EngineBoot {
             engineController = new EngineController();
             engineController.start(inst, appName, isDebug);
         } catch (Exception e) {
-            throw new RuntimeException("[SimpleIAST] Engine load error,cause:" + e.getMessage());
+            throw new RuntimeException("Engine load error," + e.getMessage());
         }
     }
 
@@ -39,7 +39,8 @@ public class EngineBoot {
         Logger logger = Logger.getLogger(getClass());
         try {
             if (!EngineController.context.isOfflineEnabled()) {
-                if (HttpClientUtils.deregister()) {
+                IASTHttpClient.getClient().close();
+                if (IASTHttpClient.getClient().deregister()) {
                     logger.info("Agent deregister successfully,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
                 } else {
                     logger.warn("Agent deregister failed,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
@@ -49,12 +50,10 @@ public class EngineBoot {
             logger.info("[SimpleIAST] Stop Hook Successfully");
             EngineController.context.clear();
             logger.info("[SimpleIAST] Clear Cache Successfully");
-            HttpClientUtils.close();
-            logger.info("[SimpleIAST] Close HttpClient Successfully");
             MonitorManager.clear();
             ClassUtils.closeSimpleIASTClassLoader();
         } catch (Exception e) {
-            System.err.println("[SimpleIAST] SimpleIAST Stop Failed,Reason:" + e.getMessage());
+            System.err.println("[SimpleIAST] Failed to Stop SimpleIAST ,Reason:" + e.getMessage());
         }
         System.out.println("[SimpleIAST] SimpleIAST Stop Successfully");
 

@@ -6,7 +6,7 @@ import com.keven1z.core.consts.CommonConst;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.pojo.InstructionDTO;
-import com.keven1z.core.utils.HttpClientUtils;
+import com.keven1z.core.utils.IASTHttpClient;
 import com.keven1z.core.utils.JsonUtils;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class InstructionMonitor extends Monitor {
 
     @Override
     public void doRun() throws Exception {
-        String instruction = HttpClientUtils.getInstruction();
+        String instruction = IASTHttpClient.getClient().getInstruction();
         if (instruction == null) {
             //如果获取失败，120s后再请求
             Thread.sleep(120 * 1000);
@@ -82,7 +82,7 @@ public class InstructionMonitor extends Monitor {
                 return;
             }
             ApplicationModel.stop();
-            boolean deregister = HttpClientUtils.deregister();
+            boolean deregister = IASTHttpClient.getClient().deregister();
             if (deregister) {
                 System.out.println("[SimpleIAST] Received instruction: close agent successfully");
                 if (LogTool.isDebugEnabled()) {

@@ -1,20 +1,14 @@
 package com.keven1z.core;
 
-import com.keven1z.core.consts.CommonConst;
 
 public class Config {
     private Config() {
-        logDebugProperties = System.getProperty(CommonConst.ENV_DEBUG_LOG);
     }
 
     public static Config getConfig() {
         return Inner.CONFIG;
     }
     public final int MAX_BODY_SIZE = 4096;
-    /**
-     * 是否输出debug日志
-     */
-    private final String logDebugProperties;
 
     private static class Inner {
         private static final Config CONFIG = new Config();
@@ -31,11 +25,6 @@ public class Config {
     public final static String IAST_PROPERTIES_FILE_PATH = "iast.properties";
 
     public final static String WEAK_PASSWORD_FILE_PATH = "weak_password.txt";
-
-    /**
-     * 服务端地址
-     */
-    public static final String IAST_SERVER = "http://127.0.0.1:8989";
     /**
      * 监控线程最大工作数量
      */

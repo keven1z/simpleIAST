@@ -42,6 +42,10 @@ public class IASTContext {
      * 是否启动debug日志
      */
     private boolean isDebug;
+    /*
+     * 服务器端url
+     */
+    private String serverUrl;
     public PolicyContainer getPolicy() {
         return policyContainer;
     }
@@ -123,5 +127,13 @@ public class IASTContext {
 
     public List<String> getBlackList() {
         return blackList;
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 }
