@@ -20,7 +20,10 @@ public class TaintGraph {
      */
     private final List<TaintNode> nodeSet;
     private final List<TaintNode> sinkNode;
-
+    /*
+     * 由to到from的路径map
+     */
+    private final Map<Integer, Set<Integer>> pathMap;
     /**
      * 污点缓存
      */
@@ -32,10 +35,10 @@ public class TaintGraph {
      * 初始化有向图
      */
     public TaintGraph() {
-//        this.nodeSet = new CopyOnWriteArraySet<>(new HashSet<>(2048));
         this.nodeSet = new ArrayList<>(1024);
         this.sinkNode = new ArrayList<>(10);
         this.taintCache = new HashSet<>(1024);
+        this.pathMap = new HashMap<>(100);
     }
 
     /**
@@ -91,6 +94,7 @@ public class TaintGraph {
             // 起始节点在开头
             if (from.equals(originFrom)) {
                 taintNode.getEdgeSet().add(taintEdge);
+                return;
             }
         }
     }
@@ -143,6 +147,23 @@ public class TaintGraph {
     }
 
     /**
+     * @param to to节点
+     * @return 获取当前节点所有from节点
+     */
+    public Set<TaintNode> getFromNodes(TaintData to) {
+        if (!this.pathMap.containsKey(to.getInvokeId())) {
+            return null;
+        }
+        Set<Integer> nodeIds = this.pathMap.get(to.getInvokeId());
+        HashSet<TaintNode> taintNodes = new HashSet<>();
+        for (Integer nodeId : nodeIds) {
+            TaintNode taintNode = this.nodeSet.get(nodeId);
+            taintNodes.add(taintNode);
+        }
+        return taintNodes;
+    }
+
+    /**
      * 获取以 from 为开始节点的所有边的set集合
      *
      * @param from 开始节点
@@ -187,6 +208,16 @@ public class TaintGraph {
     public void addEdge(TaintData from, TaintData to, String direction) {
         if (from == null || to == null) return;
         TaintEdge classInfoTaintEdge = new TaintEdge(from, to, direction);
+        int toInvokeId = to.getInvokeId();
+        Set<Integer> fromInvokeIdSet;
+        if (pathMap.containsKey(toInvokeId)) {
+            fromInvokeIdSet = pathMap.get(toInvokeId);
+        } else {
+            fromInvokeIdSet = new HashSet<>();
+        }
+        fromInvokeIdSet.add(from.getInvokeId());
+        pathMap.put(toInvokeId, fromInvokeIdSet);
+
         this.addEdge(classInfoTaintEdge);
     }
 
@@ -209,20 +240,30 @@ public class TaintGraph {
          */
         LinkedList<TaintData> taintDataList = new LinkedList<>();
 
+        Set<TaintData> visitedNodes = new HashSet<>();
+
         LinkedBlockingQueue<TaintData> queue = new LinkedBlockingQueue<>(this.getNodeSize());
-        TaintData taintData = start.getTaintData();
-        queue.add(taintData);
-        taintDataList.add(taintData);
+        TaintData startTaintData = start.getTaintData();
+        queue.add(startTaintData);
 
         while (!queue.isEmpty()) {
             TaintData poll = queue.poll();
-            Set<TaintEdge> toEdges = this.getToEdges(poll);
-            for (TaintEdge edge : toEdges) {
-                TaintData from = edge.getFrom();
-                taintDataList.add(from);
-                queue.add(from);
+            taintDataList.add(poll);
+            Set<TaintNode> fromNodes = this.getFromNodes(poll);
+            if (fromNodes == null) {
+                continue;
             }
+            for (TaintNode fromNode : fromNodes) {
+                TaintData fromNodeTaintData = fromNode.getTaintData();
+                if (!visitedNodes.contains(fromNodeTaintData)) {
+                    queue.add(fromNodeTaintData);
+                    visitedNodes.add(fromNodeTaintData);
+                }
+            }
+            fromNodes.clear();
         }
+
+        visitedNodes.clear();
         addSanitizer(taintDataList);
         //由于广度遍历由sink到source的，需要倒转顺序
         Collections.reverse(taintDataList);
@@ -232,7 +273,7 @@ public class TaintGraph {
     /**
      * 添加过滤处理到污点传播阶段
      */
-    private void addSanitizer(LinkedList<TaintData> taintDataList) {
+    private void addSanitizer(List<TaintData> taintDataList) {
         for (TaintData taintData : taintDataList) {
             if (!taintData.isSanitizer()) {
                 continue;
@@ -245,7 +286,7 @@ public class TaintGraph {
     /**
      * 提取过滤方法
      */
-    private List<TaintData> getSanitizerList(TaintData taintData, LinkedList<TaintData> taintDataList) {
+    private List<TaintData> getSanitizerList(TaintData taintData, List<TaintData> taintDataList) {
         List<TaintData> linkedList = new LinkedList<>();
         LinkedBlockingQueue<TaintData> queue = new LinkedBlockingQueue<>(this.getNodeSize());
         queue.add(taintData);

@@ -38,7 +38,7 @@ public class HttpSpy implements SimpleIASTSpy {
                 return;
             }
 
-            if (REQUEST_THREAD_LOCAL.get() != null) {
+            if (REQUEST_THREAD_LOCAL.get() != null || isRequestEnd.get()) {
                 return;
             }
             String standardStart = ApplicationModel.getApplicationInfo().get("StandardStart");

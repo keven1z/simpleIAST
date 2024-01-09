@@ -46,7 +46,7 @@ public class HookThreadLocal {
      */
     public static final ThreadLocal<HttpContext> REQUEST_THREAD_LOCAL = new ThreadLocal<>();
 
-    public static final int INVOKE_ID_INIT_VALUE = 1;
+    public static final int INVOKE_ID_INIT_VALUE = 0;
 
     public static final AtomicInteger INVOKE_ID = new AtomicInteger(INVOKE_ID_INIT_VALUE);
 

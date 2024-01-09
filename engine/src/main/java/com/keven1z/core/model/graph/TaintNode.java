@@ -90,16 +90,6 @@ public class TaintNode {
         return taintEdgeSet;
     }
 
-    public Set<TaintData> getToNode() {
-        HashSet<TaintData> taintDataSet = new HashSet<>();
-        for (TaintEdge taintEdge : this.getEdgeSet()) {
-            TaintData from = taintEdge.getFrom();
-            if (from.equals(this.taintData)) {
-                taintDataSet.add(taintEdge.getTo());
-            }
-        }
-        return taintDataSet;
-    }
 
     @Override
     public String toString() {
@@ -109,7 +99,7 @@ public class TaintNode {
     /**
      * 判断是否是该节点传出的对象
      *
-     * @param fromObject 传入对象
+     * @param fromObjectHashCode 传入对象
      */
     public boolean isToObject(int fromObjectHashCode) {
         int toObjectHashCode = this.taintData.getToObjectHashCode();
@@ -117,5 +107,6 @@ public class TaintNode {
     }
     public void clear(){
         this.taintEdgeSet.clear();
+        this.taintData.clear();
     }
 }

@@ -265,4 +265,9 @@ public class TaintData {
     public void setToType(String toType) {
         this.toType = toType;
     }
+    public void clear() {
+        if (this.stackList != null) {
+            this.stackList.clear();
+        }
+    }
 }
