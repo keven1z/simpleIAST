@@ -46,7 +46,6 @@ public class Agent {
             ModuleLoader.load(action, appName, isDebug, inst);
         } catch (Exception e) {
             System.err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
-            System.err.println("[SimpleIAST] Reason:" + e.getMessage());
             release();
         }
     }
