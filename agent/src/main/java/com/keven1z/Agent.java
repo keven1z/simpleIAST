@@ -36,7 +36,6 @@ public class Agent {
     /**
      * attack 机制加载 agent
      *
-     * @param mode    启动模式
      * @param appName 应用名称
      * @param inst    {@link Instrumentation}
      */
