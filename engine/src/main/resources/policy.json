@@ -506,7 +506,7 @@
       "from": "P1",
       "to": "O",
       "enter": 1,
-      "exit":0
+      "exit": 0
     },
     {
       "name": "ArrayList iterator",
@@ -653,7 +653,7 @@
     },
     {
       "name": "InputSource",
-      "className": "java/io/InputSource",
+      "className": "org/xml/sax/InputSource",
       "method": "<init>",
       "desc": "(Ljava/io/Reader;)V",
       "state": 1,
@@ -714,6 +714,17 @@
       "state": 1,
       "from": "P1",
       "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "StreamSource.setInputStream",
+      "className": "javax/xml/transform/stream/StreamSource",
+      "method": "setInputStream",
+      "desc": "(Ljava/io/InputStream;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
       "enter": 0,
       "exit": 1
     }
@@ -961,7 +972,7 @@
       "exit": 0
     },
     {
-      "name": "xxe",
+      "name": "deserialization",
       "className": "com/fasterxml/jackson/databind/ObjectMapper",
       "method": "readValue",
       "desc": "(Ljava/io/DataInput;Ljava/lang/Class;)Ljava/lang/Object;",
@@ -1058,7 +1069,87 @@
       "name": "xxe",
       "className": "javax/xml/parsers/DocumentBuilder",
       "method": "parse",
-      "desc": "parse(Ljava/io/File;)Lorg/w3c/dom/Document;",
+      "desc": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/parsers/DocumentBuilder",
+      "method": "parse",
+      "desc": "(Ljava/io/File;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "com/sun/org/apache/xerces/internal/jaxp/DocumentBuilderImpl",
+      "method": "parse",
+      "desc": "(Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "org/apache/xerces/jaxp/DocumentBuilderImpl",
+      "method": "parse",
+      "desc": "(Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/parsers/SAXParser",
+      "method": "parse",
+      "desc": "(Lorg/xml/sax/InputSource;)V",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "org/apache/xerces/parsers/AbstractSAXParser",
+      "method": "parse",
+      "desc": "(Lorg/xml/sax/InputSource;)V",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "com/sun/org/apache/xerces/internal/jaxp/validation/XMLSchemaFactory",
+      "method": "newSchema",
+      "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/validation/Schema;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "javax/xml/validation/Validator",
+      "method": "validate",
+      "desc": "(Ljavax/xml/transform/Source;)V",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "xxe",
+      "className": "com/sun/xml/internal/stream/XMLInputFactoryImpl",
+      "method": "createXMLStreamReader",
+      "desc": "(Ljava/io/InputStream;)Ljavax/xml/stream/XMLStreamReader;",
       "state": 1,
       "from": "P1",
       "enter": 1,
@@ -1073,7 +1164,9 @@
       "from": "P1",
       "enter": 1,
       "exit": 0,
-      "exclude": ["org/springframework/security/web/util/OnCommittedResponseWrapper$SaveContextServletOutputStream"],
+      "exclude": [
+        "org/springframework/security/web/util/OnCommittedResponseWrapper$SaveContextServletOutputStream"
+      ],
       "inter": true
     },
     {

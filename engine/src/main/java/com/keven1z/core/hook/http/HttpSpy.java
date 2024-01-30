@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import java.io.ByteArrayOutputStream;
 import java.lang.spy.SimpleIASTSpy;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
 import static com.keven1z.core.hook.HookThreadLocal.*;
@@ -38,7 +39,7 @@ public class HttpSpy implements SimpleIASTSpy {
                 return;
             }
 
-            if (REQUEST_THREAD_LOCAL.get() != null || isRequestEnd.get()) {
+            if (REQUEST_THREAD_LOCAL.get() != null || isRequestStart.get()) {
                 return;
             }
             String standardStart = ApplicationModel.getApplicationInfo().get("StandardStart");
@@ -52,7 +53,8 @@ public class HttpSpy implements SimpleIASTSpy {
             if (filterHttp(abstractRequest.getRequestURLString())) {
                 return;
             }
-
+            isRequestStart.set(true);
+            SANITIZER_RESOLVER_CACHE.set(new HashSet<>());
             REQUEST_TIME_CONSUMED.set(System.currentTimeMillis());
             HttpContext httpContext = new HttpContext();
             httpContext.setRequest(abstractRequest);
@@ -237,7 +239,7 @@ public class HttpSpy implements SimpleIASTSpy {
     }
 
     @Override
-    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName) {
+    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
 
     }
 

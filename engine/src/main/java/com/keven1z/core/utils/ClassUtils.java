@@ -1,6 +1,7 @@
 package com.keven1z.core.utils;
 
 import org.objectweb.asm.ClassReader;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import static org.objectweb.asm.Opcodes.*;
 public class ClassUtils {
     private static final String[] IGNORE_OBJECT_CLASS = new String[]{"java.lang.Object", "java.lang.Cloneable", "java.io.Serializable", "java.lang.Iterable"};
     private static final String INTEGER_CLASS = "java.lang.Integer";
+    private static final String IAST_FAMILY_CLASS_RES_PREFIX = "com/keven1z/";
 
     public static Set<String> buildAncestors(String[] interfaces, String superClass) {
         Set<String> ancestors = new HashSet<>();
@@ -158,5 +160,30 @@ public class ClassUtils {
         Field field = loadClass.getField("classLoader");
         Object classloader = field.get(loadClass);
         ReflectionUtils.invokeMethod(classloader, "closeIfPossible", new Class[]{});
+    }
+
+    public static String normalizeClass(String className) {
+        return className.replace(".", "/");
+    }
+
+    public static String toInternalClassName(String className) {
+        if (StringUtils.isEmpty(className)) {
+            return className;
+        }
+        return className.replace("/", ".");
+    }
+
+    public static boolean isComeFromIASTFamily(final String internalClassName, final ClassLoader loader) {
+
+        if (null != internalClassName
+                && isIASTPrefix(internalClassName)) {
+            return true;
+        }
+        return null != loader
+                && isIASTPrefix(normalizeClass(loader.getClass().getName()));
+    }
+
+    private static boolean isIASTPrefix(String className) {
+        return className.startsWith(IAST_FAMILY_CLASS_RES_PREFIX);
     }
 }

@@ -68,10 +68,7 @@ public class Policy implements Serializable {
      * 该hook点是否为可传播的，存在某些单一hook点为漏洞
      */
     private boolean requireHttp = true;
-    /**
-     * 是否是bean hook点
-     */
-    private boolean isBeanHook = false;
+
     /**
      * 某些类通过其接口hook类被添加为hook点，originClassName为其接口类名
      */
@@ -220,15 +217,6 @@ public class Policy implements Serializable {
         Policy policy = (Policy) o;
         return className.equals(policy.className) && method.equals(policy.method) && desc.equals(policy.desc);
     }
-
-    public boolean isBeanHook() {
-        return isBeanHook;
-    }
-
-    public void setBeanHook(boolean beanHook) {
-        isBeanHook = beanHook;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(className, method, desc);

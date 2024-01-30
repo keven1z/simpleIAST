@@ -65,6 +65,8 @@ public class TaintAdviceAdapter extends HookAdviceAdapter {
         push(desc);
         push(this.policy.getType().name());
         push(this.policy.getName());
+        push(this.policy.getFrom());
+        push(this.policy.getTo());
         Type type = Type.getType(SimpleIASTSpyManager.class);
         invokeStatic(type, AsmMethods.ASM_METHOD_HOOKSCHEDULER$_taint);
     }

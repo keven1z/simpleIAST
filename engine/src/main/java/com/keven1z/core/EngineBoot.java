@@ -39,12 +39,12 @@ public class EngineBoot {
         Logger logger = Logger.getLogger(getClass());
         try {
             if (!EngineController.context.isOfflineEnabled()) {
-                IASTHttpClient.getClient().close();
                 if (IASTHttpClient.getClient().deregister()) {
                     logger.info("Agent deregister successfully,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
                 } else {
                     logger.warn("Agent deregister failed,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
                 }
+                IASTHttpClient.getClient().close();
             }
             ApplicationModel.stop();
             logger.info("[SimpleIAST] Stop Hook Successfully");

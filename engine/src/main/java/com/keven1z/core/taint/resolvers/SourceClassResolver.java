@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static com.keven1z.core.consts.CommonConst.OFF;
 import static com.keven1z.core.consts.CommonConst.ON;
+import static com.keven1z.core.consts.PolicyConst.SOURCE_BEAN;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 import static com.keven1z.core.utils.PolicyUtils.getToPositionObject;
 
@@ -36,33 +37,24 @@ public class SourceClassResolver implements HandlerHookClassResolver {
     private static final String[] USER_PACKAGE_PREFIX = new String[]{"java", "javax", " org.spring".substring(1), " org.apache".substring(1), " io.undertow".substring(1)};
 
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName) {
+    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
         if (returnObject == null || returnObject.equals("")) {
             return;
         }
 
-        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.getInstance().getPolicyContainer().getSource());
-        if (policy == null) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.warn(ErrorType.POLICY_ERROR, "Can't match the policy,className:" + className + ",method:" + method + ",desc:" + desc);
-            }
+        Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
+        if (fromMap == null || fromMap.isEmpty()) {
             return;
         }
 
-
-        String to = policy.getTo();
         Object toObject = getToPositionObject(to, parameters, returnObject, thisObject);
         if (toObject == null) {
             return;
         }
-        String from = policy.getFrom();
-        Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
-        if (fromMap.isEmpty()) {
-            return;
-        }
+
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
         TaintData taintData = null;
-        if (policy.isBeanHook()) {
+        if (SOURCE_BEAN.equals(policyName)) {
             for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
                 Object fromObject = entry.getValue();
                 TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
@@ -101,7 +93,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             Object fromObject = entry.getValue();
             if ("org.springframework.web.method.HandlerMethod$HandlerMethodParameter".equals(fromObject.getClass().getName())) {
                 return ReflectionUtils.invokeStringMethod(fromObject, "getParameterName", new Class[]{});
-            }else {
+            } else {
                 return fromObject.toString();
             }
         }
@@ -133,7 +125,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             policy.setState(ON);
             policy.setEnter(OFF);
             policy.setExit(ON);
-            policy.setBeanHook(true);
+            policy.setName(SOURCE_BEAN);
             policy.setType(PolicyTypeEnum.SOURCE);
             TaintSpy.getInstance().getPolicyContainer().addPolicy(policy);
             reTransform(taintClassName, inst, loadedClasses);

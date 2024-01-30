@@ -240,7 +240,7 @@ public class TaintGraph {
          */
         LinkedList<TaintData> taintDataList = new LinkedList<>();
 
-        Set<TaintData> visitedNodes = new HashSet<>();
+        Set<Integer> visitedNodeInvokeIds = new HashSet<>();
 
         LinkedBlockingQueue<TaintData> queue = new LinkedBlockingQueue<>(this.getNodeSize());
         TaintData startTaintData = start.getTaintData();
@@ -255,15 +255,15 @@ public class TaintGraph {
             }
             for (TaintNode fromNode : fromNodes) {
                 TaintData fromNodeTaintData = fromNode.getTaintData();
-                if (!visitedNodes.contains(fromNodeTaintData)) {
+                if (!visitedNodeInvokeIds.contains(fromNodeTaintData.getInvokeId())) {
                     queue.add(fromNodeTaintData);
-                    visitedNodes.add(fromNodeTaintData);
+                    visitedNodeInvokeIds.add(fromNodeTaintData.getInvokeId());
                 }
             }
             fromNodes.clear();
         }
 
-        visitedNodes.clear();
+        visitedNodeInvokeIds.clear();
         addSanitizer(taintDataList);
         //由于广度遍历由sink到source的，需要倒转顺序
         Collections.reverse(taintDataList);
@@ -302,15 +302,6 @@ public class TaintGraph {
             }
         }
         return linkedList;
-    }
-
-    public LinkedList<TaintData> getAllTaint() {
-        List<TaintNode> allNode = this.getAllNode();
-        LinkedList<TaintData> list = new LinkedList<>();
-        for (TaintNode node : allNode) {
-            list.add(node.getTaintData());
-        }
-        return list;
     }
 
     public List<TaintNode> getSinkNodes() {

@@ -5,6 +5,7 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 
 import java.lang.spy.SimpleIASTSpy;
@@ -34,7 +35,7 @@ public class TaintSpy implements SimpleIASTSpy {
     }
 
     @Override
-    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName) {
+    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
         if (enableHookLock.get()) {
             return;
         } else {
@@ -47,7 +48,9 @@ public class TaintSpy implements SimpleIASTSpy {
             if (!ApplicationModel.isRunning()) {
                 return;
             }
-
+            if (TransformerProtector.instance.isInProtecting()) {
+                return;
+            }
             //如果没有流量，不进行hook
             if (REQUEST_THREAD_LOCAL.get() == null && !WEAK_PASSWORD_IN_SQL.name().equals(policyName)) {
                 return;
@@ -62,14 +65,11 @@ public class TaintSpy implements SimpleIASTSpy {
                 throw new RuntimeException("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
             }
 
-
             if (policyContainer == null) {
                 policyContainer = EngineController.context.getPolicyContainer();
             }
-            spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type, policyName);
+            spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type, policyName, from, to);
         } catch (Exception e) {
-            TAINT_GRAPH_THREAD_LOCAL.get().clear();
-            clear();
             LogTool.error(ErrorType.HOOK_ERROR, "Failed to taint", e);
         } finally {
             enableHookLock.set(false);
@@ -110,6 +110,8 @@ public class TaintSpy implements SimpleIASTSpy {
             TAINT_GRAPH_THREAD_LOCAL.get().clear();
         }
         TAINT_GRAPH_THREAD_LOCAL.remove();
+        SANITIZER_RESOLVER_CACHE.remove();
+        isRequestStart.set(false);
         isRequestEnd.set(false);
         REQUEST_THREAD_LOCAL.remove();
         INVOKE_ID.set(INVOKE_ID_INIT_VALUE);

@@ -3,10 +3,6 @@ package com.keven1z.core.taint.resolvers;
 import com.keven1z.core.model.graph.TaintData;
 import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.model.graph.TaintNode;
-import com.keven1z.core.taint.TaintSpy;
-import com.keven1z.core.log.ErrorType;
-import com.keven1z.core.log.LogTool;
-import com.keven1z.core.policy.Policy;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.TaintUtils;
@@ -15,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.keven1z.core.hook.HookThreadLocal.SANITIZER_RESOLVER_CACHE;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 /**
@@ -25,30 +22,27 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  */
 public class SanitizerClassResolver implements HandlerHookClassResolver {
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName) {
-        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.getInstance().getPolicyContainer().getSanitizers());
-        if (policy == null) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.warn(ErrorType.POLICY_ERROR, "Can't match the policy,className:" + className + ",method:" + method + ",desc:" + desc);
-            }
-            return;
-        }
+    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
 
-        String from = policy.getFrom();
         Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
 
-        if (fromMap.isEmpty()) {
+        if (fromMap == null || fromMap.isEmpty()) {
             return;
         }
 
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
         TaintData taintData = null;
-        Object toObject = PolicyUtils.getToPositionObject(policy.getTo(), parameters, returnObject, thisObject);
 
         for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
             Object fromObject = entry.getValue();
+            //如果包含在非污点缓存中，直接跳过
+            int identityHashCode = System.identityHashCode(fromObject);
+            if (SANITIZER_RESOLVER_CACHE.get().contains(identityHashCode)) {
+                continue;
+            }
             TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
             if (parentNode == null) {
+                SANITIZER_RESOLVER_CACHE.get().add(identityHashCode);
                 continue;
             }
             TaintData fromTaintData = parentNode.getTaintData();
@@ -57,15 +51,17 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
             if (taintData == null) {
                 taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);
                 taintData.setName(policyName);
-                taintData.setConditions(getConditionString(policy.getConditions(), parameters, returnObject, thisObject));
-                if (toObject != null) {
-                    taintData.setToObjectHashCode(System.identityHashCode(toObject));
-                }
+//                taintData.setConditions(getConditionString(policy.getConditions(), parameters, returnObject, thisObject));
+
             }
             taintGraph.addEdge(fromTaintData, taintData, entry.getKey());
         }
 
         if (taintData != null) {
+            Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);
+            if (toObject != null) {
+                taintData.setToObjectHashCode(System.identityHashCode(toObject));
+            }
             TaintUtils.buildTaint(returnObject, taintData, toObject, true);
         }
     }

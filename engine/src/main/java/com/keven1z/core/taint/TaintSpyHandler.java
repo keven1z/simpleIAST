@@ -14,7 +14,7 @@ public class TaintSpyHandler {
         return Inner.handler;
     }
 
-    public void doHandle(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName) {
-        classResolverInitializer.resolve(returnObject, thisObject, parameters, className, method, desc, type, policyName);
+    public void doHandle(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
+        classResolverInitializer.resolve(returnObject, thisObject, parameters, className, method, desc, type, policyName, from, to);
     }
 }

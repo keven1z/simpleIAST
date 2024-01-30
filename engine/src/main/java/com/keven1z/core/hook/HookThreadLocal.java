@@ -6,6 +6,7 @@ import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.SingleFindingData;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,7 +28,16 @@ public class HookThreadLocal {
      */
     public static final ThreadLocal<List<SingleFindingData>> SINGLE_FINDING_THREADLOCAL = new ThreadLocal<>();
     /**
-     * 请求是否结束
+     * 请求开始节点
+     */
+    public static final ThreadLocal<Boolean> isRequestStart = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+    /**
+     * 请求结束标志
      */
     public static final ThreadLocal<Boolean> isRequestEnd = new ThreadLocal<Boolean>() {
         @Override
@@ -55,5 +65,5 @@ public class HookThreadLocal {
      * 请求消耗的时间计算
      */
     public static final ThreadLocal<Long> REQUEST_TIME_CONSUMED = new ThreadLocal<>();
-
+    public static final ThreadLocal<Set<Integer>> SANITIZER_RESOLVER_CACHE = new ThreadLocal<>();
 }

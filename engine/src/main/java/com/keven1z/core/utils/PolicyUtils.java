@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.keven1z.core.consts.CommonConst.OFF;
+
 public class PolicyUtils {
     private final static ConcurrentHashMap<String, Boolean> superClassCache = new ConcurrentHashMap<>(1024);
 
@@ -94,7 +96,7 @@ public class PolicyUtils {
     public static boolean isHookedByClassName(String className, List<Policy> policies, boolean isSetHooked) {
         for (Policy hookPolicy : policies) {
             //如果为接口hook类或者已经hook，不进行hook
-            if (hookPolicy.getInter() || hookPolicy.isHooked()) {
+            if (hookPolicy.getState() == OFF || hookPolicy.getInter() || hookPolicy.isHooked()) {
                 continue;
             }
             String name = hookPolicy.getClassName();
@@ -140,6 +142,9 @@ public class PolicyUtils {
         for (Policy hookPolicy : policies) {
             String name = hookPolicy.getClassName();
             for (String ancestor : ancestors) {
+                if (hookPolicy.getState() == OFF){
+                    continue;
+                }
                 //由于传进来的className以.分割，策略为/分割，需要进行转化
                 ancestor = ancestor.replace(".", "/");
                 //className匹配和黑名单匹配
@@ -184,6 +189,9 @@ public class PolicyUtils {
     public static Policy getHookedPolicy(String className, String method, String desc, List<Policy> policies) {
 
         for (Policy p : policies) {
+            if (p.getState() == OFF){
+                continue;
+            }
             String name = p.getClassName();
             String m = p.getMethod();
             String d = p.getDesc();
@@ -204,10 +212,10 @@ public class PolicyUtils {
      * @return 对应的对象List
      */
     public static Map<String, Object> getFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
-        Map<String, Object> map = new HashMap<>();
         if (position == null) {
-            return map;
+            return null;
         }
+        Map<String, Object> map = new HashMap<>();
         String[] paths = position.split(PolicyConst.PATH_SPLIT_SEPARATOR);
         for (String path : paths) {
             Object pathObject = getPathObject(path, parameters, returnObject, thisObject);

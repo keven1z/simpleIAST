@@ -8,6 +8,7 @@ import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.utils.AsmUtils;
 import com.keven1z.core.utils.ClassUtils;
 import com.keven1z.core.utils.PolicyUtils;
+import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -17,7 +18,9 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.keven1z.core.Config.IS_DUMP_CLASS;
@@ -61,7 +64,7 @@ public class HookTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
 
-        if (className.startsWith("com/keven1z") || className.startsWith("org/objectweb") || EngineController.context.isInBlackList(className)) {
+        if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isInBlackList(className)) {
             return classfileBuffer;
         }
         if (className.contains("proxy")) {
@@ -157,26 +160,59 @@ public class HookTransformer implements ClassFileTransformer {
      * hook已经加载的类，或者是回滚已经加载的类
      */
     public void reTransform() {
-        Instrumentation instrumentation = this.instrumentation;
-        Class<?>[] loadedClasses = instrumentation.getAllLoadedClasses();
+        List<Class<?>> loadedClasses = findForReTransform();
         for (Class<?> clazz : loadedClasses) {
-            if (this.transformClasses.contains(clazz.getName())) {
-                if (LogTool.isDebugEnabled()) {
-                    logger.info("Class has been transformed,class name is" + clazz.getName());
-                }
-                continue;
-            }
-            if (instrumentation.isModifiableClass(clazz) && !EngineController.context.isInBlackList(clazz.getName()) && !clazz.getName().startsWith("java.lang.invoke.LambdaForm")) {
-                try {
-                    if (PolicyUtils.isHook(this.policy, clazz)) {
-                        // hook已经加载的类，或者是回滚已经加载的类
-                        instrumentation.retransformClasses(clazz);
-                    }
-                } catch (Throwable t) {
-                    LogTool.error(ErrorType.TRANSFORM_ERROR, "Failed to reTransform class " + clazz.getName() + ": " + t.getMessage(), t);
+            try {
+
+                if (PolicyUtils.isHook(this.policy, clazz)) {
+                    // hook已经加载的类，或者是回滚已经加载的类
+                    instrumentation.retransformClasses(clazz);
                 }
 
+            } catch (Throwable t) {
+                LogTool.error(ErrorType.TRANSFORM_ERROR, "Failed to reTransform class " + clazz.getName() + ": " + t.getMessage(), t);
             }
         }
+    }
+
+    /**
+     * 查找已transform的hook点
+     */
+    public List<Class<?>> findForReTransform() {
+        final List<Class<?>> classes = new ArrayList<>();
+        TransformerProtector.instance.enterProtecting();
+
+        Class<?>[] loadedClasses = this.instrumentation.getAllLoadedClasses();
+        for (Class<?> clazz : loadedClasses) {
+            try {
+                String normalizeClass = ClassUtils.normalizeClass(clazz.getName());
+                if (ClassUtils.isComeFromIASTFamily(normalizeClass, clazz.getClassLoader())) {
+                    continue;
+                }
+                if (!instrumentation.isModifiableClass(clazz)) {
+                    continue;
+                }
+                if (clazz.getName().startsWith("java.lang.invoke.LambdaForm")) {
+                    continue;
+                }
+                if (this.transformClasses.contains(normalizeClass)) {
+                    if (LogTool.isDebugEnabled()) {
+                        logger.warn("Class has been transformed,class name is" + clazz.getName());
+                    }
+                    continue;
+                }
+                if (EngineController.context.isInBlackList(normalizeClass)) {
+                    continue;
+                }
+                if (PolicyUtils.isHook(this.policy, clazz)) {
+                    classes.add(clazz);
+                }
+            } catch (Throwable cause) {
+                logger.debug("remove from findForReTransform, because loading class:" + clazz.getName() + "occur an exception");
+            } finally {
+                TransformerProtector.instance.exitProtecting();
+            }
+        }
+        return classes;
     }
 }

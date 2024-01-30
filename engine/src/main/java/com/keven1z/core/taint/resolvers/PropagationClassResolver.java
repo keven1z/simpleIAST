@@ -3,14 +3,11 @@ package com.keven1z.core.taint.resolvers;
 import com.keven1z.core.model.graph.TaintData;
 import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.model.graph.TaintNode;
-import com.keven1z.core.taint.TaintSpy;
-import com.keven1z.core.log.ErrorType;
-import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.PolicyTypeEnum;
-import com.keven1z.core.policy.Policy;
 import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.TaintUtils;
 import java.util.Map;
+
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 /**
@@ -21,25 +18,12 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  */
 public class PropagationClassResolver implements HandlerHookClassResolver {
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName) {
-        Policy policy = PolicyUtils.getHookedPolicy(className, method, desc, TaintSpy.getInstance().getPolicyContainer().getPropagation());
-        if (policy == null) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.warn(ErrorType.POLICY_ERROR, "Can't match the policy,className:" + className + ",method:" + method + ",desc:" + desc);
-            }
-            return;
-        }
-
-        String from = policy.getFrom();
+    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
         Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
-        if (fromMap.isEmpty()) {
+        if (fromMap == null || fromMap.isEmpty()) {
             return;
         }
 
-        Object toObject = PolicyUtils.getToPositionObject(policy.getTo(), parameters, returnObject, thisObject);
-        if (toObject == null) {
-            return;
-        }
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
         TaintData taintData = null;
         for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
@@ -54,6 +38,10 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
             taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
         }
         if (taintData != null) {
+            Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);
+            if (toObject == null) {
+                return;
+            }
             TaintUtils.buildTaint(returnObject, taintData, toObject, false);
         }
 

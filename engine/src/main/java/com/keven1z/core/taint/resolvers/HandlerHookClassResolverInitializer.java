@@ -45,7 +45,7 @@ public class HandlerHookClassResolverInitializer {
 
     }
 
-    public void resolve(Object returnValue, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName) {
+    public void resolve(Object returnValue, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
         /*
          * 如果污点图为空，并且不为污染源节点，则不处理
          */
@@ -73,7 +73,7 @@ public class HandlerHookClassResolverInitializer {
         }
 
         try {
-            resolver.resolve(returnValue, thisObject, parameters, className, method, desc, policyName);
+            resolver.resolve(returnValue, thisObject, parameters, className, method, desc, policyName, from, to);
         } catch (Exception e) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.RESOLVE_ERROR, "Resolver error", e);

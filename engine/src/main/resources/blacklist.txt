@@ -551,7 +551,6 @@ java/beans/Introspector
 org/yaml/snakeyaml
 sun/reflect/
 com/sun/naming/
-com/sun/org/apache/xerces/
 com/sun/org/apache/xalan/
 com/sun/org/apache/xml/
 java/sql/Date
@@ -603,9 +602,6 @@ org/springframework/beans/TypeConverterSupport
 org/springframework/beans/PropertyEditorRegistrySupport
 org/springframework/beans/TypeConverterDelegate
 javax/validation/Validation
-javax/validation/Validation$GenericBootstrapImpl
-javax/validation/Validation$DefaultValidationProviderResolver
-javax/validation/Validation$GetValidationProviderListAction
 java/util/AbstractList$ListItr
 java/util/AbstractList$Itr
 org/springframework/core/io/ResourceEditor
@@ -672,7 +668,6 @@ org/springframework/beans/factory/support/MethodOverrides
 org/springframework/beans/factory/config/BeanDefinitionHolder
 org/springframework/beans/factory/annotation/AutowiredAnnotationBeanPostProcessor
 org/springframework/beans/factory/config/InstantiationAwareBeanPostProcessorAdapter
-javax/validation/executable/ExecutableType
 org/springframework/context/annotation/CommonAnnotationBeanPostProcessor
 org/springframework/beans/factory/annotation/InitDestroyAnnotationBeanPostProcessor
 org/springframework/context/event/EventListenerMethodProcessor
@@ -799,7 +794,6 @@ com/sun/beans/introspect/EventSetInfo
 com/sun/beans/introspect/PropertyInfo
 com/sun/beans/WildcardTypeImpl
 com/sun/beans/introspect/PropertyInfo$Name
-javax/validation/constraintvalidation/ValidationTarget
 org/springframework/beans/factory/groovy/GroovyBeanDefinitionWrapper
 org/springframework/core/io/support/EncodedResource
 org/springframework/beans/factory/support/GenericBeanDefinition
@@ -815,7 +809,7 @@ org/springframework/context/expression/StandardBeanExpressionResolver
 org/springframework/context/expression/StandardBeanExpressionResolver$1
 org/springframework/expression/spel/SpelParserConfiguration
 org/springframework/expression/spel/SpelCompilerMode
-javax/annotation/meta/When
+javax/annotation/
 org/springframework/data/domain/PageRequest
 org/springframework/data/domain/AbstractPageRequest
 org/springframework/web/servlet/mvc/method/annotation/JsonViewRequestBodyAdvice
@@ -1039,7 +1033,6 @@ com/fasterxml/jackson/core/sym/ByteQuadsCanonicalizer
 com/fasterxml/jackson/databind/util/RootNameLookup
 com/fasterxml/jackson/databind/cfg/MapperConfig
 javax/persistence/Persistence
-javax/persistence/Persistence$PersistenceUtilImpl
 javax/el/
 java/util/concurrent/CompletableFuture
 com/fasterxml/jackson/databind/DeserializationConfig
