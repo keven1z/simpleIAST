@@ -101,7 +101,7 @@ public class LogConfig {
                             System.err.println("[SimpleIAST] Log Dir:" + log4jBaseDir + " create failed");
                         }
                     }
-                    System.out.println("[SimpleIAST] Log Dir:" + log4jBaseDir);
+                    System.out.println("[SimpleIAST] IAST log dir:" + log4jBaseDir);
 
                     String path = log4jBaseDir + type.getTargetPath();
                     BasicConfigurator.configure(createFileAppender(type.getAppender(), path));

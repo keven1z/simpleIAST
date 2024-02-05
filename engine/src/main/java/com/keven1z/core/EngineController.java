@@ -2,6 +2,7 @@ package com.keven1z.core;
 
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
+import com.keven1z.core.monitor.FindingReportMonitor;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
 import com.keven1z.core.hook.transforms.ServerDetectTransform;
@@ -62,15 +63,17 @@ public class EngineController {
                  */
                 IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
                 if (!register()) {
-                    System.err.println("[SimpleIAST] Register failed,hostName:" + ApplicationModel.getHostName());
+                    System.err.println("[SimpleIAST] Failed to register,server url:" + context.getServerUrl());
                     throw new RuntimeException("The failure occurred when registering,server url:" + context.getServerUrl());
                 } else {
-                    System.out.println("[SimpleIAST] Register successful,server url:" + context.getServerUrl());
+                    System.out.println("[SimpleIAST] IAST agent successfully registered,server url:" + context.getServerUrl());
                 }
             } catch (Exception e) {
                 LogTool.error(ErrorType.REGISTER_ERROR, "Register failed,hostName:" + ApplicationModel.getHostName(), e);
                 throw new RuntimeException("Exception occurred during registration");
             }
+        } else {
+            ApplicationModel.setAgentId(OFFLINE_AGENT_NAME);
         }
         /*
          * 加载策略
@@ -87,13 +90,13 @@ public class EngineController {
         /*
          * 启动监控进程
          */
-        MonitorManager.start(new ReportMonitor(), new InstructionMonitor());
+        MonitorManager.start(new ReportMonitor(), new FindingReportMonitor(), new InstructionMonitor());
         /*
          * agent设置为启动状态
          */
         ApplicationModel.start();
 
-        System.out.println("[SimpleIAST] SimpleIAST run successfully");
+        System.out.println("[SimpleIAST] IAST run successfully");
         Logger.getLogger(getClass()).info("SimpleIAST run successfully,hostName:" + ApplicationModel.getHostName());
         if (LogTool.isDebugEnabled()) {
             logger.info("HostName:" + ApplicationModel.getHostName());

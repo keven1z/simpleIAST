@@ -9,6 +9,7 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.policy.PolicyContainer;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,7 +141,7 @@ public class PolicyUtils {
         for (Policy hookPolicy : policies) {
             String name = hookPolicy.getClassName();
             for (String ancestor : ancestors) {
-                if (hookPolicy.getState() == OFF){
+                if (hookPolicy.getState() == OFF) {
                     continue;
                 }
                 //由于传进来的className以.分割，策略为/分割，需要进行转化
@@ -187,7 +188,7 @@ public class PolicyUtils {
     public static Policy getHookedPolicy(String className, String method, String desc, List<Policy> policies) {
 
         for (Policy p : policies) {
-            if (p.getState() == OFF){
+            if (p.getState() == OFF) {
                 continue;
             }
             String name = p.getClassName();
@@ -223,7 +224,8 @@ public class PolicyUtils {
         }
         return map;
     }
-    public static  Object getToPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
+
+    public static Object getToPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
         if (position == null) {
             return null;
         }
@@ -269,5 +271,27 @@ public class PolicyUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 查找来源的节点,来源不仅仅是source阶段的节点
+     */
+    public static Set<TaintNode> searchParentNodes(Object fromObject, TaintGraph taintGraph) {
+        int fromObjectHashCode = System.identityHashCode(fromObject);
+        if (!taintGraph.isTaint(fromObjectHashCode)) {
+            return null;
+        }
+        List<TaintNode> allNode = taintGraph.getAllNode();
+        HashSet<TaintNode> parentNodes = new HashSet<>();
+        //倒序查询，符合代码执行的流程
+        for (TaintNode taintNode : allNode) {
+            /*
+             * 是否为污点对象，eg: fromObject= "sql",传播方法为StringBuilder.toString,污点传出方向为返回值，返回值为sql，则判定为污点
+             */
+            if (taintNode.isToObject(fromObjectHashCode)) {
+                parentNodes.add(taintNode);
+            }
+        }
+        return parentNodes;
     }
 }

@@ -14,6 +14,7 @@ public class CommonConst {
      * 默认应用名
      */
     public static final String DEFAULT_APPLICATION_NAME = "default";
+    public static final String OFFLINE_AGENT_NAME = "OFFLINE";
 
     /**
      * 状态开关：开启

@@ -7,9 +7,7 @@ import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
-
 import java.lang.spy.SimpleIASTSpy;
-
 import static com.keven1z.core.Config.MAX_REPORT_QUEUE_SIZE;
 import static com.keven1z.core.consts.VulnEnum.WEAK_PASSWORD_IN_SQL;
 import static com.keven1z.core.hook.HookThreadLocal.*;
@@ -17,7 +15,7 @@ import static com.keven1z.core.hook.HookThreadLocal.*;
 public class TaintSpy implements SimpleIASTSpy {
     private PolicyContainer policyContainer;
     private final TaintSpyHandler spyHandler = TaintSpyHandler.getInstance();
-    private static final Logger LOGGER = Logger.getLogger(TaintSpy.class);
+    private static final Logger logger = Logger.getLogger(TaintSpy.class);
 
     private TaintSpy() {
     }
@@ -62,7 +60,9 @@ public class TaintSpy implements SimpleIASTSpy {
              * 如果上报线程满了，不进行hook
              */
             if (REPORT_QUEUE.size() >= MAX_REPORT_QUEUE_SIZE) {
-                throw new RuntimeException("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
+                if (LogTool.isDebugEnabled()){
+                    logger.warn("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
+                }
             }
 
             if (policyContainer == null) {
@@ -106,9 +106,6 @@ public class TaintSpy implements SimpleIASTSpy {
     }
 
     public void clear() {
-        if (TAINT_GRAPH_THREAD_LOCAL.get() != null) {
-            TAINT_GRAPH_THREAD_LOCAL.get().clear();
-        }
         TAINT_GRAPH_THREAD_LOCAL.remove();
         SANITIZER_RESOLVER_CACHE.remove();
         isRequestStart.set(false);

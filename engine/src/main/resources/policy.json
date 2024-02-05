@@ -150,28 +150,6 @@
       "exit": 1
     },
     {
-      "name": "AbstractStringBuilder appendChars",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "appendChars",
-      "desc": "(Ljava/lang/CharSequence;II)V",
-      "state": 1,
-      "from": "O,P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "AbstractStringBuilder appendChars",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "appendChars",
-      "desc": "([CII)V",
-      "state": 1,
-      "from": "O,P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
       "className": "java/lang/AbstractStringBuilder",
       "method": "append",
       "desc": "(Ljava/lang/AbstractStringBuilder;)Ljava/lang/AbstractStringBuilder;",
@@ -1373,6 +1351,18 @@
       "className": "org/apache/commons/lang/StringUtils",
       "method": "replace",
       "desc": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
+      "conditions": "P2,P3",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "replace",
+      "className": "org/springframework/util/StringUtils",
+      "method": "replace",
+      "desc": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
       "state": 1,
       "from": "P1",
       "to": "R",

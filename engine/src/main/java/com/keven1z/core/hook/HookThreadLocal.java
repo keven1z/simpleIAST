@@ -2,6 +2,7 @@ package com.keven1z.core.hook;
 
 import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.hook.http.HttpContext;
+import com.keven1z.core.pojo.FindingReportBo;
 import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.SingleFindingData;
 
@@ -61,6 +62,8 @@ public class HookThreadLocal {
     public static final AtomicInteger INVOKE_ID = new AtomicInteger(INVOKE_ID_INIT_VALUE);
 
     public static final LinkedBlockingQueue<ReportData> REPORT_QUEUE = new LinkedBlockingQueue<>(MAX_REPORT_QUEUE_SIZE);
+    public static final LinkedBlockingQueue<FindingReportBo> FINDING_REPORT_QUEUE = new LinkedBlockingQueue<>(MAX_REPORT_QUEUE_SIZE);
+
     /**
      * 请求消耗的时间计算
      */

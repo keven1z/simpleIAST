@@ -6,7 +6,9 @@ import com.keven1z.core.model.graph.TaintNode;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.TaintUtils;
+
 import java.util.Map;
+import java.util.Set;
 
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
@@ -28,14 +30,17 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
         TaintData taintData = null;
         for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
             Object fromObject = entry.getValue();
-            TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
-            if (parentNode == null) {
+            Set<TaintNode> parentNodes = PolicyUtils.searchParentNodes(fromObject, taintGraph);
+            if (parentNodes == null || parentNodes.isEmpty()) {
                 continue;
             }
-            if (taintData == null) {
-                taintData = new TaintData(className, method, desc, PolicyTypeEnum.PROPAGATION);
+            for (TaintNode parentNode : parentNodes) {
+                if (taintData == null) {
+                    taintData = new TaintData(className, method, desc, PolicyTypeEnum.PROPAGATION);
+                }
+                taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
             }
-            taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
+
         }
         if (taintData != null) {
             Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);

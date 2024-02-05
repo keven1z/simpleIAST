@@ -35,13 +35,18 @@ import static com.keven1z.core.utils.PolicyUtils.getToPositionObject;
  */
 public class SourceClassResolver implements HandlerHookClassResolver {
     private static final String[] USER_PACKAGE_PREFIX = new String[]{"java", "javax", " org.spring".substring(1), " org.apache".substring(1), " io.undertow".substring(1)};
-
+    private static final String BLACK_SPRINGFRAMEWORK_RETURN_OBJECT = "SecurityContextHolderAwareRequestWrapper";
     @Override
     public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
         if (returnObject == null || returnObject.equals("")) {
             return;
         }
-
+        /*
+          过滤HandlerMethodArgumentResolverComposite初始包装request对象
+         */
+        if (returnObject.toString().startsWith(BLACK_SPRINGFRAMEWORK_RETURN_OBJECT)){
+            return;
+        }
         Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
         if (fromMap == null || fromMap.isEmpty()) {
             return;
