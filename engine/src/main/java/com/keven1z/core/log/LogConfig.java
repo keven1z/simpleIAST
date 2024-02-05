@@ -36,7 +36,7 @@ public class LogConfig {
      * 创建rasp.log、alarm.log、policy_alarm.log和plugin.log 的appender
      * 为appender增加限速
      */
-    public static void ConfigFileAppender() throws Exception {
+    public static void ConfigFileAppender() {
         initLog4jLogger();
         fileAppenderAddBurstFilter();
     }
@@ -213,11 +213,7 @@ public class LogConfig {
      * log4j debug开关
      */
     public static void enableDebug() {
-        if (LogTool.isDebugEnabled()) {
-            LogLog.setInternalDebugging(true);
-        } else {
-            LogLog.setInternalDebugging(false);
-        }
+        LogLog.setInternalDebugging(LogTool.isDebugEnabled());
     }
 
     /**
