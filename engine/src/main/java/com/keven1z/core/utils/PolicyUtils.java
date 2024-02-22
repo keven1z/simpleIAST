@@ -282,9 +282,10 @@ public class PolicyUtils {
             return null;
         }
         List<TaintNode> allNode = taintGraph.getAllNode();
-        HashSet<TaintNode> parentNodes = new HashSet<>();
+        Set<TaintNode> parentNodes = new LinkedHashSet<>();
         //倒序查询，符合代码执行的流程
-        for (TaintNode taintNode : allNode) {
+        for (int i = allNode.size() - 1; i >= 0; i--) {
+            TaintNode taintNode = allNode.get(i);
             /*
              * 是否为污点对象，eg: fromObject= "sql",传播方法为StringBuilder.toString,污点传出方向为返回值，返回值为sql，则判定为污点
              */

@@ -50,8 +50,6 @@ public class FindingReportMonitor extends Monitor {
                 return;
             }
             buildAndReport(findingReportBo, findingDataList);
-            //降低漏洞处理频率，减少cpu 持续消耗
-            Thread.sleep(1000);
         } catch (Exception e) {
             LogTool.error(ErrorType.REPORT_ERROR, "Failed to report finding", e);
         } finally {

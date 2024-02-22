@@ -2,6 +2,7 @@ package com.keven1z;
 
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.instrument.Instrumentation;
 import java.net.URL;
 import java.util.Objects;
@@ -45,7 +46,9 @@ public class Agent {
             readVersion();
             ModuleLoader.load(action, appName, isDebug, inst);
         } catch (Exception e) {
-            System.err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
+            PrintStream err = System.err;
+            err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
+            e.printStackTrace(err);
             release();
         }
     }

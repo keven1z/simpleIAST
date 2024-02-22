@@ -42,6 +42,10 @@ public class Config {
      */
     public static final int MAX_REPORT_QUEUE_SIZE = 5;
     /**
+     * 最大同时检测大小
+     */
+    public static final int MAX_DETECT_SIZE = 5;
+    /**
      * 日志最大备份天数
      */
     public static final int MAX_LOG_BACKUP_DAYS = 7;

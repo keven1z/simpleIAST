@@ -6,6 +6,7 @@ import com.keven1z.core.pojo.FindingReportBo;
 import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.SingleFindingData;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -69,4 +70,9 @@ public class HookThreadLocal {
      */
     public static final ThreadLocal<Long> REQUEST_TIME_CONSUMED = new ThreadLocal<>();
     public static final ThreadLocal<Set<Integer>> SANITIZER_RESOLVER_CACHE = new ThreadLocal<>();
+    /**
+     * 最大同时检测set
+     */
+    public static final Set<String> DETECT_LIMIT_SET = new HashSet<>();
+
 }

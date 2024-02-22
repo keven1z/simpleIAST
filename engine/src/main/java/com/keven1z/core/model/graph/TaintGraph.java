@@ -155,7 +155,7 @@ public class TaintGraph {
             return null;
         }
         Set<Integer> nodeIds = this.pathMap.get(to.getInvokeId());
-        HashSet<TaintNode> taintNodes = new HashSet<>();
+        Set<TaintNode> taintNodes = new LinkedHashSet<>();
         for (Integer nodeId : nodeIds) {
             TaintNode taintNode = this.nodeSet.get(nodeId);
             taintNodes.add(taintNode);
@@ -213,7 +213,7 @@ public class TaintGraph {
         if (pathMap.containsKey(toInvokeId)) {
             fromInvokeIdSet = pathMap.get(toInvokeId);
         } else {
-            fromInvokeIdSet = new HashSet<>();
+            fromInvokeIdSet = new LinkedHashSet<>();
         }
         fromInvokeIdSet.add(from.getInvokeId());
         pathMap.put(toInvokeId, fromInvokeIdSet);

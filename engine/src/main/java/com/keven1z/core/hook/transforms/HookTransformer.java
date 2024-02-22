@@ -70,6 +70,7 @@ public class HookTransformer implements ClassFileTransformer {
         if (className.contains("proxy")) {
             return classfileBuffer;
         }
+        TransformerProtector.instance.enterProtecting();
         try {
             return doTransform(loader, className, classBeingRedefined, classfileBuffer);
         } catch (Throwable throwable) {
@@ -78,6 +79,8 @@ public class HookTransformer implements ClassFileTransformer {
                 LogTool.error(ErrorType.TRANSFORM_ERROR, "DoTransform " + className + " error", throwable);
             }
             return classfileBuffer;
+        } finally {
+            TransformerProtector.instance.exitProtecting();
         }
 
     }
@@ -180,10 +183,10 @@ public class HookTransformer implements ClassFileTransformer {
      */
     public List<Class<?>> findForReTransform() {
         final List<Class<?>> classes = new ArrayList<>();
-        TransformerProtector.instance.enterProtecting();
 
         Class<?>[] loadedClasses = this.instrumentation.getAllLoadedClasses();
         for (Class<?> clazz : loadedClasses) {
+            TransformerProtector.instance.enterProtecting();
             try {
                 String normalizeClass = ClassUtils.normalizeClass(clazz.getName());
                 if (ClassUtils.isComeFromIASTFamily(normalizeClass, clazz.getClassLoader())) {

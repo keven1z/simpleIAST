@@ -17,6 +17,7 @@ import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -35,18 +36,14 @@ import static com.keven1z.core.utils.PolicyUtils.getToPositionObject;
  */
 public class SourceClassResolver implements HandlerHookClassResolver {
     private static final String[] USER_PACKAGE_PREFIX = new String[]{"java", "javax", " org.spring".substring(1), " org.apache".substring(1), " io.undertow".substring(1)};
-    private static final String BLACK_SPRINGFRAMEWORK_RETURN_OBJECT = "SecurityContextHolderAwareRequestWrapper";
+    private static final String[] BLACK_SPRINGFRAMEWORK_RETURN_OBJECT = new String[]{"org.springframework.web", "SecurityContextHolderAwareRequestWrapper"};
+
     @Override
     public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
-        if (returnObject == null || returnObject.equals("")) {
+        if (!sourceFilter(returnObject)) {
             return;
         }
-        /*
-          过滤HandlerMethodArgumentResolverComposite初始包装request对象
-         */
-        if (returnObject.toString().startsWith(BLACK_SPRINGFRAMEWORK_RETURN_OBJECT)){
-            return;
-        }
+
         Map<String, Object> fromMap = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
         if (fromMap == null || fromMap.isEmpty()) {
             return;
@@ -176,5 +173,34 @@ public class SourceClassResolver implements HandlerHookClassResolver {
                 }
             }
         }
+    }
+
+    /**
+     * @param returnObject 返回污染源
+     * @return 判断源是否可以视为污染源，false表示无法作为污染源，true表示可以作为污染源
+     */
+    private boolean sourceFilter(Object returnObject) {
+        if (returnObject == null || returnObject.equals("")) {
+            return false;
+        }
+        if (returnObject instanceof Collection) {
+            if (((Collection<?>) returnObject).isEmpty()) {
+                return false;
+            }
+        }
+        if (returnObject instanceof Map) {
+            if (((Map<?, ?>) returnObject).isEmpty()) {
+                return false;
+            }
+        }
+        /*
+          过滤HandlerMethodArgumentResolverComposite初始包装request对象
+         */
+        for (String blackReturnObject : BLACK_SPRINGFRAMEWORK_RETURN_OBJECT) {
+            if (returnObject.toString().startsWith(blackReturnObject)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

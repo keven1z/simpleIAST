@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 
+import static com.keven1z.core.Config.MAX_DETECT_SIZE;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 import static com.keven1z.core.hook.HookThreadLocal.REQUEST_THREAD_LOCAL;
 
@@ -42,6 +43,9 @@ public class HttpSpy implements SimpleIASTSpy {
             if (REQUEST_THREAD_LOCAL.get() != null || isRequestStart.get()) {
                 return;
             }
+            if (DETECT_LIMIT_SET.size() > MAX_DETECT_SIZE) {
+                return;
+            }
             String standardStart = ApplicationModel.getApplicationInfo().get("StandardStart");
             AbstractRequest abstractRequest;
             if (Objects.equals(standardStart, "false")) {
@@ -53,6 +57,7 @@ public class HttpSpy implements SimpleIASTSpy {
             if (filterHttp(abstractRequest.getRequestURLString())) {
                 return;
             }
+            DETECT_LIMIT_SET.add(abstractRequest.getRequestId());
             isRequestStart.set(true);
             SANITIZER_RESOLVER_CACHE.set(new HashSet<>());
             REQUEST_TIME_CONSUMED.set(System.currentTimeMillis());
@@ -101,6 +106,7 @@ public class HttpSpy implements SimpleIASTSpy {
         } finally {
             enableHookLock.set(false);
             if (isRequestEnd.get()) {
+                DETECT_LIMIT_SET.remove(REQUEST_THREAD_LOCAL.get().getRequest().getRequestId());
                 TaintSpy.getInstance().clear();
             }
         }

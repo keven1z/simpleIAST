@@ -26,17 +26,25 @@ public class InstructionMonitor extends Monitor {
 
     @Override
     public void doRun() throws Exception {
+        Thread.sleep(30 * 1000);
         String instruction = IASTHttpClient.getClient().getInstruction();
         if (instruction == null) {
+            if (ApplicationModel.isRunning()) {
+                ApplicationModel.stop();
+            }
             //如果获取失败，120s后再请求
             Thread.sleep(120 * 1000);
             return;
+        } else {
+            if (ApplicationModel.isRunning()) {
+                ApplicationModel.start();
+            }
         }
 
         List<InstructionDTO> instructions = JsonUtils.toList(instruction, new TypeReference<List<InstructionDTO>>() {
         });
+
         if (instructions.isEmpty()) {
-            Thread.sleep(30 * 1000);
             return;
         }
         if (LogTool.isDebugEnabled()) {
