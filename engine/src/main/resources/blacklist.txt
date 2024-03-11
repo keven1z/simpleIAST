@@ -550,7 +550,6 @@ java/beans/Introspector
 org/yaml/snakeyaml
 sun/reflect/
 com/sun/naming/
-com/sun/org/apache/xalan/
 com/sun/org/apache/xml/
 java/sql/Date
 java/sql/Timestamp
@@ -990,7 +989,6 @@ sun/invoke/util/VerifyAccess$1
 javax/xml/transform/dom/DOMSource
 javax/xml/transform/sax/SAXSource
 javax/xml/transform/stax/StAXSource
-javax/xml/transform/stream/StreamSource
 javax/xml/transform/TransformerFactory
 javax/xml/transform/FactoryFinder
 javax/xml/bind/Binder

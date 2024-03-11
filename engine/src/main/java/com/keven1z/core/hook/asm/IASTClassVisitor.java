@@ -5,6 +5,7 @@ import com.keven1z.core.hook.asm.adapter.HttpAdviceAdapter;
 import com.keven1z.core.hook.asm.adapter.HttpBodyAdviceAdapter;
 import com.keven1z.core.hook.asm.adapter.HttpBodyReadAdviceAdapter;
 import com.keven1z.core.hook.asm.adapter.SingleAdviceAdapter;
+import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.Policy;
 import com.keven1z.core.hook.asm.adapter.TaintAdviceAdapter;
 import com.keven1z.core.utils.PolicyUtils;
@@ -21,7 +22,7 @@ public class IASTClassVisitor extends ClassVisitor {
     protected final String className;
     //监控进入hook点，但未成功匹配方法描述，弹出警告告知method或者desc错误
     private boolean isVisitMethod;
-    protected final Logger hookLogger = Logger.getLogger("hook.info");
+    protected final Logger logger = Logger.getLogger(this.getClass());
     /**
      * 策略名称:http body 读取标志hook点
      */
@@ -34,6 +35,7 @@ public class IASTClassVisitor extends ClassVisitor {
      * 策略名称:http body读取hook点
      */
     private final static String HTTP_BODY_READ = "http_body_read";
+
 
     public IASTClassVisitor(ClassVisitor classVisitor, String className) {
         super(Opcodes.ASM9, classVisitor);
@@ -52,23 +54,26 @@ public class IASTClassVisitor extends ClassVisitor {
         if (isNative(access)) {
             return methodVisitor;
         }
-        JSRInlinerAdapter jsrInlinerAdapter = new JSRInlinerAdapter(methodVisitor, access, name, descriptor, signature, exceptions);
-
-        Policy policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getHttp());
+        methodVisitor = new JSRInlinerAdapter(methodVisitor, access, name, descriptor, signature, exceptions);
+        Policy policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getSingles());
         if (policy != null) {
+            isVisitMethod = true;
             //打印错误日志
-            return visitHTTPMethod(access, name, descriptor, jsrInlinerAdapter, policy);
+            return visitNormalMethod(access, name, descriptor, methodVisitor, policy);
         }
-        policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getSingles());
+
+        policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getHttp());
         if (policy != null) {
+            isVisitMethod = true;
             //打印错误日志
-            return visitNormalMethod(access, name, descriptor, jsrInlinerAdapter, policy);
+            methodVisitor = visitHTTPMethod(access, name, descriptor, methodVisitor, policy);
         }
 
         policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getTaintPolicy());
         if (policy != null) {
+            isVisitMethod = true;
             //打印错误日志
-            return visitTaintMethod(access, name, descriptor, jsrInlinerAdapter, policy);
+            return visitTaintMethod(access, name, descriptor, methodVisitor, policy);
         }
 
         return methodVisitor;
@@ -113,11 +118,10 @@ public class IASTClassVisitor extends ClassVisitor {
     @Override
     public void visitEnd() {
         super.visitEnd();
-//        if (!isVisitMethod) {
-//            System.out.println("[SimpleIAST] Failed to visit method,className:" + this.className + ",Please check method or desc in policy.json");
-//            if (LogTool.isDebugEnabled()) {
-//                Logger.getLogger(getClass()).info("Failed to visit method,className:" + this.className + ",Please check method or desc in policy.json");
-//            }
-//        }
+        if (!isVisitMethod) {
+            if (LogTool.isDebugEnabled()) {
+                logger.info("Failed to visit method,className:" + this.className + ",Please check method or desc in policy.json");
+            }
+        }
     }
 }

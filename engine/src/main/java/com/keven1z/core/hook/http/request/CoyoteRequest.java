@@ -17,16 +17,15 @@
 package com.keven1z.core.hook.http.request;
 
 
-import com.keven1z.core.Config;
 import com.keven1z.core.utils.ReflectionUtils;
 import com.keven1z.core.utils.StringUtils;
-
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.keven1z.core.consts.HTTPConst.GET;
+import static com.keven1z.core.utils.ReflectionUtils.EMPTY_CLASS;
+import static com.keven1z.core.utils.ReflectionUtils.STRING_CLASS;
 
 /**
  * Created by zhuming01 on 6/23/17.

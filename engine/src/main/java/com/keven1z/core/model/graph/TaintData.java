@@ -24,6 +24,8 @@ public class TaintData {
     private String desc;
     private String name;
     @JsonIgnore
+    private Object thisObject;
+    @JsonIgnore
     private int toObjectHashCode;
     /**
      * 该hook点所属的阶段，污染源、传播、污染汇聚点等阶段
@@ -68,6 +70,7 @@ public class TaintData {
      * 过滤条件值
      */
     private String conditions;
+    @JsonIgnore
     private Object[] parameters;
     /**
      * 是否进行过滤处理
@@ -206,6 +209,14 @@ public class TaintData {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Object getThisObject() {
+        return thisObject;
+    }
+
+    public void setThisObject(Object thisObject) {
+        this.thisObject = thisObject;
     }
 
     @Override

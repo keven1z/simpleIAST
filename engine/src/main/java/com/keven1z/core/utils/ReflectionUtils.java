@@ -26,7 +26,8 @@ import java.lang.reflect.Method;
  * 反射工具类
  */
 public class ReflectionUtils {
-//    private static final Logger LOGGER = Logger.getLogger(Reflection.class.getName());
+    public final static Class<?>[] STRING_CLASS = new Class[]{String.class};
+    public final static Class<?>[] EMPTY_CLASS = new Class[]{};
 
     /**
      * 根据方法名调用对象的某一个方法

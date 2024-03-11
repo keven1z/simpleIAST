@@ -29,7 +29,7 @@ public class TaintUtils {
         return sourceNodes;
     }
 
-    private static final int MAX_VALUE_LENGTH = 100;
+    private static final int MAX_VALUE_LENGTH = 200;
 
     /**
      * 格式化值，值的长度大于 MAX_VALUE_LENGTH，省略中间部分
@@ -40,7 +40,7 @@ public class TaintUtils {
         if (value.length() <= MAX_VALUE_LENGTH) {
             return value;
         }
-        value = value.substring(0, 40) + "..." + value.substring(value.length() - 40);
+        value = value.substring(0, 100) + "..." + value.substring(value.length() - 100);
         return value;
     }
 

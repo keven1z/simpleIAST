@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.keven1z.core.consts.HTTPConst.GET;
+import static com.keven1z.core.utils.ReflectionUtils.EMPTY_CLASS;
+import static com.keven1z.core.utils.ReflectionUtils.STRING_CLASS;
 
 /**
  * Created by zhuming01 on 6/15/17.
@@ -35,7 +37,6 @@ import static com.keven1z.core.consts.HTTPConst.GET;
  * javax.servlet.http.HttpServletRequest类请求的统一格式接口
  */
 public final class HttpServletRequest extends AbstractRequest {
-    private static final Map<String, String[]> EMPTY_PARAM = new HashMap<String, String[]>();
     private static final Pattern PATTERN = Pattern.compile("\\d+(\\.\\d+)*");
 
     /**

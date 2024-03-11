@@ -25,14 +25,12 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 import static com.keven1z.core.consts.HTTPConst.POST;
+import static com.keven1z.core.utils.ReflectionUtils.STRING_CLASS;
 
 /**
  * 为不同服务器的不同请求hook点做出的统一格式抽象类
  */
 public abstract class AbstractRequest {
-    public static final Class[] EMPTY_CLASS = new Class[]{};
-    protected static final Class[] STRING_CLASS = new Class[]{String.class};
-
 
     protected WeakReference<Object> request;
     protected WeakReference<Object> inputStream = null;
@@ -41,7 +39,7 @@ public abstract class AbstractRequest {
     protected Object charReader = null;
     protected ByteArrayOutputStream bodyOutputStream = null;
     protected CharArrayWriter bodyWriter = null;
-    protected int maxBodySize = 4096;
+    protected int maxBodySize = Config.getConfig().MAX_BODY_SIZE;
     protected String requestId;
     protected boolean canGetParameter = false;
     /**
@@ -79,7 +77,6 @@ public abstract class AbstractRequest {
     public AbstractRequest(Object request, String requestId) {
         this.request = new WeakReference<>(request);
         this.requestId = requestId;
-        this.maxBodySize = Config.getConfig().MAX_BODY_SIZE;
     }
 
     /**

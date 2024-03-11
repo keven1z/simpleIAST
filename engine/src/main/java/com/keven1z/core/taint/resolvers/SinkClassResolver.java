@@ -37,6 +37,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
                 taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
                 taintData.setFromValue(fromObject.toString());
                 taintData.setVulnType(policyName);
+                taintData.setThisObject(thisObject);
             }
             taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
         }
