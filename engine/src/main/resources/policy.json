@@ -8,6 +8,13 @@
       "state": 1,
       "enter": 1,
       "exit": 1,
+      "exclude": ["org/springframework/security/web/header/HeaderWriterFilter",
+        "org/springframework/security/web/csrf/CsrfFilter",
+        "org/springframework/security/web/authentication/preauth/x509/X509AuthenticationFilter",
+        "org/springframework/security/web/authentication/UsernamePasswordAuthenticationFilter",
+        "org/springframework/security/web/authentication/www/BasicAuthenticationFilter",
+        ""
+      ],
       "inter": true
     },
     {
@@ -112,6 +119,31 @@
       "from": "O",
       "to": "R",
       "inter": true,
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getHeader",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getHeader",
+      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+      "state": 0,
+      "from": "P1",
+      "to": "R",
+      "inter": true,
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getParameterValues",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getParameterValues",
+      "desc": "(Ljava/lang/String;)[Ljava/lang/String;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
+      "inter": true,
+      "exclude": ["org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"],
       "enter": 0,
       "exit": 1
     },

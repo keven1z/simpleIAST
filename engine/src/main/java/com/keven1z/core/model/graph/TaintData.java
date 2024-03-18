@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.utils.TaintUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,7 +27,9 @@ public class TaintData {
     @JsonIgnore
     private Object thisObject;
     @JsonIgnore
-    private int toObjectHashCode;
+    private Object toObject;
+    @JsonIgnore
+    private List<Integer> toObjectHashCode;
     /**
      * 该hook点所属的阶段，污染源、传播、污染汇聚点等阶段
      */
@@ -122,12 +125,15 @@ public class TaintData {
         this.toValue = TaintUtils.format(toValue);
     }
 
-    public int getToObjectHashCode() {
+    public List<Integer> getToObjectHashCode() {
         return toObjectHashCode;
     }
 
-    public void setToObjectHashCode(int toObjectHashCode) {
-        this.toObjectHashCode = toObjectHashCode;
+    public void setToObjectHashCode(Integer toObjectHashCode) {
+        if (this.toObjectHashCode == null) {
+            this.toObjectHashCode = new ArrayList<>(5);
+        }
+        this.toObjectHashCode.add(toObjectHashCode);
     }
 
     public String getStage() {
@@ -276,6 +282,25 @@ public class TaintData {
     public void setToType(String toType) {
         this.toType = toType;
     }
+
+    public Object getToObject() {
+        return toObject;
+    }
+
+    private final static String STRING_ARR_CLASS_NAME = "[Ljava.lang.String;";
+
+    public void setToObject(Object toObject) {
+        this.toObject = toObject;
+        if (STRING_ARR_CLASS_NAME.equals(toObject.getClass().getName())) {
+            String[] toObjects = (String[]) toObject;
+            for (String to : toObjects) {
+                this.setToObjectHashCode(System.identityHashCode(to));
+            }
+        } else {
+            this.setToObjectHashCode(System.identityHashCode(toObject));
+        }
+    }
+
     public void clear() {
         if (this.stackList != null) {
             this.stackList.clear();

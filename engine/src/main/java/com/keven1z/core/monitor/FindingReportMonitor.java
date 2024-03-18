@@ -45,7 +45,7 @@ public class FindingReportMonitor extends Monitor {
             List<FindingData> findingDataList = check(findingReportBo);
             if (findingDataList.isEmpty()) {
                 if (LogTool.isDebugEnabled()){
-                    logger.warn("Failed to report finding");
+                    logger.warn("Failed to report finding,no vulnerabilities were detected.");
                 }
                 return;
             }

@@ -96,30 +96,34 @@ public class TaintUtils {
                 return taintData.getToValue();
             case "java.io.InputStream":
                 return null;
-//            case "java.util.ArrayList":
-//                for (TaintData data : taintDataLinkedList) {
-//                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-//                        if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
-//                            String className = data.getClassName();
-//                            String method = data.getMethod();
-//                            if (className.contains("List") && method.equals("get")) {
-//                                return data.getToValue();
-//                            }
-//                        }
-//                    }
-//                }
-//            case "java.util.Map":
-//                for (TaintData data : taintDataLinkedList) {
-//                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-//                        if (data.getFromObjectHashCode() == taintData.getToObjectHashCode()) {
-//                            String className = data.getClassName();
-//                            String method = data.getMethod();
-//                            if (className.contains("Map") && method.equals("get")) {
-//                                return data.getToValue();
-//                            }
-//                        }
-//                    }
-//                }
+            case "java.util.ArrayList":
+                for (TaintData data : taintDataLinkedList) {
+                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
+                        String className = data.getClassName();
+                        String method = data.getMethod();
+                        if (className.contains("List") && method.equals("get")) {
+                            return data.getToValue();
+                        }
+                    }
+                }
+            case "java.util.Map":
+                for (TaintData data : taintDataLinkedList) {
+                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
+                        String className = data.getClassName();
+                        String method = data.getMethod();
+                        if (className.contains("Map") && method.equals("get")) {
+                            return data.getToValue();
+                        }
+                    }
+                }
+            case "java.lang.String[]":
+                for (TaintData data : taintDataLinkedList) {
+                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
+                        if (taintData.getToObjectHashCode().contains(System.identityHashCode(data.getFromValue()))) {
+                            return data.getToValue();
+                        }
+                    }
+                }
             default:
                 return null;
         }
@@ -173,8 +177,8 @@ public class TaintUtils {
             return;
         }
 
-        taintData.setToObjectHashCode(System.identityHashCode(toObject));
         if (toObject != null) {
+            taintData.setToObject(toObject);
             taintData.setToValue(toObject.toString());
             taintData.setToType(toObject.getClass().getTypeName());
         }

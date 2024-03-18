@@ -75,7 +75,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         }
 
         taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
-        taintData.setToType(String.class.getTypeName());
+        taintData.setToType(toObject.getClass().getName());
         taintData.setFromValue(getSourceFromName(fromMap));
         TaintUtils.buildTaint(returnObject, taintData, toObject, true);
 

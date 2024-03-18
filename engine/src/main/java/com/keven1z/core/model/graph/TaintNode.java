@@ -2,6 +2,7 @@ package com.keven1z.core.model.graph;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -102,10 +103,14 @@ public class TaintNode {
      * @param fromObjectHashCode 传入对象
      */
     public boolean isToObject(int fromObjectHashCode) {
-        int toObjectHashCode = this.taintData.getToObjectHashCode();
-        return fromObjectHashCode == toObjectHashCode;
+        List<Integer> toObjectHashCode = this.taintData.getToObjectHashCode();
+        if (toObjectHashCode == null || toObjectHashCode.isEmpty()){
+            return false;
+        }
+        return toObjectHashCode.contains(fromObjectHashCode);
     }
-    public void clear(){
+
+    public void clear() {
         this.taintEdgeSet.clear();
         this.taintData.clear();
     }

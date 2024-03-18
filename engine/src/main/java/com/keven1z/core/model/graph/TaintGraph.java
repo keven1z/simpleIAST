@@ -47,7 +47,10 @@ public class TaintGraph {
     public void addNode(TaintData taintData) {
         TaintNode node = new TaintNode(taintData);
         addNode(node);
-        this.taintCache.add(taintData.getToObjectHashCode());
+        List<Integer> toObjectHashCode = taintData.getToObjectHashCode();
+        if (toObjectHashCode != null && !toObjectHashCode.isEmpty()) {
+            this.taintCache.addAll(taintData.getToObjectHashCode());
+        }
         if (LogTool.isDebugEnabled()) {
             taintLogger.info("Add taint:" + taintData);
         }

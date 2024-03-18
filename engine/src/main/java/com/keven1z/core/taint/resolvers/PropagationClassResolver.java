@@ -38,9 +38,9 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
                 if (taintData == null) {
                     taintData = new TaintData(className, method, desc, PolicyTypeEnum.PROPAGATION);
                 }
+                taintData.setFromValue(fromObject.toString());
                 taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
             }
-
         }
         if (taintData != null) {
             Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);
