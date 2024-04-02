@@ -748,6 +748,72 @@
       "to": "O",
       "enter": 0,
       "exit": 1
+    },
+    {
+      "name": "HierarchicalStreamDriver.createReader",
+      "className": "com/thoughtworks/xstream/io/HierarchicalStreamDriver",
+      "method": "createReader",
+      "desc": "(Ljava/io/Reader;)Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "HierarchicalStreamDriver.createReader",
+      "className": "com/thoughtworks/xstream/io/HierarchicalStreamDriver",
+      "method": "createReader",
+      "desc": "(Ljava/io/InputStream;)Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "Input.<init>",
+      "className": "com/esotericsoftware/kryo/io/Input",
+      "method": "<init>",
+      "desc": "([B)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "Input.<init>",
+      "className": "com/esotericsoftware/kryo/io/Input",
+      "method": "<init>",
+      "desc": "([BII)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "Input.<init>",
+      "className": "com/esotericsoftware/kryo/io/Input",
+      "method": "<init>",
+      "desc": "([BII)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "Input.<init>",
+      "className": "com/esotericsoftware/kryo/io/Input",
+      "method": "<init>",
+      "desc": "(Ljava/io/InputStream;I)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
     }
   ],
   "sink": [
@@ -1277,7 +1343,39 @@
       "name": "spring_expression_injection",
       "className": "org/springframework/expression/ExpressionParser",
       "method": "parseExpression",
-      "desc": "(Ljava/lang/String;Lorg/springframework/expression/ParserContext;)Lorg/springframework/expression/Expression;",
+      "desc": "(Ljava/lang/String;)Lorg/springframework/expression/Expression;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },{
+      "name": "spring_expression_injection",
+      "className": "javax/el/ExpressionFactory",
+      "method": "createValueExpression",
+      "desc": "(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;)Ljavax/el/ValueExpression;",
+      "state": 1,
+      "from": "P3",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
+      "name": "spring_expression_injection",
+      "className": "javax/el/ExpressionFactory",
+      "method": "createMethodExpression",
+      "desc": "(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;[Ljava/lang/Class;)Ljavax/el/MethodExpression;",
+      "state": 1,
+      "from": "P3",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
+      "name": "spring_expression_injection",
+      "className": "org/apache/ibatis/ognl/Ognl",
+      "method": "parseExpression",
+      "desc": "(Ljava/lang/String;)Ljava/lang/Object;",
       "state": 1,
       "from": "P1",
       "enter": 1,
@@ -1286,14 +1384,13 @@
     },
     {
       "name": "spring_expression_injection",
-      "className": "org/springframework/expression/ExpressionParser",
+      "className": "org/thymeleaf/standard/expression/StandardExpressionParser",
       "method": "parseExpression",
-      "desc": "(Ljava/lang/String;Lorg/springframework/expression/ParserContext;)Lorg/springframework/expression/Expression;",
+      "desc": "(Lorg/thymeleaf/context/IExpressionContext;Ljava/lang/String;Z)Lorg/thymeleaf/standard/expression/IStandardExpression;",
       "state": 1,
       "from": "P1",
       "enter": 1,
-      "exit": 0,
-      "inter": true
+      "exit": 0
     }
   ],
   "sanitizers": [
