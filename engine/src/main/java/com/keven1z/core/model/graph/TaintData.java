@@ -56,11 +56,6 @@ public class TaintData {
      * 污染传出的值
      */
     private String toValue;
-
-    /**
-     * 污染传出的值类型
-     */
-    private String toType;
     /**
      * 返回值字符串
      */
@@ -122,7 +117,7 @@ public class TaintData {
     }
 
     public void setToValue(String toValue) {
-        this.toValue = TaintUtils.format(toValue);
+        this.toValue = toValue;
     }
 
     public List<Integer> getToObjectHashCode() {
@@ -275,30 +270,15 @@ public class TaintData {
         this.fromType = fromType;
     }
 
-    public String getToType() {
-        return toType;
-    }
-
-    public void setToType(String toType) {
-        this.toType = toType;
-    }
 
     public Object getToObject() {
         return toObject;
     }
 
-    private final static String STRING_ARR_CLASS_NAME = "[Ljava.lang.String;";
-
     public void setToObject(Object toObject) {
         this.toObject = toObject;
-        if (STRING_ARR_CLASS_NAME.equals(toObject.getClass().getName())) {
-            String[] toObjects = (String[]) toObject;
-            for (String to : toObjects) {
-                this.setToObjectHashCode(System.identityHashCode(to));
-            }
-        } else {
-            this.setToObjectHashCode(System.identityHashCode(toObject));
-        }
+        this.setToObjectHashCode(System.identityHashCode(toObject));
+        this.setToValue(toObject.toString());
     }
 
     public void clear() {

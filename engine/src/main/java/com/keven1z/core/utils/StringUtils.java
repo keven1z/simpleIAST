@@ -7,7 +7,7 @@ public class StringUtils {
      * 判断字符是否存在以数组中的元素开头
      */
     public static boolean isStartsWithElementInArray(String str, String[] arr) {
-        if (isEmpty(str) || arr.length == 0) {
+        if (isEmpty(str)) {
             return false;
         }
         for (String element : arr) {
@@ -22,7 +22,7 @@ public class StringUtils {
      * 判断Collection中是否存在以str结尾的元素
      */
     public static boolean isEndWithElementInList(String str, Collection<String> collection) {
-        if (isEmpty(str) || collection.size() == 0) {
+        if (isEmpty(str) || collection.isEmpty()) {
             return false;
         }
         for (String element : collection) {

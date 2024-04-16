@@ -56,13 +56,13 @@ public class TaintUtils {
         //如果为单个源
         if (sourceList.size() == 1) {
             TaintData taintData = sourceList.get(0);
-            String source = handlerSource(taintData, taintDataLinkedList);
+            String source = getSourceString(taintData, taintDataLinkedList);
             if (source != null) {
                 returnSourceList.add(source);
             }
         } else {
             for (TaintData taintData : sourceList) {
-                String source = handlerSource(taintData, taintDataLinkedList);
+                String source = getSourceString(taintData, taintDataLinkedList);
                 if (source != null) {
                     returnSourceList.add(source);
                 }
@@ -87,46 +87,14 @@ public class TaintUtils {
     /**
      * 返回污染源数据，返回null不进行源计入
      *
-     * @param taintData 污染源
+     * @param source 污染源
      */
-    private static String handlerSource(TaintData taintData, LinkedList<TaintData> taintDataLinkedList) {
-        String taintValueType = taintData.getToType();
-        switch (taintValueType) {
-            case "java.lang.String":
-                return taintData.getToValue();
-            case "java.io.InputStream":
-                return null;
-            case "java.util.ArrayList":
-                for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-                        String className = data.getClassName();
-                        String method = data.getMethod();
-                        if (className.contains("List") && method.equals("get")) {
-                            return data.getToValue();
-                        }
-                    }
-                }
-            case "java.util.Map":
-                for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-                        String className = data.getClassName();
-                        String method = data.getMethod();
-                        if (className.contains("Map") && method.equals("get")) {
-                            return data.getToValue();
-                        }
-                    }
-                }
-            case "java.lang.String[]":
-                for (TaintData data : taintDataLinkedList) {
-                    if (PolicyTypeEnum.PROPAGATION.name().equals(data.getStage())) {
-                        if (taintData.getToObjectHashCode().contains(System.identityHashCode(data.getFromValue()))) {
-                            return data.getToValue();
-                        }
-                    }
-                }
-            default:
-                return null;
+    private static String getSourceString(TaintData source, LinkedList<TaintData> taintDataLinkedList) {
+        Object toObject = source.getToObject();
+        if (toObject instanceof String){
+            return toObject.toString();
         }
+        else return null;
     }
 
     /**
@@ -167,7 +135,7 @@ public class TaintUtils {
      *
      * @param isRecordStack 是否记录调用栈
      */
-    public static void buildTaint(Object returnObject, TaintData taintData, Object toObject, boolean isRecordStack) {
+    public static void buildTaint(Object returnObject, TaintData taintData, boolean isRecordStack) {
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
         if (taintGraph == null) {
             return;
@@ -175,12 +143,6 @@ public class TaintUtils {
 
         if (taintData == null) {
             return;
-        }
-
-        if (toObject != null) {
-            taintData.setToObject(toObject);
-            taintData.setToValue(toObject.toString());
-            taintData.setToType(toObject.getClass().getTypeName());
         }
 
         if (isRecordStack) {

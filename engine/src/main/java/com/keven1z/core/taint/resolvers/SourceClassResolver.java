@@ -14,19 +14,15 @@ import com.keven1z.core.utils.*;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 import static com.keven1z.core.consts.CommonConst.OFF;
 import static com.keven1z.core.consts.CommonConst.ON;
 import static com.keven1z.core.consts.PolicyConst.SOURCE_BEAN;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
-import static com.keven1z.core.utils.PolicyUtils.getToPositionObject;
 
 /**
  * 污染源的解析器
@@ -37,10 +33,11 @@ import static com.keven1z.core.utils.PolicyUtils.getToPositionObject;
 public class SourceClassResolver implements HandlerHookClassResolver {
     private static final String[] USER_PACKAGE_PREFIX = new String[]{"java", "javax", " org.spring".substring(1), " org.apache".substring(1), " io.undertow".substring(1)};
     private static final String[] BLACK_SPRINGFRAMEWORK_RETURN_OBJECT = new String[]{"org.springframework.web", "SecurityContextHolderAwareRequestWrapper"};
+    private static final String CLASS_OPTIONAL = "java.util.Optional";
 
     @Override
     public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
-        if (!sourceFilter(returnObject)) {
+        if (!isReturnObjectFiltered(returnObject)) {
             return;
         }
 
@@ -49,42 +46,15 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             return;
         }
 
-        Object toObject = getToPositionObject(to, parameters, returnObject, thisObject);
-        if (toObject == null) {
-            return;
-        }
-
-        TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-        TaintData taintData = null;
         if (SOURCE_BEAN.equals(policyName)) {
-            for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
-                Object fromObject = entry.getValue();
-                TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
-                if (parentNode == null) {
-                    continue;
-                }
-                if (taintData == null) {
-                    taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
-                }
-                taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
-            }
-            if (taintData != null) {
-                TaintUtils.buildTaint(returnObject, taintData, toObject, true);
-            }
+            resolveBeanHook(className, method, desc, returnObject, fromMap);
             return;
         }
 
-        taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
-        taintData.setToType(toObject.getClass().getName());
+        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+        searchAndFillSourceFromReturnObject(returnObject, taintData);
         taintData.setFromValue(getSourceFromName(fromMap));
-        TaintUtils.buildTaint(returnObject, taintData, toObject, true);
-
-
-        //如果污染源为用户对象，则判断为bean对象，将其对象所有get方法加入hook策略
-        if (!StringUtils.isStartsWithElementInArray(toObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
-            addBeanObjectPolicy(toObject.getClass());
-        }
-
+        TaintUtils.buildTaint(returnObject, taintData, true);
     }
 
     /**
@@ -100,6 +70,26 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             }
         }
         return null;
+    }
+
+    private void resolveBeanHook(String className, String method, String desc, Object returnObject, Map<String, Object> fromMap) {
+        TaintData taintData = null;
+        for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
+            TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
+            Object fromObject = entry.getValue();
+            TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
+            if (parentNode == null) {
+                continue;
+            }
+            if (taintData == null) {
+                taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+            }
+            taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
+        }
+        if (taintData != null) {
+            taintData.setToObject(returnObject);
+            TaintUtils.buildTaint(returnObject, taintData, true);
+        }
     }
 
     /**
@@ -118,6 +108,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             return;
         }
         Class<?>[] loadedClasses = inst.getAllLoadedClasses();
+        Set<String> toBeTransformedClass = new HashSet<>();
         for (Method method : toBeTransformedMethods) {
             String name = method.getName();
             String taintClassName = method.getDeclaringClass().getName();
@@ -130,6 +121,9 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             policy.setName(SOURCE_BEAN);
             policy.setType(PolicyTypeEnum.SOURCE);
             TaintSpy.getInstance().getPolicyContainer().addPolicy(policy);
+            toBeTransformedClass.add(taintClassName);
+        }
+        for (String taintClassName : toBeTransformedClass) {
             reTransform(taintClassName, inst, loadedClasses);
         }
 
@@ -179,16 +173,14 @@ public class SourceClassResolver implements HandlerHookClassResolver {
      * @param returnObject 返回污染源
      * @return 判断源是否可以视为污染源，false表示无法作为污染源，true表示可以作为污染源
      */
-    private boolean sourceFilter(Object returnObject) {
+    private boolean isReturnObjectFiltered(Object returnObject) {
         if (returnObject == null || returnObject.equals("")) {
             return false;
-        }
-        if (returnObject instanceof Collection) {
+        } else if (returnObject instanceof Collection) {
             if (((Collection<?>) returnObject).isEmpty()) {
                 return false;
             }
-        }
-        if (returnObject instanceof Map) {
+        } else if (returnObject instanceof Map) {
             if (((Map<?, ?>) returnObject).isEmpty()) {
                 return false;
             }
@@ -202,5 +194,90 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             }
         }
         return true;
+    }
+
+    public void searchAndFillSourceFromReturnObject(Object returnObject, TaintData taintData) {
+        if (returnObject.getClass().isArray() && !returnObject.getClass().getComponentType().isPrimitive()) {
+            parseArrayObject(returnObject, taintData);
+        } else if (returnObject instanceof Iterator) {
+            parseIteratorObject((Iterator<?>) returnObject, taintData);
+        } else if (returnObject instanceof Map) {
+            parseMap((Map<?, ?>) returnObject, taintData);
+        } else if (returnObject instanceof Map.Entry) {
+            parseMapEntry((Map.Entry<?, ?>) returnObject, taintData);
+        } else if (returnObject instanceof Collection) {
+            if (returnObject instanceof List) {
+                parseList((List<?>) returnObject, taintData);
+            } else {
+                parseIteratorObject(((Collection<?>) returnObject).iterator(), taintData);
+            }
+        } else if (CLASS_OPTIONAL.equals(returnObject.getClass().getName())) {
+            parseOptional(returnObject, taintData);
+        }
+        //如果污染源为用户对象，则判断为bean对象，将其对象所有get方法加入hook策略
+        else if (!StringUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
+            addBeanObjectPolicy(returnObject.getClass());
+        } else {
+            taintData.setToObject(returnObject);
+        }
+    }
+
+    private void parseArrayObject(Object toObject, TaintData taintData) {
+        int length = Array.getLength(toObject);
+        for (int i = 0; i < length; i++) {
+            Object data = Array.get(toObject, i);
+            if (data == null || data == "") {
+                continue;
+            }
+            searchAndFillSourceFromReturnObject(data, taintData);
+        }
+    }
+
+    private void parseIteratorObject(Iterator<?> iterator, TaintData taintData) {
+        while (iterator.hasNext()) {
+            Object data = iterator.next();
+            if (data == null || data == "") {
+                continue;
+            }
+            searchAndFillSourceFromReturnObject(data, taintData);
+        }
+    }
+
+    private void parseMap(Map<?, ?> map, TaintData taintData) {
+        for (Object value : map.values()) {
+            if (value == null || value == "") {
+                continue;
+            }
+            searchAndFillSourceFromReturnObject(value, taintData);
+        }
+    }
+
+    private void parseMapEntry(Map.Entry<?, ?> entry, TaintData taintData) {
+        Object value = entry.getValue();
+        if (value == null || value == "") {
+            return;
+        }
+        searchAndFillSourceFromReturnObject(value, taintData);
+    }
+
+    private void parseList(List<?> list, TaintData taintData) {
+        for (Object data : list) {
+            if (data == null || data == "") {
+                continue;
+            }
+            searchAndFillSourceFromReturnObject(data, taintData);
+        }
+    }
+
+    private void parseOptional(Object obj, TaintData taintData) {
+        try {
+            Object value = ((Optional<?>) obj).orElse(null);
+            if (value == null || value == "") {
+                return;
+            }
+            searchAndFillSourceFromReturnObject(value, taintData);
+        } catch (Exception e) {
+            //pass
+        }
     }
 }

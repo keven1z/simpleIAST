@@ -8,7 +8,8 @@
       "state": 1,
       "enter": 1,
       "exit": 1,
-      "exclude": ["org/springframework/security/web/header/HeaderWriterFilter",
+      "exclude": [
+        "org/springframework/security/web/header/HeaderWriterFilter",
         "org/springframework/security/web/csrf/CsrfFilter",
         "org/springframework/security/web/authentication/preauth/x509/X509AuthenticationFilter",
         "org/springframework/security/web/authentication/UsernamePasswordAuthenticationFilter",
@@ -143,7 +144,39 @@
       "from": "P1",
       "to": "R",
       "inter": true,
-      "exclude": ["org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"],
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
+      ],
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getReader",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getReader",
+      "desc": "()Ljava/io/BufferedReader;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "inter": true,
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
+      ],
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getQueryString",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getQueryString",
+      "desc": "()Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "inter": true,
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
+      ],
       "enter": 0,
       "exit": 1
     },
@@ -198,6 +231,71 @@
       "state": 1,
       "from": "O,P1",
       "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "getChars",
+      "desc": "(II[CI)V",
+      "state": 1,
+      "from": "O,P1",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "insert",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "insert",
+      "desc": "(ILjava/lang/CharSequence;)Ljava/lang/AbstractStringBuilder;",
+      "state": 1,
+      "from": "P2",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "insert",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "insert",
+      "desc": "(ILjava/lang/CharSequence;II)Ljava/lang/AbstractStringBuilder;",
+      "state": 1,
+      "from": "P2",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "insert",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "insert",
+      "desc": "(ILjava/lang/String;)Ljava/lang/AbstractStringBuilder;",
+      "state": 1,
+      "from": "P2",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "insert",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "insert",
+      "desc": "(I[CII)Ljava/lang/AbstractStringBuilder;",
+      "state": 1,
+      "from": "P2",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "insert",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "insert",
+      "desc": "(I[C)Ljava/lang/AbstractStringBuilder;",
+      "state": 1,
+      "from": "P2",
+      "to": "O",
       "enter": 0,
       "exit": 1
     },
@@ -277,17 +375,6 @@
       "exit": 1
     },
     {
-      "name": "substring",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
       "name": "getBytes",
       "className": "java/lang/String",
       "method": "getBytes",
@@ -317,6 +404,116 @@
       "state": 1,
       "from": "O",
       "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([BII)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([BIII)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([C)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([CII)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([BIILjava/lang/String;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([BIILjava/nio/charset/Charset;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "(Ljava/lang/String;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "(Ljava/lang/StringBuffer;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "(Ljava/lang/StringBuilder;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "String.<init>",
+      "className": "java/lang/String",
+      "method": "<init>",
+      "desc": "([BB)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
       "enter": 0,
       "exit": 1
     },
@@ -485,106 +682,6 @@
       "exit": 1
     },
     {
-      "name": "iterator next",
-      "className": "java/util/Iterator",
-      "method": "next",
-      "desc": "()Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1,
-      "inter": true
-    },
-    {
-      "name": "ArrayList get",
-      "className": "java/util/ArrayList",
-      "method": "get",
-      "desc": "(I)Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "ArrayList add",
-      "className": "java/util/ArrayList",
-      "method": "add",
-      "desc": "(Ljava/lang/Object;)Z",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ArrayList iterator",
-      "className": "java/util/ArrayList",
-      "method": "iterator",
-      "desc": "()Ljava/util/Iterator;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "LinkedList get",
-      "className": "java/util/LinkedList",
-      "method": "get",
-      "desc": "(I)Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "HashMap get",
-      "className": "java/util/HashMap",
-      "method": "get",
-      "desc": "(Ljava/lang/Object;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "hashMap put",
-      "className": "java/util/HashMap",
-      "method": "put",
-      "desc": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "LinkedHashMap",
-      "className": "java/util/LinkedHashMap",
-      "method": "get",
-      "desc": "(Ljava/lang/Object;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Hashtable",
-      "className": "java/util/Hashtable",
-      "method": "get",
-      "desc": "(Ljava/lang/Object;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
       "name": "ObjectInputStream",
       "className": "java/io/ObjectInputStream",
       "method": "<init>",
@@ -699,28 +796,6 @@
       "className": "java/nio/file/Paths",
       "method": "get",
       "desc": "(Ljava/net/URI;)Ljava/nio/file/Paths;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "valueOf",
-      "className": "java/lang/Integer",
-      "method": "toString",
-      "desc": "(I)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "valueOf",
-      "className": "java/lang/String",
-      "method": "valueOf",
-      "desc": "(C)Ljava/lang/String;",
       "state": 1,
       "from": "P1",
       "to": "R",
@@ -1349,7 +1424,8 @@
       "enter": 1,
       "exit": 0,
       "inter": true
-    },{
+    },
+    {
       "name": "spring_expression_injection",
       "className": "javax/el/ExpressionFactory",
       "method": "createValueExpression",
@@ -1563,12 +1639,83 @@
       "exit": 1
     },
     {
-      "name": "feature",
-      "className": "org/jdom2/input/SAXBuilder",
-      "method": "setFeature",
-      "desc": "(Ljava/lang/String;Z)V",
+      "name": "substring",
+      "className": "java/lang/String",
+      "method": "substring",
+      "desc": "(II)Ljava/lang/String;",
       "state": 1,
       "from": "O",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "replace",
+      "className": "java/lang/String",
+      "method": "replaceAll",
+      "desc": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+      "state": 1,
+      "from": "P1,P2",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/String",
+      "method": "subSequence",
+      "desc": "(II)Ljava/lang/CharSequence;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/String",
+      "method": "substring",
+      "desc": "(II)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/String",
+      "method": "substring",
+      "desc": "(I)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "substring",
+      "desc": "(II)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "subSequence",
+      "desc": "(II)Ljava/lang/CharSequence;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
       "conditions": "P1,P2",
       "enter": 0,
       "exit": 1

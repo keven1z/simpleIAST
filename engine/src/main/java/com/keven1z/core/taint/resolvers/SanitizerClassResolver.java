@@ -59,7 +59,10 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
 
         if (taintData != null) {
             Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);
-            TaintUtils.buildTaint(returnObject, taintData, toObject, true);
+            if (toObject != null) {
+                taintData.setToObject(toObject);
+            }
+            TaintUtils.buildTaint(returnObject, taintData, true);
         }
     }
 

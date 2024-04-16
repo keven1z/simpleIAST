@@ -47,7 +47,8 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
             if (toObject == null) {
                 return;
             }
-            TaintUtils.buildTaint(returnObject, taintData, toObject, false);
+            taintData.setToObject(toObject);
+            TaintUtils.buildTaint(returnObject, taintData, false);
         }
 
     }

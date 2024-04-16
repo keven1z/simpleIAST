@@ -42,7 +42,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
             taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
         }
         if (taintData != null) {
-            TaintUtils.buildTaint(returnObject, taintData, null, true);
+            TaintUtils.buildTaint(returnObject, taintData, true);
         }
     }
 }

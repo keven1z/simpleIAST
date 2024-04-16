@@ -1,9 +1,6 @@
 package com.keven1z.core.model.graph;
 
-import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.PolicyTypeEnum;
-import org.apache.log4j.Logger;
-
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -28,8 +25,6 @@ public class TaintGraph {
      * 污点缓存
      */
     private final Set<Integer> taintCache;
-    private final Logger taintLogger = Logger.getLogger("taint.info");
-
 
     /**
      * 初始化有向图
@@ -50,9 +45,6 @@ public class TaintGraph {
         List<Integer> toObjectHashCode = taintData.getToObjectHashCode();
         if (toObjectHashCode != null && !toObjectHashCode.isEmpty()) {
             this.taintCache.addAll(taintData.getToObjectHashCode());
-        }
-        if (LogTool.isDebugEnabled()) {
-            taintLogger.info("Add taint:" + taintData);
         }
     }
 
@@ -157,11 +149,12 @@ public class TaintGraph {
         if (!this.pathMap.containsKey(to.getInvokeId())) {
             return null;
         }
-        Set<Integer> nodeIds = this.pathMap.get(to.getInvokeId());
+        Set<Integer> invokeIds = this.pathMap.get(to.getInvokeId());
         Set<TaintNode> taintNodes = new LinkedHashSet<>();
-        for (Integer nodeId : nodeIds) {
-            TaintNode taintNode = this.nodeSet.get(nodeId);
-            taintNodes.add(taintNode);
+        for (Integer invokeId : invokeIds) {
+            this.nodeSet.stream()
+                    .filter(obj -> obj.getTaintData().getInvokeId() == invokeId)
+                    .findFirst().ifPresent(taintNodes::add);
         }
         return taintNodes;
     }
