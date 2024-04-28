@@ -36,6 +36,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
             if (taintData == null) {
                 taintData = new TaintData(className, method, desc, PolicyTypeEnum.SINK);
                 taintData.setFromValue(fromObject.toString());
+                taintData.setFromObject(fromObject);
                 taintData.setVulnType(policyName);
                 taintData.setThisObject(thisObject);
             }

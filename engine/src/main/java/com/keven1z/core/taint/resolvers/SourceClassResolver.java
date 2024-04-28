@@ -54,6 +54,8 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
         searchAndFillSourceFromReturnObject(returnObject, taintData);
         taintData.setFromValue(getSourceFromName(fromMap));
+        //加入原始对象的hashcode
+        taintData.setToObjectHashCode(System.identityHashCode(returnObject));
         TaintUtils.buildTaint(returnObject, taintData, true);
     }
 
@@ -73,23 +75,19 @@ public class SourceClassResolver implements HandlerHookClassResolver {
     }
 
     private void resolveBeanHook(String className, String method, String desc, Object returnObject, Map<String, Object> fromMap) {
-        TaintData taintData = null;
-        for (Map.Entry<String, Object> entry : fromMap.entrySet()) {
-            TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-            Object fromObject = entry.getValue();
-            TaintNode parentNode = PolicyUtils.searchParentNode(fromObject, taintGraph);
-            if (parentNode == null) {
-                continue;
-            }
-            if (taintData == null) {
-                taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
-            }
-            taintGraph.addEdge(parentNode.getTaintData(), taintData, entry.getKey());
+        TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
+        Map.Entry<String, Object> objectEntry = fromMap.entrySet().iterator().next();
+        TaintNode parentNode = PolicyUtils.searchParentNode(objectEntry.getValue(), taintGraph);
+        if (parentNode == null) {
+            return;
         }
-        if (taintData != null) {
-            taintData.setToObject(returnObject);
-            TaintUtils.buildTaint(returnObject, taintData, true);
-        }
+        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+        taintGraph.addEdge(parentNode.getTaintData(), taintData, objectEntry.getKey());
+
+        searchAndFillSourceFromReturnObject(returnObject, taintData);
+        taintData.setToObject(returnObject);
+        TaintUtils.buildTaint(returnObject, taintData, true);
+
     }
 
     /**
@@ -197,14 +195,14 @@ public class SourceClassResolver implements HandlerHookClassResolver {
     }
 
     public void searchAndFillSourceFromReturnObject(Object returnObject, TaintData taintData) {
-        if (returnObject.getClass().isArray() && !returnObject.getClass().getComponentType().isPrimitive()) {
-            parseArrayObject(returnObject, taintData);
-        } else if (returnObject instanceof Iterator) {
+        if (returnObject instanceof Iterator) {
             parseIteratorObject((Iterator<?>) returnObject, taintData);
-        } else if (returnObject instanceof Map) {
-            parseMap((Map<?, ?>) returnObject, taintData);
         } else if (returnObject instanceof Map.Entry) {
             parseMapEntry((Map.Entry<?, ?>) returnObject, taintData);
+        } else if (returnObject instanceof Map) {
+            parseMap((Map<?, ?>) returnObject, taintData);
+        } else if (returnObject.getClass().isArray() && !returnObject.getClass().getComponentType().isPrimitive()) {
+            parseArrayObject(returnObject, taintData);
         } else if (returnObject instanceof Collection) {
             if (returnObject instanceof List) {
                 parseList((List<?>) returnObject, taintData);
@@ -213,13 +211,12 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             }
         } else if (CLASS_OPTIONAL.equals(returnObject.getClass().getName())) {
             parseOptional(returnObject, taintData);
-        }
-        //如果污染源为用户对象，则判断为bean对象，将其对象所有get方法加入hook策略
-        else if (!StringUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
+        } else if (!StringUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
             addBeanObjectPolicy(returnObject.getClass());
         } else {
             taintData.setToObject(returnObject);
         }
+
     }
 
     private void parseArrayObject(Object toObject, TaintData taintData) {

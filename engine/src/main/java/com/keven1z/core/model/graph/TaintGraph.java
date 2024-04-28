@@ -271,7 +271,7 @@ public class TaintGraph {
      */
     private void addSanitizer(List<TaintData> taintDataList) {
         for (TaintData taintData : taintDataList) {
-            if (!taintData.isSanitizer()) {
+            if (!taintData.isHasSanitizer()) {
                 continue;
             }
             List<TaintData> sanitizerList = this.getSanitizerList(taintData, taintDataList);

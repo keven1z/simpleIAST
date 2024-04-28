@@ -2,7 +2,6 @@ package com.keven1z.core.utils;
 
 import com.keven1z.core.model.graph.TaintData;
 import com.keven1z.core.model.graph.TaintGraph;
-import com.keven1z.core.model.graph.TaintNode;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.policy.SanitizerTypeEnum;
 
@@ -11,23 +10,6 @@ import java.util.*;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 public class TaintUtils {
-    /**
-     * 查找所有source点
-     */
-    public static List<TaintNode> findSourceInTaintNodes(LinkedList<TaintNode> taintNodes) {
-        List<TaintNode> sourceNodes = new ArrayList<>();
-        for (TaintNode taintNode : taintNodes) {
-            if (PolicyTypeEnum.SOURCE.name().equals(taintNode.getTaintData().getStage())) {
-                sourceNodes.add(taintNode);
-            } else {
-                /*
-                 * 由于taintNodes按顺序排序的，若判断到非source节点直接返回
-                 */
-                return sourceNodes;
-            }
-        }
-        return sourceNodes;
-    }
 
     private static final int MAX_VALUE_LENGTH = 200;
 
@@ -47,28 +29,39 @@ public class TaintUtils {
     /**
      * 计算污染源的最终值
      */
-    public static List<String> calculateSourceValue(LinkedList<TaintData> taintDataLinkedList) {
+    public static List<Object> calculateSourceValue(LinkedList<TaintData> taintDataLinkedList) {
         List<TaintData> sourceList = getSourceList(taintDataLinkedList);
-        ArrayList<String> returnSourceList = new ArrayList<>();
+        ArrayList<Object> returnSourceList = new ArrayList<>();
         if (sourceList.isEmpty()) {
             return returnSourceList;
         }
-        //如果为单个源
-        if (sourceList.size() == 1) {
-            TaintData taintData = sourceList.get(0);
-            String source = getSourceString(taintData, taintDataLinkedList);
+
+        for (TaintData taintData : sourceList) {
+            Object source = calculateSingleSource(taintData, taintDataLinkedList);
             if (source != null) {
                 returnSourceList.add(source);
             }
-        } else {
-            for (TaintData taintData : sourceList) {
-                String source = getSourceString(taintData, taintDataLinkedList);
-                if (source != null) {
-                    returnSourceList.add(source);
-                }
-            }
         }
         return returnSourceList;
+    }
+
+    /**
+     * 计算单个污染源
+     */
+    public static Object calculateSingleSource(TaintData source, LinkedList<TaintData> taintDataLinkedList) {
+        List<Integer> sourceHashCodes = source.getToObjectHashCode();
+        Object sourceObject = source.getReturnObject();
+        for (TaintData taint : taintDataLinkedList) {
+            if (taint.isSource()) {
+                continue;
+            }
+            Object fromObject = taint.getFromObject();
+            if (sourceHashCodes.contains(System.identityHashCode(fromObject))) {
+                sourceObject = fromObject;
+            }
+
+        }
+        return sourceObject;
     }
 
     /**
@@ -84,26 +77,6 @@ public class TaintUtils {
         return sourceDataList;
     }
 
-    /**
-     * 返回污染源数据，返回null不进行源计入
-     *
-     * @param source 污染源
-     */
-    private static String getSourceString(TaintData source, LinkedList<TaintData> taintDataLinkedList) {
-        Object toObject = source.getToObject();
-        if (toObject instanceof String){
-            return toObject.toString();
-        }
-        else return null;
-    }
-
-    /**
-     * 判定污染链中是否包含指定过滤类型
-     *
-     * @param taintDataList     污染链
-     * @param sanitizerTypeEnum 过滤类型
-     * @param occurrenceNum     过滤类型出现次数
-     */
     public static boolean isContainSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int occurrenceNum) {
         for (TaintData taintData : taintDataList) {
             List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
@@ -148,8 +121,7 @@ public class TaintUtils {
         if (isRecordStack) {
             taintData.setStackList(StackUtils.getStackTraceArray(true, true));
         }
-        taintData.setReturnObjectString(returnObject == null ? null : returnObject.toString());
-        taintData.setReturnObjectType(returnObject == null ? null : returnObject.getClass().getName());
+        taintData.setReturnObject(returnObject);
 
         taintGraph.addNode(taintData);
     }

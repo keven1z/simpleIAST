@@ -1,20 +1,19 @@
 package com.keven1z.core.pojo;
 
 import com.keven1z.core.model.graph.TaintData;
-
-import java.util.LinkedList;
+import java.util.List;
 
 public class TaintFindingData extends FindingData{
-    private LinkedList<TaintData> flowData;
+    private List<TaintData> flowData;
     public TaintFindingData(){
 
     }
 
-    public LinkedList<TaintData> getFlowData() {
+    public List<TaintData> getFlowData() {
         return flowData;
     }
 
-    public void setFlowData(LinkedList<TaintData> flowData) {
+    public void setFlowData(List<TaintData> flowData) {
         this.flowData = flowData;
     }
 

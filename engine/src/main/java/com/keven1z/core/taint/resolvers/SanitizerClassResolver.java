@@ -52,16 +52,13 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
                 taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);
                 taintData.setName(policyName);
 //                taintData.setConditions(getConditionString(policy.getConditions(), parameters, returnObject, thisObject));
-
             }
             taintGraph.addEdge(fromTaintData, taintData, entry.getKey());
-        }
-
-        if (taintData != null) {
             Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);
             if (toObject != null) {
                 taintData.setToObject(toObject);
             }
+            taintData.setFromObject(fromObject);
             TaintUtils.buildTaint(returnObject, taintData, true);
         }
     }

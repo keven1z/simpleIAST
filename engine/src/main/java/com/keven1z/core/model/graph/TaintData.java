@@ -44,10 +44,9 @@ public class TaintData {
      */
     private List<TaintData> sanitizerNodes;
 
-    /**
-     * 污点进入值类型
-     */
-    private String fromType;
+    @JsonIgnore
+    private Object fromObject;
+
     /**
      * 污点进入的值
      */
@@ -56,14 +55,12 @@ public class TaintData {
      * 污染传出的值
      */
     private String toValue;
+
     /**
-     * 返回值字符串
+     * 返回对象
      */
-    private String returnObjectString;
-    /**
-     *
-     */
-    private String returnObjectType;
+    @JsonIgnore
+    private Object returnObject;
     /**
      * 过滤条件值
      */
@@ -148,22 +145,6 @@ public class TaintData {
     }
 
 
-    public String getReturnObjectString() {
-        return returnObjectString;
-    }
-
-    public void setReturnObjectString(String returnObjectString) {
-        this.returnObjectString = returnObjectString;
-    }
-
-    public String getReturnObjectType() {
-        return returnObjectType;
-    }
-
-    public void setReturnObjectType(String returnObjectType) {
-        this.returnObjectType = returnObjectType;
-    }
-
     public String getConditions() {
         return conditions;
     }
@@ -172,8 +153,12 @@ public class TaintData {
         this.conditions = conditions;
     }
 
-    public boolean isSanitizer() {
+    public boolean isHasSanitizer() {
         return isSanitizer;
+    }
+
+    public boolean isSource() {
+        return PolicyTypeEnum.SOURCE.name().equals(getStage());
     }
 
     public void setSanitizer(boolean sanitizer) {
@@ -182,10 +167,6 @@ public class TaintData {
 
     public List<TaintData> getSanitizerNodes() {
         return sanitizerNodes;
-    }
-
-    public void setSanitizerNodes(List<TaintData> sanitizerNodes) {
-        this.sanitizerNodes = sanitizerNodes;
     }
 
     public String getFromValue() {
@@ -262,17 +243,25 @@ public class TaintData {
         this.parameters = parameters;
     }
 
-    public String getFromType() {
-        return fromType;
+
+    public Object getReturnObject() {
+        return returnObject;
     }
 
-    public void setFromType(String fromType) {
-        this.fromType = fromType;
+    public void setReturnObject(Object returnObject) {
+        this.returnObject = returnObject;
     }
-
 
     public Object getToObject() {
         return toObject;
+    }
+
+    public Object getFromObject() {
+        return fromObject;
+    }
+
+    public void setFromObject(Object fromObject) {
+        this.fromObject = fromObject;
     }
 
     public void setToObject(Object toObject) {
