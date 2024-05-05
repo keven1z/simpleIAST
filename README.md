@@ -115,5 +115,15 @@ Config.java中增加服务器地址，默认漏洞上报api如下：
 ## 计划
 - [x] 心跳包
 - [x] API改造
-- [ ] 漏洞检测率以及覆盖率增加
+- [ ] 漏洞检测数量，覆盖[ant-application-security-testing-benchmark](https://github.com/alipay/ant-application-security-testing-benchmark)
 - [ ] 服务端交互界面（预计24年）
+
+## 鸣谢
+> [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。
+
+特别感谢 [JetBrains](https://www.jetbrains.com/?from=mirai) 为开源项目提供免费的 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=mirai)授权  
+![](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)
+
+## License
+本项目采用 Apache License 2.0 开源授权许可证。
+ 
