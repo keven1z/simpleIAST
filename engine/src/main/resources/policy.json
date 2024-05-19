@@ -124,18 +124,6 @@
       "exit": 1
     },
     {
-      "name": "getHeader",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getHeader",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 0,
-      "from": "P1",
-      "to": "R",
-      "inter": true,
-      "enter": 0,
-      "exit": 1
-    },
-    {
       "name": "getParameterValues",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getParameterValues",
@@ -172,6 +160,51 @@
       "desc": "()Ljava/lang/String;",
       "state": 1,
       "from": "O",
+      "to": "R",
+      "inter": true,
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
+      ],
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getPart",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getPart",
+      "desc": "(Ljava/lang/String;)Ljavax/servlet/http/Part;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
+      "inter": true,
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
+      ],
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getParts",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getParts",
+      "desc": "()Ljava/util/Collection;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "inter": true,
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper","org/apache/catalina/connector/RequestFacade"
+      ],
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getHeader",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getHeader",
+      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+      "state": 1,
+      "from": "P1",
       "to": "R",
       "inter": true,
       "exclude": [
@@ -325,7 +358,7 @@
       "method": "concat",
       "desc": "(Ljava/lang/String;)Ljava/lang/String;",
       "state": 1,
-      "from": "O",
+      "from": "O,P1",
       "to": "R",
       "enter": 0,
       "exit": 1
@@ -887,6 +920,29 @@
       "state": 1,
       "from": "P1",
       "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "getSubmittedFileName",
+      "className": "javax/servlet/http/Part",
+      "method": "getSubmittedFileName",
+      "desc": "()Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "inter": true,
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "readLine",
+      "className": "java/io/BufferedReader",
+      "method": "readLine",
+      "desc": "(Z)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
       "enter": 0,
       "exit": 1
     }

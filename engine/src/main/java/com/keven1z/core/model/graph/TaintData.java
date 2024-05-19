@@ -70,6 +70,7 @@ public class TaintData {
     /**
      * 是否进行过滤处理
      */
+    @JsonIgnore
     private boolean isSanitizer;
     private List<String> stackList;
 
