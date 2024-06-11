@@ -32,4 +32,7 @@ public class IASTAdviceAdapter extends AdviceAdapter {
         return opcode == ATHROW;
     }
 
+    final protected void pushNull() {
+        push((Type) null);
+    }
 }

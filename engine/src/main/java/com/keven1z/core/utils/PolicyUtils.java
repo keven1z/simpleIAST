@@ -200,7 +200,23 @@ public class PolicyUtils {
         }
         return null;
     }
+    /**
+     *
+     */
+    public static Policy getHookedPolicyByBisection(String className, String method, String desc, List<Policy> policies) {
+        Policy target = new Policy(className, method, desc);
+        Collections.sort(policies);
+        // Perform binary search
+        int index = Collections.binarySearch(policies, target);
 
+        if (index >= 0) {
+            Policy foundPolicy = policies.get(index);
+            if (foundPolicy.getState() != OFF) {
+                return foundPolicy;
+            }
+        }
+        return null;
+    }
     /**
      * 获取对应from、to、conditions的对象
      *

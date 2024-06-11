@@ -33,25 +33,33 @@ import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 public class HookTransformer implements ClassFileTransformer {
     private final PolicyContainer policy;
     private final Instrumentation instrumentation;
+    /**
+     * transform class计数
+     */
     private int transformCount = 0;
     /**
      * 设置最大transformer数量防止意外情况，导致出现不可预知的问题
      */
     private final static int MAX_TRANSFORM_COUNT = 1000;
-    private final Logger hookLogger = Logger.getLogger("hook.info");
     private final Logger logger = Logger.getLogger(HookTransformer.class);
     private final Set<String> transformClasses;
-
-    public HookTransformer(PolicyContainer policyContainer, Instrumentation instrumentation) {
+    private final String nativePrefix;
+    /**
+     * native代理方法的前缀
+     */
+    public static final String SANDBOX_SPECIAL_PREFIX = "$$SIMPLE$$";
+    public HookTransformer(PolicyContainer policyContainer,
+                           Instrumentation instrumentation) {
         this.policy = policyContainer;
         this.instrumentation = instrumentation;
         this.instrumentation.addTransformer(this, true);
         this.transformClasses = new HashSet<>();
+        this.nativePrefix = SANDBOX_SPECIAL_PREFIX;
     }
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-        //如果transformer数量大于阈值，不进行transform，发出警告
+        /* 如果transformer数量大于阈值，不进行transform，发出警告 */
         if (transformCount > MAX_TRANSFORM_COUNT) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.TRANSFORM_ERROR, "TransformCount exceeded the threshold.current transformCount is " + transformCount + ",class:" + className);
@@ -59,12 +67,12 @@ public class HookTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
 
-        //若className为空，不进行任何操作，直接返回
+        /* 若className为空，不进行任何操作，直接返回 */
         if (null == className) {
             return classfileBuffer;
         }
 
-        if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isInBlackList(className)) {
+        if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isClassNameBlacklisted(className)) {
             return classfileBuffer;
         }
         if (className.contains("proxy")) {
@@ -74,7 +82,7 @@ public class HookTransformer implements ClassFileTransformer {
         try {
             return doTransform(loader, className, classBeingRedefined, classfileBuffer);
         } catch (Throwable throwable) {
-            //由于可能出现的错误日志较多的情况，默认debug模式才打开
+            /* 由于可能出现的错误日志较多的情况，默认debug模式才打开 */
             if (LogTool.isDebugEnabled()) {
                 LogTool.error(ErrorType.TRANSFORM_ERROR, "DoTransform " + className + " error", throwable);
             }
@@ -93,20 +101,17 @@ public class HookTransformer implements ClassFileTransformer {
             }
         }
 
-        //判断该类为ReTransform类
-//        if (!isReTransform) {
         ClassReader classReader = new ClassReader(classfileBuffer);
-        //不hook接口类
+        /* 不hook接口类 */
         if (ClassUtils.isInterface(classReader.getAccess())) {
             return classfileBuffer;
         }
-        //判断是否在hook点策略中
+        /* 判断是否在hook点策略中 */
         if (!PolicyUtils.isHook(className, policy, classReader.getInterfaces(), classReader.getSuperName(), loader)) {
 //            hookLogger.info(className);
             return classfileBuffer;
         }
-//        }
-        //transform class +1
+        /* transform class +1 */
         ++transformCount;
 
         ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS) {
@@ -126,7 +131,11 @@ public class HookTransformer implements ClassFileTransformer {
         };
 
         //通过自定义classVisitor进行类的改造
-        classReader.accept(new IASTClassVisitor(classWriter, className), ClassReader.EXPAND_FRAMES);
+        classReader.accept(new IASTClassVisitor(classWriter,
+                        className,
+                        this.nativePrefix),
+                ClassReader.EXPAND_FRAMES
+                );
 
         this.transformClasses.add(className);
         return dumpClassIfNecessary(className, classWriter.toByteArray());
@@ -143,7 +152,6 @@ public class HookTransformer implements ClassFileTransformer {
         if (!classPath.mkdirs() && !classPath.exists()) {
             if (LogTool.isDebugEnabled()) {
                 Logger.getLogger(HookTransformer.class).warn("create dump classpath=" + classPath + "failed.");
-
             }
             return data;
         }
@@ -151,9 +159,7 @@ public class HookTransformer implements ClassFileTransformer {
         // 将类字节码写入文件
         try {
             writeByteArrayToFile(dumpClassFile, data);
-//            logger.info("dump {} to {} success.", className, dumpClassFile);
-        } catch (IOException e) {
-//            logger.warn("dump {} to {} failed.", className, dumpClassFile, e);
+        } catch (IOException ignored) {
         }
 
         return data;
@@ -179,7 +185,7 @@ public class HookTransformer implements ClassFileTransformer {
     }
 
     /**
-     * 查找已transform的hook点
+     * 查找已加载到内存中hook点
      */
     public List<Class<?>> findForReTransform() {
         final List<Class<?>> classes = new ArrayList<>();
@@ -204,7 +210,10 @@ public class HookTransformer implements ClassFileTransformer {
                     }
                     continue;
                 }
-                if (EngineController.context.isInBlackList(normalizeClass)) {
+                /*
+                * 排除在黑名单中的class
+                */
+                if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
                     continue;
                 }
                 if (PolicyUtils.isHook(this.policy, clazz)) {
@@ -217,5 +226,9 @@ public class HookTransformer implements ClassFileTransformer {
             }
         }
         return classes;
+    }
+
+    public String getNativePrefix() {
+        return nativePrefix;
     }
 }

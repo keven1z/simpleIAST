@@ -59,7 +59,7 @@ public class SingleAdviceAdapter extends HookAdviceAdapter {
             pushReturnValue(opcode);
         }
         //如果是静态方法，push null
-        pushThisObject(isStatic);
+        pushThisObject();
         loadArgArray();
         push(className);
         push(methodName);
@@ -70,6 +70,4 @@ public class SingleAdviceAdapter extends HookAdviceAdapter {
         Type type = Type.getType(SimpleIASTSpyManager.class);
         invokeStatic(type, AsmMethods.ASM_METHOD_HOOKSCHEDULER$_single);
     }
-
-
 }

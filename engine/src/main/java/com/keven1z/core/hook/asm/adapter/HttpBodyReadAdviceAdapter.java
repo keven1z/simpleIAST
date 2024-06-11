@@ -2,9 +2,7 @@ package com.keven1z.core.hook.asm.adapter;
 
 import com.keven1z.core.hook.asm.AsmMethods;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
-
-import java.lang.spy.SimpleIASTSpyManager;
+import static com.keven1z.core.hook.asm.AsmMethods.ASM_TYPE_SPY;
 
 public class HttpBodyReadAdviceAdapter extends IASTAdviceAdapter {
     private static final String READ_BODY_1 = "()I";
@@ -23,18 +21,17 @@ public class HttpBodyReadAdviceAdapter extends IASTAdviceAdapter {
             return;
         }
         pushReturnValue(opcode);
-        Type type = Type.getType(SimpleIASTSpyManager.class);
         loadThis();
         if (READ_BODY_1.equals(desc)) {
-            invokeStatic(type, AsmMethods.ASM_METHOD_HTTPSPY$_onReadInvoked_1);
+            invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HTTPSPY$_onReadInvoked_1);
         } else if (READ_BODY_2.equals(desc)) {
             loadArg(0);
-            invokeStatic(type, AsmMethods.ASM_METHOD_HTTPSPY$_onReadInvoked_2);
+            invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HTTPSPY$_onReadInvoked_2);
         } else if (READ_BODY_3.equals(desc)) {
             loadArg(0);
             loadArg(1);
             loadArg(2);
-            invokeStatic(type, AsmMethods.ASM_METHOD_HTTPSPY$_onReadInvoked_3);
+            invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HTTPSPY$_onReadInvoked_3);
         }
     }
 }

@@ -2,14 +2,11 @@ package com.keven1z.core.hook.asm.adapter;
 
 
 import com.keven1z.core.consts.CommonConst;
-import com.keven1z.core.hook.asm.AsmMethods;
 import com.keven1z.core.policy.Policy;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
-
-import java.lang.spy.SimpleIASTSpyManager;
 
 public class TaintAdviceAdapter extends HookAdviceAdapter {
     /**
@@ -34,7 +31,6 @@ public class TaintAdviceAdapter extends HookAdviceAdapter {
         }
 
         inject(-1, true);
-
     }
 
     @Override
@@ -46,30 +42,6 @@ public class TaintAdviceAdapter extends HookAdviceAdapter {
         if (isThrow(opcode)) {
             return;
         }
-
         inject(opcode, false);
-
     }
-
-    protected void inject(int opcode, boolean isEnter) {
-        if (isEnter) {
-            push((Type) null);
-        } else {
-            pushReturnValue(opcode);
-        }
-        //如果是静态方法，push null
-        pushThisObject(isStatic);
-        loadArgArray();
-        push(className);
-        push(methodName);
-        push(desc);
-        push(this.policy.getType().name());
-        push(this.policy.getName());
-        push(this.policy.getFrom());
-        push(this.policy.getTo());
-        Type type = Type.getType(SimpleIASTSpyManager.class);
-        invokeStatic(type, AsmMethods.ASM_METHOD_HOOKSCHEDULER$_taint);
-    }
-
-
 }

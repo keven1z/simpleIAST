@@ -9,7 +9,7 @@ import java.util.Set;
  * @author keven1z
  * @date 2023/02/22
  */
-public class Policy implements Serializable {
+public class Policy implements Serializable,Comparable<Policy> {
     public Policy(String className, String method, String desc) {
         this.className = className;
         this.method = method;
@@ -220,5 +220,20 @@ public class Policy implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(className, method, desc);
+    }
+
+    @Override
+    public int compareTo(Policy other) {
+        int classNameComparison = this.className.compareTo(other.className);
+        if (classNameComparison != 0) {
+            return classNameComparison;
+        }
+
+        int methodComparison = this.method.compareTo(other.method);
+        if (methodComparison != 0) {
+            return methodComparison;
+        }
+
+        return this.desc.compareTo(other.desc);
     }
 }

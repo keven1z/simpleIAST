@@ -4,11 +4,14 @@ import com.keven1z.core.utils.ReflectionUtils;
 
 import java.lang.spy.SimpleIASTSpyManager;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Method;
 
 import static com.keven1z.core.hook.asm.AsmMethods.InnerHelper.getAsmMethod;
 
 public interface AsmMethods {
+    Type ASM_TYPE_SPY = Type.getType(SimpleIASTSpyManager.class);
+
     class InnerHelper {
         private InnerHelper() {
         }

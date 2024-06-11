@@ -8,8 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
-
-import java.lang.spy.SimpleIASTSpyManager;
+import static com.keven1z.core.hook.asm.AsmMethods.ASM_TYPE_SPY;
 
 public class HttpAdviceAdapter extends IASTAdviceAdapter {
     private final Policy policy;
@@ -34,10 +33,9 @@ public class HttpAdviceAdapter extends IASTAdviceAdapter {
         if (policy.getEnter() != CommonConst.ON) {
             return;
         }
-        Type type = Type.getType(SimpleIASTSpyManager.class);
         loadArg(0);
         loadArg(1);
-        invokeStatic(type, AsmMethods.ASM_METHOD_HTTPSPY$_requestStarted);
+        invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HTTPSPY$_requestStarted);
     }
 
     @Override
@@ -49,10 +47,9 @@ public class HttpAdviceAdapter extends IASTAdviceAdapter {
         if (isThrow(opcode)) {
             return;
         }
-        Type type = Type.getType(SimpleIASTSpyManager.class);
         loadArg(0);
         loadArg(1);
-        invokeStatic(type, AsmMethods.ASM_METHOD_HTTPSPY$_requestEnded);
+        invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HTTPSPY$_requestEnded);
     }
 
 }

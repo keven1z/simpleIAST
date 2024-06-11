@@ -102,6 +102,7 @@ java/lang/SecurityManager
 java/lang/String$CaseInsensitiveComparator
 java/lang/StringCoding$1
 java/lang/StringCoding$StringDecoder
+java/lang/System$1
 java/lang/System$2
 java/lang/SystemClassLoaderAction
 java/lang/Terminator
@@ -174,8 +175,6 @@ java/lang/StackTraceElement
 java/lang/StrictMath
 java/lang/StringCoding$StringEncoder
 java/lang/SuppressWarnings
-java/lang/System
-java/lang/System$1
 java/lang/Thread
 java/lang/Thread$1
 java/lang/Thread$State

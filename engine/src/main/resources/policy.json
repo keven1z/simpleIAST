@@ -945,6 +945,17 @@
       "to": "R",
       "enter": 0,
       "exit": 1
+    },
+    {
+      "name": "arraycopy",
+      "className": "java/lang/System",
+      "method": "arraycopy",
+      "desc": "(Ljava/lang/Object;ILjava/lang/Object;II)V",
+      "state": 1,
+      "from": "P1",
+      "to": "P3",
+      "enter": 0,
+      "exit": 1
     }
   ],
   "sink": [

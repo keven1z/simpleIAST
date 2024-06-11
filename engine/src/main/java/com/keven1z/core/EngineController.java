@@ -200,8 +200,12 @@ public class EngineController {
      * 初始化类字节码的转换器
      */
     private void initTransformer() {
+        Instrumentation instrumentation = context.getInstrumentation();
         context.getInstrumentation().addTransformer(new ServerDetectTransform(), true);
-        HookTransformer hookTransformer = new HookTransformer(context.getPolicy(), context.getInstrumentation());
+        HookTransformer hookTransformer = new HookTransformer(context.getPolicy(),instrumentation );
+        if(instrumentation.isNativeMethodPrefixSupported()){
+            instrumentation.setNativeMethodPrefix(hookTransformer,hookTransformer.getNativePrefix());
+        }
         hookTransformer.reTransform();
 
     }

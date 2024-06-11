@@ -46,6 +46,7 @@ public class IASTContext {
      * 服务器端url
      */
     private String serverUrl;
+
     public PolicyContainer getPolicy() {
         return policyContainer;
     }
@@ -97,16 +98,12 @@ public class IASTContext {
     /**
      * 判定hook点是否在黑名单中
      */
-    public boolean isInBlackList(String className) {
+    public boolean isClassNameBlacklisted(String className) {
         if (blackList == null || className == null) {
-            return false;
+            return true;//如果为空，则说明程序存在错误，不进行任何hook
         }
-        for (String blackStr : blackList) {
-            if (className.startsWith(blackStr) || className.endsWith(blackStr)) {
-                return true;
-            }
-        }
-        return false;
+        return blackList.stream()
+                .anyMatch(blackStr -> className.startsWith(blackStr) || className.endsWith(blackStr));
     }
 
     public boolean isDebug() {

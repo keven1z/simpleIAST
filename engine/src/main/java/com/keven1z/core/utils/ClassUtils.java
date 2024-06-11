@@ -166,12 +166,6 @@ public class ClassUtils {
         return className.replace(".", "/");
     }
 
-    public static String toInternalClassName(String className) {
-        if (StringUtils.isEmpty(className)) {
-            return className;
-        }
-        return className.replace("/", ".");
-    }
 
     public static boolean isComeFromIASTFamily(final String internalClassName, final ClassLoader loader) {
 
