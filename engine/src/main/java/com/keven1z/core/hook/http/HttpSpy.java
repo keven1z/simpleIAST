@@ -28,6 +28,13 @@ public class HttpSpy implements SimpleIASTSpy {
     Logger logger = Logger.getLogger(HttpSpy.class);
 
 
+    /**
+     * 当请求开始时调用此方法。
+     *
+     * @param requestObject 请求对象
+     * @param responseObject 响应对象
+     *
+     */
     @Override
     public void $_requestStarted(Object requestObject, Object responseObject) {
         if (enableHookLock.get()) {
@@ -78,6 +85,12 @@ public class HttpSpy implements SimpleIASTSpy {
 
     }
 
+    /**
+     * 请求结束时的处理方法
+     *
+     * @param requestObject 请求对象
+     * @param responseObject 响应对象
+     */
     @Override
     public void $_requestEnded(Object requestObject, Object responseObject) {
         if (enableHookLock.get()) {
@@ -89,29 +102,39 @@ public class HttpSpy implements SimpleIASTSpy {
             if (!ApplicationModel.isRunning()) {
                 return;
             }
-            if (isRequestEnd.get() || REQUEST_THREAD_LOCAL.get() == null) {
+            HttpContext requestData  = REQUEST_THREAD_LOCAL.get();
+            if (isRequestEnded.get() || requestData  == null) {
                 return;
             }
-            if (!REQUEST_THREAD_LOCAL.get().isHttpExit(requestObject, responseObject)) {
+            if (!requestData .isHttpExit(requestObject, responseObject)) {
                 return;
             }
             System.out.println("[SimpleIAST] 请求消耗时间:" + (System.currentTimeMillis() - REQUEST_TIME_CONSUMED.get()) + "ms");
             REQUEST_TIME_CONSUMED.remove();
             if (LogTool.isDebugEnabled()) {
-                logger.info("[" + REQUEST_THREAD_LOCAL.get().getRequest().getRequestId() + "] Request exit,URL:" + REQUEST_THREAD_LOCAL.get().getRequest().getRequestURLString());
+                logger.info("[" + requestData .getRequest().getRequestId() + "] Request exit,URL:" + REQUEST_THREAD_LOCAL.get().getRequest().getRequestURLString());
             }
-            isRequestEnd.set(true);
-            FlowProcessingStation.getInstance().doProcess();
+            isRequestEnded.set(true);
+            FlowProcessingStation.getInstance().processAndReportFindings();
 
         } finally {
             enableHookLock.set(false);
-            if (isRequestEnd.get()) {
-                DETECT_LIMIT_SET.remove(REQUEST_THREAD_LOCAL.get().getRequest().getRequestId());
+            if (isRequestEnded.get()) {
                 TaintSpy.getInstance().clear();
+                HttpContext requestData = REQUEST_THREAD_LOCAL.get();
+                if (requestData != null) {
+                    DETECT_LIMIT_SET.remove(requestData.getRequest().getRequestId());
+                }
             }
         }
     }
 
+    /**
+     * 填充请求体内容
+     *
+     * @param body 请求体内容
+     *
+     */
     @Override
     public void $_setRequestBody(Object body) {
         if (enableHookLock.get()) {
@@ -138,6 +161,16 @@ public class HttpSpy implements SimpleIASTSpy {
 
     }
 
+    /**
+     * 当读取操作被调用时触发的方法
+     *
+     * @param length 读取的长度
+     * @param inputStream 输入流对象
+     * @param bytes 读取的字节数组
+     * @param off 数组中的起始偏移量（包括）
+     * @param len 要读取的字节数
+     *
+     */
     @Override
     public void $_onReadInvoked(Integer length, Object inputStream, byte[] bytes, int off, int len) {
         if (enableHookLock.get()) {
@@ -162,6 +195,14 @@ public class HttpSpy implements SimpleIASTSpy {
         }
     }
 
+    /**
+     * 在读取操作被调用时触发
+     *
+     * @param length 读取的字节长度
+     * @param inputStream 输入流对象
+     * @param bytes 读取的字节数组
+     *
+     */
     @Override
     public void $_onReadInvoked(Integer length, Object inputStream, byte[] bytes) {
         if (enableHookLock.get()) {
@@ -186,6 +227,13 @@ public class HttpSpy implements SimpleIASTSpy {
         }
     }
 
+    /**
+     * 当读取操作被调用时触发的函数
+     *
+     * @param b            待读取的字节
+     * @param inputStream  输入流
+     *
+     */
     @Override
     public void $_onReadInvoked(Integer b, Object inputStream) {
         if (enableHookLock.get()) {
@@ -209,6 +257,13 @@ public class HttpSpy implements SimpleIASTSpy {
 
     }
 
+    /**
+     * 获取请求体输出流并设置长度
+     *
+     * @param b 请求体长度
+     * @param inputStream 输入流对象
+     * @return 如果当前线程中的请求上下文存在，并且输入流与请求中的输入流匹配，则返回请求体输出流；否则返回null
+     */
     private ByteArrayOutputStream getBodyOutputStreamAndSetLength(Integer b, Object inputStream) {
         if (REQUEST_THREAD_LOCAL.get() == null) {
             return null;
@@ -230,6 +285,9 @@ public class HttpSpy implements SimpleIASTSpy {
 
     /**
      * 过滤静态页面
+     *
+     * @param url 需要过滤的URL
+     * @return 如果URL是静态页面则返回true，否则返回false
      */
     private boolean filterHttp(String url) {
         if (url == null) {

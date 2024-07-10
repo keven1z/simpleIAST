@@ -45,6 +45,20 @@ public class HandlerHookClassResolverInitializer {
 
     }
 
+    /**
+     * 解析污点数据，根据污点类型调用相应的解析器进行处理
+     *
+     * @param returnValue 方法的返回值
+     * @param thisObject 当前对象
+     * @param parameters 方法的参数
+     * @param className 方法的类名
+     * @param method 方法的名称
+     * @param desc 方法的描述符
+     * @param type 污点类型
+     * @param policyName 污点策略名称
+     * @param from 污点来源
+     * @param to 污点去向
+     */
     public void resolve(Object returnValue, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
         /*
          * 如果污点图为空，并且不为污染源节点，则不处理

@@ -32,6 +32,20 @@ public class TaintSpy implements SimpleIASTSpy {
         public static final TaintSpy taintSpy = new TaintSpy();
     }
 
+    /**
+     * 对方法返回值、当前对象、方法参数进行taint标记
+     *
+     * @param returnObject 被污染的对象，即方法的返回值
+     * @param thisObject 当前对象
+     * @param parameters 方法参数
+     * @param className 被hook的类名
+     * @param method 被hook的方法名
+     * @param desc 方法描述符
+     * @param type taint类型
+     * @param policyName 污点策略名
+     * @param from 污点来源
+     * @param to 污点去向
+     */
     @Override
     public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
         if (enableHookLock.get()) {
@@ -53,7 +67,7 @@ public class TaintSpy implements SimpleIASTSpy {
             if (REQUEST_THREAD_LOCAL.get() == null && !WEAK_PASSWORD_IN_SQL.name().equals(policyName)) {
                 return;
             }
-            if (isRequestEnd.get()) {
+            if (isRequestEnded.get()) {
                 return;
             }
             /*
@@ -63,6 +77,7 @@ public class TaintSpy implements SimpleIASTSpy {
                 if (LogTool.isDebugEnabled()){
                     logger.warn("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
                 }
+                return;
             }
 
             if (policyContainer == null) {
@@ -109,7 +124,7 @@ public class TaintSpy implements SimpleIASTSpy {
         TAINT_GRAPH_THREAD_LOCAL.remove();
         SANITIZER_RESOLVER_CACHE.remove();
         isRequestStart.set(false);
-        isRequestEnd.set(false);
+        isRequestEnded.set(false);
         REQUEST_THREAD_LOCAL.remove();
         INVOKE_ID.set(INVOKE_ID_INIT_VALUE);
         SINGLE_FINDING_THREADLOCAL.remove();

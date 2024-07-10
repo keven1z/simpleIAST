@@ -176,7 +176,9 @@ public class ClassUtils {
         return null != loader
                 && isIASTPrefix(normalizeClass(loader.getClass().getName()));
     }
-
+    public static boolean shouldSkipProxyClass(String className) {
+        return className.endsWith("$Proxy") || className.endsWith("Proxy$");
+    }
     private static boolean isIASTPrefix(String className) {
         return className.startsWith(IAST_FAMILY_CLASS_RES_PREFIX);
     }

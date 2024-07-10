@@ -142,21 +142,36 @@ public class TaintGraph {
     }
 
     /**
-     * @param to to节点
-     * @return 获取当前节点所有from节点
+     * 从给定的TaintData对象中获取其所有from节点。
+     *
+     * @param to 要获取from节点的to节点对应的TaintData对象
+     * @return 包含所有from节点的Set集合，如果to节点不存在于pathMap中，则返回null
      */
-    public Set<TaintNode> getFromNodes(TaintData to) {
+    private Set<TaintNode> getFromNodes(TaintData to) {
+        if (to == null) {
+            throw new IllegalArgumentException("TaintData object cannot be null.");
+        }
+
         if (!this.pathMap.containsKey(to.getInvokeId())) {
             return null;
         }
+
         Set<Integer> invokeIds = this.pathMap.get(to.getInvokeId());
         Set<TaintNode> taintNodes = new LinkedHashSet<>();
         for (Integer invokeId : invokeIds) {
-            this.nodeSet.stream()
-                    .filter(obj -> obj.getTaintData().getInvokeId() == invokeId)
-                    .findFirst().ifPresent(taintNodes::add);
+            TaintNode node = findNodeByInvokeId(invokeId);
+            if (node != null) {
+                taintNodes.add(node);
+            }
         }
         return taintNodes;
+    }
+
+    private TaintNode findNodeByInvokeId(Integer invokeId) {
+        return this.nodeSet.stream()
+                .filter(node -> invokeId.equals(node.getTaintData().getInvokeId()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -231,16 +246,16 @@ public class TaintGraph {
      * @return 返回遍历过的taintData集合
      */
     public LinkedList<TaintData> bfs(TaintNode start) {
-        /*
-         * 存储遍历的taintData
-         */
+        if (start == null) {
+            throw new IllegalArgumentException("Start node cannot be null.");
+        }
+
         LinkedList<TaintData> taintDataList = new LinkedList<>();
-
         Set<Integer> visitedNodeInvokeIds = new HashSet<>();
-
-        LinkedBlockingQueue<TaintData> queue = new LinkedBlockingQueue<>(this.getNodeSize());
+        Queue<TaintData> queue = new LinkedList<>();
         TaintData startTaintData = start.getTaintData();
-        queue.add(startTaintData);
+        queue.offer(startTaintData);
+        visitedNodeInvokeIds.add(startTaintData.getInvokeId()); // 添加起始节点ID到已访问集合
 
         while (!queue.isEmpty()) {
             TaintData poll = queue.poll();
@@ -252,16 +267,13 @@ public class TaintGraph {
             for (TaintNode fromNode : fromNodes) {
                 TaintData fromNodeTaintData = fromNode.getTaintData();
                 if (!visitedNodeInvokeIds.contains(fromNodeTaintData.getInvokeId())) {
-                    queue.add(fromNodeTaintData);
+                    queue.offer(fromNodeTaintData);
                     visitedNodeInvokeIds.add(fromNodeTaintData.getInvokeId());
                 }
             }
-            fromNodes.clear();
         }
-
-        visitedNodeInvokeIds.clear();
         addSanitizer(taintDataList);
-        //由于广度遍历由sink到source的，需要倒转顺序
+        // 广度遍历的结果需要按从source到sink的顺序排列，因此倒转列表
         Collections.reverse(taintDataList);
         return taintDataList;
     }
@@ -283,7 +295,7 @@ public class TaintGraph {
      * 提取过滤方法
      */
     private List<TaintData> getSanitizerList(TaintData taintData, List<TaintData> taintDataList) {
-        List<TaintData> linkedList = new LinkedList<>();
+        List<TaintData> sanitizerTaintDataList = new LinkedList<>();
         LinkedBlockingQueue<TaintData> queue = new LinkedBlockingQueue<>(this.getNodeSize());
         queue.add(taintData);
         while (!queue.isEmpty()) {
@@ -293,11 +305,11 @@ public class TaintGraph {
                 //如果污点的去向为SANITIZER并且没有包含在污点传播流程中
                 if (PolicyTypeEnum.SANITIZER.name().equals(to.getStage()) && !taintDataList.contains(to)) {
                     queue.add(to);
-                    linkedList.add(to);
+                    sanitizerTaintDataList.add(to);
                 }
             }
         }
-        return linkedList;
+        return sanitizerTaintDataList;
     }
 
     public List<TaintNode> getSinkNodes() {

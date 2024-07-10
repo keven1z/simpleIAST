@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ public class HookTransformer implements ClassFileTransformer {
      * native代理方法的前缀
      */
     public static final String SANDBOX_SPECIAL_PREFIX = "$$SIMPLE$$";
+
     public HookTransformer(PolicyContainer policyContainer,
                            Instrumentation instrumentation) {
         this.policy = policyContainer;
@@ -59,33 +61,30 @@ public class HookTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-        /* 如果transformer数量大于阈值，不进行transform，发出警告 */
-        if (transformCount > MAX_TRANSFORM_COUNT) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.warn(ErrorType.TRANSFORM_ERROR, "TransformCount exceeded the threshold.current transformCount is " + transformCount + ",class:" + className);
-            }
+        /* 若className为空，不进行任何操作，直接返回 */
+        if (null == className) {
             return classfileBuffer;
         }
 
-        /* 若className为空，不进行任何操作，直接返回 */
-        if (null == className) {
+        /* 如果transformer数量大于阈值，不进行transform，发出警告 */
+        if (transformCount > MAX_TRANSFORM_COUNT) {
+            if (LogTool.isDebugEnabled()) {
+                LogTool.error(ErrorType.TRANSFORM_ERROR, "TransformCount exceeded the threshold.current transformCount is " + transformCount + ",class:" + className);
+            }
             return classfileBuffer;
         }
 
         if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isClassNameBlacklisted(className)) {
             return classfileBuffer;
         }
-        if (className.contains("proxy")) {
+        if (ClassUtils.shouldSkipProxyClass(className)) {
             return classfileBuffer;
         }
         TransformerProtector.instance.enterProtecting();
         try {
             return doTransform(loader, className, classBeingRedefined, classfileBuffer);
         } catch (Throwable throwable) {
-            /* 由于可能出现的错误日志较多的情况，默认debug模式才打开 */
-            if (LogTool.isDebugEnabled()) {
-                LogTool.error(ErrorType.TRANSFORM_ERROR, "DoTransform " + className + " error", throwable);
-            }
+            LogTool.error(ErrorType.TRANSFORM_ERROR, "DoTransform " + className + " error", throwable);
             return classfileBuffer;
         } finally {
             TransformerProtector.instance.exitProtecting();
@@ -94,6 +93,7 @@ public class HookTransformer implements ClassFileTransformer {
     }
 
     private byte[] doTransform(ClassLoader loader, String className, Class<?> classBeingRedefined, byte[] classfileBuffer) throws IOException {
+        // 如果正在被重定义的类不为空，并且其名称与传入的className不匹配，则直接返回原始的类文件缓冲区
         if (classBeingRedefined != null) {
             String name = classBeingRedefined.getName().replace(".", "/");
             if (!name.equals(className)) {
@@ -101,6 +101,9 @@ public class HookTransformer implements ClassFileTransformer {
             }
         }
 
+        if (classBeingRedefined != null && !ClassUtils.normalizeClass(classBeingRedefined.getName()).equals(className)) {
+            return classfileBuffer;
+        }
         ClassReader classReader = new ClassReader(classfileBuffer);
         /* 不hook接口类 */
         if (ClassUtils.isInterface(classReader.getAccess())) {
@@ -135,9 +138,10 @@ public class HookTransformer implements ClassFileTransformer {
                         className,
                         this.nativePrefix),
                 ClassReader.EXPAND_FRAMES
-                );
-
+        );
+        // 记录已转换的类名
         this.transformClasses.add(className);
+        // 如果需要，则导出类文件
         return dumpClassIfNecessary(className, classWriter.toByteArray());
     }
 
@@ -172,14 +176,15 @@ public class HookTransformer implements ClassFileTransformer {
         List<Class<?>> loadedClasses = findForReTransform();
         for (Class<?> clazz : loadedClasses) {
             try {
-
                 if (PolicyUtils.isHook(this.policy, clazz)) {
                     // hook已经加载的类，或者是回滚已经加载的类
                     instrumentation.retransformClasses(clazz);
                 }
-
+            } catch (UnmodifiableClassException e) {
+                // 处理类无法被修改的情况
+                logger.warn("Class " + clazz.getName() + " cannot be retransformed because it is unmodifiable.");
             } catch (Throwable t) {
-                LogTool.error(ErrorType.TRANSFORM_ERROR, "Failed to reTransform class " + clazz.getName() + ": " + t.getMessage(), t);
+                logger.error("Failed to reTransform class " + clazz.getName() + ": " + t.getMessage(), t);
             }
         }
     }
@@ -211,8 +216,8 @@ public class HookTransformer implements ClassFileTransformer {
                     continue;
                 }
                 /*
-                * 排除在黑名单中的class
-                */
+                 * 排除在黑名单中的class
+                 */
                 if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
                     continue;
                 }

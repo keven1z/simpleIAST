@@ -1221,6 +1221,17 @@
       "exit": 0
     },
     {
+      "name": "url_redirect",
+      "className": "javax/servlet/http/HttpServletResponse",
+      "method": "setHeader",
+      "desc": "(Ljava/lang/String;Ljava/lang/String;)V",
+      "state": 1,
+      "from": "P2",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
       "name": "xxe",
       "className": "com/sun/org/apache/xerces/internal/jaxp/validation/XMLSchemaFactory",
       "method": "newSchema",
@@ -1534,6 +1545,81 @@
       "from": "P1",
       "enter": 1,
       "exit": 0
+    },
+    {
+      "name": "XPath_injection",
+      "className": "javax/xml/xpath/XPath",
+      "method": "compile",
+      "desc": "(Ljava/lang/String;)Ljavax/xml/xpath/XPathExpression;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
+      "name": "XPath_injection",
+      "className": "org/apache/xpath/XPath",
+      "method": "<init>",
+      "desc": "(Ljava/lang/String;Ljavax/xml/transform/SourceLocator;Lorg/apache/xml/utils/PrefixResolver;ILjavax/xml/transform/ErrorListener;)V",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "XPath_injection",
+      "className": "org/apache/xpath/XPath",
+      "method": "<init>",
+      "desc": "(Ljava/lang/String;Ljavax/xml/transform/SourceLocator;Lorg/apache/xml/utils/PrefixResolver;ILjavax/xml/transform/ErrorListener;Lorg/apache/xpath/compiler/FunctionTable;)V",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
+    },
+    {
+      "name": "XPath_injection",
+      "className": "javax/xml/xpath/XPath",
+      "method": "evaluate",
+      "desc": "(Ljava/lang/String;Ljava/lang/Object;Ljavax/xml/namespace/QName;)Ljava/lang/Object;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
+      "name": "XPath_injection",
+      "className": "javax/xml/xpath/XPath",
+      "method": "evaluate",
+      "desc": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
+      "name": "XPath_injection",
+      "className": "javax/xml/xpath/XPath",
+      "method": "evaluate",
+      "desc": "(Ljava/lang/String;Lorg/xml/sax/InputSource;Ljavax/xml/namespace/QName;)Ljava/lang/Object;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
+    },
+    {
+      "name": "XPath_injection",
+      "className": "javax/xml/xpath/XPath",
+      "method": "evaluate",
+      "desc": "(Ljava/lang/String;Lorg/xml/sax/InputSource;)Ljava/lang/String;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0,
+      "inter": true
     }
   ],
   "sanitizers": [

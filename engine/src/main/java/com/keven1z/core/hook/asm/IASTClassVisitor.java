@@ -66,6 +66,16 @@ public class IASTClassVisitor extends ClassVisitor {
         }
     }
 
+    /**
+     * 重写普通方法
+     *
+     * @param access 方法的访问权限修饰符
+     * @param name   方法名
+     * @param descriptor 方法描述符
+     * @param signature 方法的泛型签名
+     * @param exceptions 方法抛出的异常类型数组
+     * @return 改写后的方法访问器
+     */
     private MethodVisitor rewriteNormalMethod(final int access,
                                               final String name,
                                               final String descriptor,
@@ -98,6 +108,16 @@ public class IASTClassVisitor extends ClassVisitor {
         return methodVisitor;
     }
 
+    /**
+     * 重写原生方法，将原生方法的实现替换为代理方法
+     *
+     * @param access 方法的访问权限修饰符
+     * @param name 方法名
+     * @param descriptor 方法描述符
+     * @param signature 方法的泛型签名
+     * @param exceptions 方法抛出的异常类型数组
+     * @return 改写后的方法访问器
+     */
     private MethodVisitor rewriteNativeMethod(final int access,
                                               final String name,
                                               final String descriptor,
@@ -143,6 +163,16 @@ public class IASTClassVisitor extends ClassVisitor {
         };
     }
 
+    /**
+     * 访问HTTP方法并返回MethodVisitor对象
+     *
+     * @param access 方法的访问修饰符
+     * @param name 方法名
+     * @param descriptor 方法的描述符
+     * @param jsrInlinerAdapter 方法的MethodVisitor适配器
+     * @param policy 应用的策略
+     * @return 返回适配后的MethodVisitor对象，如果策略不是HTTP_CIRCLE、HTTP_BODY或HTTP_BODY_READ则直接返回传入的jsrInlinerAdapter
+     */
     public MethodVisitor visitHTTPMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, Policy policy) {
         String policyName = policy.getName();
         if (HTTP_CIRCLE.equals(policyName)) {

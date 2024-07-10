@@ -41,7 +41,7 @@ public class HookThreadLocal {
     /**
      * 请求结束标志
      */
-    public static final ThreadLocal<Boolean> isRequestEnd = new ThreadLocal<Boolean>() {
+    public static final ThreadLocal<Boolean> isRequestEnded = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return false;
@@ -73,6 +73,6 @@ public class HookThreadLocal {
     /**
      * 最大同时检测set
      */
-    public static final Set<String> DETECT_LIMIT_SET = new HashSet<>();
+    public static final  Set<String> DETECT_LIMIT_SET = new HashSet<>();
 
 }

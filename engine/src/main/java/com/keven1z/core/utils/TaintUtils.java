@@ -77,15 +77,23 @@ public class TaintUtils {
         return sourceDataList;
     }
 
-    public static boolean isContainSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int occurrenceNum) {
+    /**
+     * 判断给定的TaintDataList中是否包含指定类型的Sanitizer，且数量达到或超过requiredOccurrenceNum。
+     *
+     * @param taintDataList 包含TaintData对象的列表
+     * @param sanitizerTypeEnum 需要匹配的Sanitizer类型枚举
+     * @param requiredOccurrenceNum 需要的Sanitizer数量
+     * @return 如果在taintDataList中找到指定类型的Sanitizer数量达到或超过requiredOccurrenceNum，则返回true；否则返回false
+     */
+    public static boolean containSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int requiredOccurrenceNum) {
+        int occurrenceNum = requiredOccurrenceNum;
+
         for (TaintData taintData : taintDataList) {
-            List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
-            if (PolicyTypeEnum.SANITIZER.name().equals(taintData.getStage())) {
-                if (sanitizerTypeEnum.name().equals(taintData.getName())) {
-                    occurrenceNum--;
-                }
+            if (PolicyTypeEnum.SANITIZER.name().equals(taintData.getStage()) && sanitizerTypeEnum.name().equals(taintData.getName())) {
+                occurrenceNum--;
             }
 
+            List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
             if (sanitizerNodes != null) {
                 for (TaintData sanitizerNode : sanitizerNodes) {
                     if (sanitizerTypeEnum.name().equals(sanitizerNode.getName())) {
@@ -97,10 +105,34 @@ public class TaintUtils {
             if (occurrenceNum <= 0) {
                 return true;
             }
-
         }
         return false;
+    }
 
+    /**
+     * 判断给定的TaintDataList中是否连续包含指定类型的Sanitizer，且数量达到或超过requiredOccurrenceNum。
+     *
+     * @param taintDataList 包含TaintData对象的列表
+     * @param sanitizerTypeEnum 需要匹配的Sanitizer类型枚举
+     * @param requiredOccurrenceNum 需要的Sanitizer连续出现的次数
+     * @return 如果在taintDataList中存在连续出现的sanitizerTypeEnum类型的Sanitizer数量达到或超过requiredOccurrenceNum，则返回true；否则返回false
+     */
+    public static boolean containSanitizerInContinuousCode(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int requiredOccurrenceNum) {
+        for (TaintData taintData : taintDataList) {
+            List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
+            if (sanitizerNodes != null) {
+                int currentOccurrenceNum = requiredOccurrenceNum;
+                for (TaintData sanitizerNode : sanitizerNodes) {
+                    if (sanitizerTypeEnum.name().equals(sanitizerNode.getName())) {
+                        currentOccurrenceNum--;
+                    }
+                    if (currentOccurrenceNum <= 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
