@@ -199,6 +199,21 @@
       "exit": 1
     },
     {
+      "name": "getParameterNames",
+      "className": "javax/servlet/http/HttpServletRequest",
+      "method": "getParameterNames()",
+      "desc": "Ljava/util/Enumeration;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "inter": true,
+      "exclude": [
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper","org/apache/catalina/connector/RequestFacade"
+      ],
+      "enter": 0,
+      "exit": 1
+    },
+    {
       "name": "getHeader",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getHeader",
@@ -272,8 +287,8 @@
       "method": "getChars",
       "desc": "(II[CI)V",
       "state": 1,
-      "from": "O,P1",
-      "to": "R",
+      "from": "O",
+      "to": "P3",
       "enter": 0,
       "exit": 1
     },
@@ -954,6 +969,17 @@
       "state": 1,
       "from": "P1",
       "to": "P3",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "intern",
+      "className": "java/lang/String",
+      "method": "intern",
+      "desc": "()Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
       "enter": 0,
       "exit": 1
     }
