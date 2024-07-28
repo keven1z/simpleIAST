@@ -18,7 +18,7 @@ package com.keven1z.core.hook.http.request;
 
 
 import com.keven1z.core.utils.ReflectionUtils;
-import com.keven1z.core.utils.StringUtils;
+import com.keven1z.core.utils.CommonUtils;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -153,7 +153,7 @@ public final class HttpServletRequest extends AbstractRequest {
         Object ret = ReflectionUtils.invokeMethod(getRequest(), "getRequestURL", EMPTY_CLASS);
         if (ret != null) {
             StringBuffer sb = (StringBuffer) ret;
-            if (GET.equals(getMethod()) && !StringUtils.isEmpty(getParameterString())) {
+            if (GET.equals(getMethod()) && !CommonUtils.isEmpty(getParameterString())) {
                 sb.append("?").append(getParameterString());
             }
             return sb;

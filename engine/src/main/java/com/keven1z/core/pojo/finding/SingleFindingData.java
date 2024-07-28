@@ -1,9 +1,7 @@
-package com.keven1z.core.pojo;
+package com.keven1z.core.pojo.finding;
 
 
-
-
-public class SingleFindingData extends FindingData{
+public class SingleFindingData extends FindingData {
     private String className;
     private String method;
     private String desc;

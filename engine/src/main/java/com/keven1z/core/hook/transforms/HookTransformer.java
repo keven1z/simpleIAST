@@ -1,14 +1,16 @@
 package com.keven1z.core.hook.transforms;
 
 import com.keven1z.core.EngineController;
+import com.keven1z.core.hook.asm.HardcodedClassVisitor;
 import com.keven1z.core.hook.asm.IASTClassVisitor;
+import com.keven1z.core.hook.server.detectors.ServerDetector;
+import com.keven1z.core.hook.server.detectors.SpringbootDetector;
+import com.keven1z.core.hook.server.detectors.TomcatDetector;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
+import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.policy.PolicyContainer;
-import com.keven1z.core.utils.AsmUtils;
-import com.keven1z.core.utils.ClassUtils;
-import com.keven1z.core.utils.PolicyUtils;
-import com.keven1z.core.utils.TransformerProtector;
+import com.keven1z.core.utils.*;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -80,9 +82,21 @@ public class HookTransformer implements ClassFileTransformer {
         if (ClassUtils.shouldSkipProxyClass(className)) {
             return classfileBuffer;
         }
+        // 如果正在被重定义的类不为空，并且其名称与传入的className不匹配，则直接返回原始的类文件缓冲区
+        if (classBeingRedefined != null) {
+            String name = classBeingRedefined.getName().replace(".", "/");
+            if (!name.equals(className)) {
+                return classfileBuffer;
+            }
+        }
+        // 判断是否已经转换过，避免重复转换
+        if (classBeingRedefined != null && !ClassUtils.normalizeClass(classBeingRedefined.getName()).equals(className)) {
+            return classfileBuffer;
+        }
+
         TransformerProtector.instance.enterProtecting();
         try {
-            return doTransform(loader, className, classBeingRedefined, classfileBuffer);
+            return doTransform(loader, className, protectionDomain, classfileBuffer);
         } catch (Throwable throwable) {
             LogTool.error(ErrorType.TRANSFORM_ERROR, "DoTransform " + className + " error", throwable);
             return classfileBuffer;
@@ -92,31 +106,25 @@ public class HookTransformer implements ClassFileTransformer {
 
     }
 
-    private byte[] doTransform(ClassLoader loader, String className, Class<?> classBeingRedefined, byte[] classfileBuffer) throws IOException {
-        // 如果正在被重定义的类不为空，并且其名称与传入的className不匹配，则直接返回原始的类文件缓冲区
-        if (classBeingRedefined != null) {
-            String name = classBeingRedefined.getName().replace(".", "/");
-            if (!name.equals(className)) {
-                return classfileBuffer;
-            }
-        }
+    private byte[] doTransform(ClassLoader loader, String className, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IOException {
+        // 识别server类型
+        identifyServerType(loader, className, protectionDomain);
 
-        if (classBeingRedefined != null && !ClassUtils.normalizeClass(classBeingRedefined.getName()).equals(className)) {
-            return classfileBuffer;
-        }
+        // 加载class
         ClassReader classReader = new ClassReader(classfileBuffer);
         /* 不hook接口类 */
         if (ClassUtils.isInterface(classReader.getAccess())) {
             return classfileBuffer;
         }
-        /* 判断是否在hook点策略中 */
+        hardcodedCheckBeforeHook(classReader, className);
+        /* 判断是否需要hook */
         if (!PolicyUtils.isHook(className, policy, classReader.getInterfaces(), classReader.getSuperName(), loader)) {
-//            hookLogger.info(className);
             return classfileBuffer;
         }
         /* transform class +1 */
         ++transformCount;
 
+        // 创建classWriter
         ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS) {
             /*
              * 注意，为了自动计算帧的大小，有时必须计算两个类共同的父类。
@@ -211,7 +219,7 @@ public class HookTransformer implements ClassFileTransformer {
                 }
                 if (this.transformClasses.contains(normalizeClass)) {
                     if (LogTool.isDebugEnabled()) {
-                        logger.warn("Class has been transformed,class name is" + clazz.getName());
+                        logger.warn("Class has been transformed,class name:" + clazz.getName());
                     }
                     continue;
                 }
@@ -225,7 +233,7 @@ public class HookTransformer implements ClassFileTransformer {
                     classes.add(clazz);
                 }
             } catch (Throwable cause) {
-                logger.debug("remove from findForReTransform, because loading class:" + clazz.getName() + "occur an exception");
+                logger.warn("remove from findForReTransform, because loading class:" + clazz.getName() + "occur an exception");
             } finally {
                 TransformerProtector.instance.exitProtecting();
             }
@@ -236,4 +244,42 @@ public class HookTransformer implements ClassFileTransformer {
     public String getNativePrefix() {
         return nativePrefix;
     }
+
+    private static final List<ServerDetector> SERVER_HOOKS = new ArrayList<>();
+
+    static {
+        SERVER_HOOKS.add(new TomcatDetector());
+        SERVER_HOOKS.add(new SpringbootDetector());
+    }
+
+    private void identifyServerType(ClassLoader loader, String className, ProtectionDomain protectionDomain) {
+        // 已经识别到ServerType，不再重复检测
+        if (!CommonUtils.isEmpty(ApplicationModel.getContainerName())) {
+            return;
+        }
+        for (final ServerDetector hook : SERVER_HOOKS) {
+            if (hook.isClassMatched(className)) {
+                try {
+                    boolean detectionSuccessful = hook.processServerInfo(loader, protectionDomain);
+                    if (detectionSuccessful) {
+                        String serverType = ApplicationModel.getContainerName();
+                        logger.info("Detect server successfully, server type: " + serverType);
+                        return;
+                    } else {
+                        LogTool.warn(ErrorType.DETECT_SERVER_ERROR, "Failed to detect server type by " + hook);
+                    }
+                } catch (Exception e) {
+                    LogTool.error(ErrorType.UNEXPECTED_ERROR, "Exception occurred while detecting server type", e);
+                }
+            }
+        }
+    }
+
+    private void hardcodedCheckBeforeHook(ClassReader classReader, String className) {
+        HardcodedClassVisitor classVisitor = new HardcodedClassVisitor(className);
+        // ClassReader.SKIP_CODE: 跳过代码块，只解析class文件结构
+        //此处仅仅访问属性值，所以跳过方法体，且不进行扩展帧操作
+        classReader.accept(classVisitor, ClassReader.SKIP_CODE);
+    }
+
 }

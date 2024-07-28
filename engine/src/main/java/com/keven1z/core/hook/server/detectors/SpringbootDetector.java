@@ -14,7 +14,7 @@ public class SpringbootDetector extends ServerDetector {
     }
 
     @Override
-    public boolean handleServerInfo(ClassLoader classLoader, ProtectionDomain domain) {
+    public boolean processServerInfo(ClassLoader classLoader, ProtectionDomain domain) {
         //tomcat标准启动方式设置为true，内置tomcat启动设置为false
         ApplicationModel.setStartUpInfo("true");
         return false;

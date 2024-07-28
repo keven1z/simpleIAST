@@ -1,6 +1,8 @@
-package com.keven1z.core.pojo;
+package com.keven1z.core.pojo.finding;
 
 import com.keven1z.core.model.graph.TaintGraph;
+import com.keven1z.core.pojo.HttpRequestData;
+import com.keven1z.core.pojo.HttpResponseData;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -62,7 +62,7 @@ public class AsmUtils {
                     return "java/lang/Object";
                 }
             } while (!classStructureOfType2.getFamilyTypeClassStructures().contains(classStructure));
-            return StringUtils.toInternalClassName(classStructure.getJavaClassName());
+            return CommonUtils.toInternalClassName(classStructure.getJavaClassName());
         } finally {
             IOUtils.closeQuietly(inputStreamOfType1);
             IOUtils.closeQuietly(inputStreamOfType2);

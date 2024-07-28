@@ -1,8 +1,9 @@
 package com.keven1z.core.utils;
 
 import java.util.Collection;
+import java.util.List;
 
-public class StringUtils {
+public class CommonUtils {
     /**
      * 判断字符是否存在以数组中的元素开头
      */
@@ -113,4 +114,24 @@ public class StringUtils {
                 + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
         return str.matches(regex);
     }
+
+    /**
+     * 判断元素是否在集合中
+     *
+     * @param element 要检查的元素
+     * @param list 要检查的字符串集合
+     * @return 如果元素在集合中，则返回true；否则返回false
+     */
+    public static boolean isInList(String element, List<String> list) {
+        if (element == null || list == null || list.isEmpty()) {
+            return false;
+        }
+        for (String l : list) {
+            if (element.equals(l)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

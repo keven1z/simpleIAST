@@ -1,9 +1,10 @@
-package com.keven1z.core.pojo;
+package com.keven1z.core.pojo.finding;
 
 import com.keven1z.core.model.graph.TaintData;
+
 import java.util.List;
 
-public class TaintFindingData extends FindingData{
+public class TaintFindingData extends FindingData {
     private List<TaintData> flowData;
     public TaintFindingData(){
 

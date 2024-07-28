@@ -2,7 +2,7 @@ package com.keven1z.core.hook.asm.structure;
 
 
 import com.keven1z.core.utils.BitUtils;
-import com.keven1z.core.utils.StringUtils;
+import com.keven1z.core.utils.CommonUtils;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.*;
 
@@ -270,7 +270,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
     // 但如果遇到来自BootstrapClassLoader的类就必须从java.lang.Object来获取，但是该方法仅限于jdk8
     // 对于jdk >= 9的版本来说，需要先获取到相关类，然后通过这个类获取自己的resource
     private InputStream getResourceAsStream(final String javaClassName) {
-        final String resourceName = internalClassNameToResourceName(StringUtils.toInternalClassName(javaClassName));
+        final String resourceName = internalClassNameToResourceName(CommonUtils.toInternalClassName(javaClassName));
         InputStream ins = null;
         if(isBootstrapClassLoader()) {
             try {
@@ -322,7 +322,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
             return existClassStructure;
         } else {
             // fix for #385
-            final InputStream is = getResourceAsStream(StringUtils.toJavaClassName(javaClassName));
+            final InputStream is = getResourceAsStream(CommonUtils.toJavaClassName(javaClassName));
             if (null != is) {
                 try {
                     final ClassStructure classStructure = new ClassStructureImplByAsm(is, loader);
@@ -365,7 +365,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
 
     @Override
     public String getJavaClassName() {
-        return StringUtils.toJavaClassName(classReader.getClassName());
+        return CommonUtils.toJavaClassName(classReader.getClassName());
     }
 
     @Override
@@ -381,7 +381,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
             if (org.apache.commons.lang3.StringUtils.equals("java/lang/Object", superInternalClassName)) {
                 return null;
             }
-            return newInstance(StringUtils.toJavaClassName(superInternalClassName));
+            return newInstance(CommonUtils.toJavaClassName(superInternalClassName));
         }
     };
 

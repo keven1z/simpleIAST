@@ -36,10 +36,10 @@ public enum ErrorType {
     TRANSFORM_ERROR(20019, "Transform Error"),
     MEMORY_ERROR(20020, "Count Memory Usage Failed"),
     DETECT_VULNERABILITY_ERROR(20020, "Detect Vulnerability Error"),
-    REFLECT_ERROR(20021,"Reflect Method Error"),
-    SHUTDOWN_ERROR(20022,"Shutdown Error"),
-    REQUEST_START_ERROR(20023, "Request start error");
-
+    REFLECT_ERROR(20021, "Reflect Method Error"),
+    SHUTDOWN_ERROR(20022, "Shutdown Error"),
+    REQUEST_START_ERROR(20023, "Request start error"),
+    UNEXPECTED_ERROR(20099, "Unexpected Error");
     private final int code;
     private final String message;
 

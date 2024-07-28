@@ -18,7 +18,7 @@ package com.keven1z.core.hook.http.request;
 
 
 import com.keven1z.core.utils.ReflectionUtils;
-import com.keven1z.core.utils.StringUtils;
+import com.keven1z.core.utils.CommonUtils;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -147,7 +147,7 @@ public class CoyoteRequest extends AbstractRequest {
             sb.append(uri);
         }
         String method = getMethod();
-        if (GET.equals(method) && !StringUtils.isEmpty(getParameterString())) {
+        if (GET.equals(method) && !CommonUtils.isEmpty(getParameterString())) {
             sb.append("?").append(getParameterString());
         }
 

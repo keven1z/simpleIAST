@@ -2,9 +2,9 @@ package com.keven1z.core.hook;
 
 import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.hook.http.HttpContext;
-import com.keven1z.core.pojo.FindingReportBo;
+import com.keven1z.core.pojo.finding.FindingReportBo;
 import com.keven1z.core.pojo.ReportData;
-import com.keven1z.core.pojo.SingleFindingData;
+import com.keven1z.core.pojo.finding.SingleFindingData;
 
 import java.util.HashSet;
 import java.util.List;

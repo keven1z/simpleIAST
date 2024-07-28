@@ -13,8 +13,8 @@ public enum VulnEnum {
     Sp_EL("spring_expression_injection", 1),
     WEAK_PASSWORD_IN_SQL("weak_password_in_sql", 3),
     WEAK_PASSWORD_IN_POST("weak_password_in_post", 3),
-    XPATH_INJECTION("XPath_injection", 2);
-
+    XPATH_INJECTION("XPath_injection", 2),
+    HARD_CODE("hard_code", 3);
     private final String name;
     /**
      * 漏洞等级

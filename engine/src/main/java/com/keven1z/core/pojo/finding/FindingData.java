@@ -1,10 +1,10 @@
-package com.keven1z.core.pojo;
-
+package com.keven1z.core.pojo.finding;
 
 public class FindingData {
     private String vulnerableType;
     private int level;
-    public FindingData(){
+
+    public FindingData() {
 
     }
 

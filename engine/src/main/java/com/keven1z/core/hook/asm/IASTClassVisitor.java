@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.keven1z.core.consts.CommonConst.ON;
-import static com.keven1z.core.utils.StringUtils.toInternalClassName;
+import static com.keven1z.core.utils.CommonUtils.toInternalClassName;
 import static org.objectweb.asm.Opcodes.*;
 
 /**

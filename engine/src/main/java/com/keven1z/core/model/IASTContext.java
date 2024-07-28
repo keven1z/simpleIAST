@@ -99,12 +99,14 @@ public class IASTContext {
      * 判定hook点是否在黑名单中
      */
     public boolean isClassNameBlacklisted(String className) {
-        if (blackList == null || className == null) {
-            return true;//如果为空，则说明程序存在错误，不进行任何hook
+        if (blackList == null || blackList.isEmpty()) {
+            // 如果黑名单为空，则认为不在黑名单中
+            return false;
         }
         return blackList.stream()
                 .anyMatch(blackStr -> className.startsWith(blackStr) || className.endsWith(blackStr));
     }
+
 
     public boolean isDebug() {
         return isDebug;

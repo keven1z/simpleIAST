@@ -4,6 +4,7 @@ import java.security.ProtectionDomain;
 
 public abstract class ServerDetector {
     public abstract boolean isClassMatched(String className);
-    public abstract boolean handleServerInfo(ClassLoader classLoader, ProtectionDomain domain);
+    public abstract boolean processServerInfo(ClassLoader classLoader, ProtectionDomain domain);
+
     public abstract String getServerName();
 }

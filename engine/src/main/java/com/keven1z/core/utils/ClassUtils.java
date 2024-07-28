@@ -24,13 +24,13 @@ public class ClassUtils {
         if (superClass != null) {
             superClass = superClass.replace("/", ".");
 
-            if (!ObjectUtils.isInList(superClass, Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (!CommonUtils.isInList(superClass, Arrays.asList(IGNORE_OBJECT_CLASS))) {
                 ancestors.add(superClass);
             }
         }
         for (String inter : interfaces) {
             inter = inter.replace("/", ".");
-            if (!ObjectUtils.isInList(inter, Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (!CommonUtils.isInList(inter, Arrays.asList(IGNORE_OBJECT_CLASS))) {
                 ancestors.add(inter);
             }
         }
@@ -72,14 +72,14 @@ public class ClassUtils {
                 ClassReader classReader = new ClassReader(bufferedInput);
                 String superName = classReader.getSuperName();
                 if (superName != null) {
-                    if (!ObjectUtils.isInList(superName, ignoreList)) {
+                    if (!CommonUtils.isInList(superName, ignoreList)) {
                         set.add(superName.replace(".", "/"));
                     }
                 }
 
                 String[] interfaces = classReader.getInterfaces();
                 for (String interfaceName : interfaces) {
-                    if (!ObjectUtils.isInList(interfaceName, ignoreList)) {
+                    if (!CommonUtils.isInList(interfaceName, ignoreList)) {
                         interfaceName = interfaceName.replace(".", "/");
                         if (set.size() <= 5) {
                             set.add(interfaceName);

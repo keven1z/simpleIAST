@@ -147,7 +147,7 @@ public class PolicyUtils {
                 //由于传进来的className以.分割，策略为/分割，需要进行转化
                 ancestor = ancestor.replace(".", "/");
                 //className匹配和黑名单匹配
-                if (!name.equals(ancestor) || StringUtils.isEndWithElementInList(className, hookPolicy.getExclude())) {
+                if (!name.equals(ancestor) || CommonUtils.isEndWithElementInList(className, hookPolicy.getExclude())) {
                     continue;
                 }
 

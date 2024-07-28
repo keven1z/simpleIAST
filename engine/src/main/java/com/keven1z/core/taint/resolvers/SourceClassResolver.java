@@ -143,7 +143,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
                     continue;
                 }
 
-                if (StringUtils.isStartsWithElementInArray(taintClassName, USER_PACKAGE_PREFIX)) {
+                if (CommonUtils.isStartsWithElementInArray(taintClassName, USER_PACKAGE_PREFIX)) {
                     continue;
                 }
 
@@ -211,7 +211,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             }
         } else if (CLASS_OPTIONAL.equals(returnObject.getClass().getName())) {
             parseOptional(returnObject, taintData);
-        } else if (!StringUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
+        } else if (!CommonUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
             addBeanObjectPolicy(returnObject.getClass());
         } else {
             taintData.setToObject(returnObject);

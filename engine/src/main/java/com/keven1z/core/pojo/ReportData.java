@@ -1,5 +1,7 @@
 package com.keven1z.core.pojo;
 
+import com.keven1z.core.pojo.finding.FindingData;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

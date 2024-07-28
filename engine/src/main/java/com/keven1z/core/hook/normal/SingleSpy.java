@@ -3,7 +3,7 @@ package com.keven1z.core.hook.normal;
 
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.pojo.ReportData;
-import com.keven1z.core.pojo.SingleFindingData;
+import com.keven1z.core.pojo.finding.SingleFindingData;
 import com.keven1z.core.vulnerability.NormalDetector;
 import com.keven1z.core.vulnerability.detectors.WeakPasswordInSqlDetector;
 import org.apache.log4j.Logger;

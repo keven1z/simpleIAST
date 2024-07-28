@@ -25,7 +25,7 @@ public class TomcatDetector extends ServerDetector {
     }
 
     @Override
-    public boolean handleServerInfo(ClassLoader classLoader, ProtectionDomain domain) {
+    public boolean processServerInfo(ClassLoader classLoader, ProtectionDomain domain) {
         String version = "";
         try {
             if (classLoader == null) {

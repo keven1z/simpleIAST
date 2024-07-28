@@ -5,7 +5,6 @@ import com.keven1z.core.hook.normal.SingleSpy;
 import com.keven1z.core.monitor.FindingReportMonitor;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
-import com.keven1z.core.hook.transforms.ServerDetectTransform;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogConfig;
 import com.keven1z.core.log.LogTool;
@@ -201,7 +200,6 @@ public class EngineController {
      */
     private void initTransformer() {
         Instrumentation instrumentation = context.getInstrumentation();
-        context.getInstrumentation().addTransformer(new ServerDetectTransform(), true);
         HookTransformer hookTransformer = new HookTransformer(context.getPolicy(),instrumentation );
         if(instrumentation.isNativeMethodPrefixSupported()){
             instrumentation.setNativeMethodPrefix(hookTransformer,hookTransformer.getNativePrefix());
