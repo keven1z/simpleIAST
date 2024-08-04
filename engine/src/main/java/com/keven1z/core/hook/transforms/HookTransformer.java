@@ -75,25 +75,14 @@ public class HookTransformer implements ClassFileTransformer {
             }
             return classfileBuffer;
         }
-
-        if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isClassNameBlacklisted(className)) {
-            return classfileBuffer;
-        }
-        if (ClassUtils.shouldSkipProxyClass(className)) {
-            return classfileBuffer;
-        }
-        // 如果正在被重定义的类不为空，并且其名称与传入的className不匹配，则直接返回原始的类文件缓冲区
-        if (classBeingRedefined != null) {
-            String name = classBeingRedefined.getName().replace(".", "/");
-            if (!name.equals(className)) {
+        if (classBeingRedefined == null) {
+            if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isClassNameBlacklisted(className)) {
+                return classfileBuffer;
+            }
+            if (ClassUtils.shouldSkipProxyClass(className)) {
                 return classfileBuffer;
             }
         }
-        // 判断是否已经转换过，避免重复转换
-        if (classBeingRedefined != null && !ClassUtils.normalizeClass(classBeingRedefined.getName()).equals(className)) {
-            return classfileBuffer;
-        }
-
         TransformerProtector.instance.enterProtecting();
         try {
             return doTransform(loader, className, protectionDomain, classfileBuffer);
@@ -184,13 +173,10 @@ public class HookTransformer implements ClassFileTransformer {
         List<Class<?>> loadedClasses = findForReTransform();
         for (Class<?> clazz : loadedClasses) {
             try {
-                if (PolicyUtils.isHook(this.policy, clazz)) {
-                    // hook已经加载的类，或者是回滚已经加载的类
-                    instrumentation.retransformClasses(clazz);
-                }
+                instrumentation.retransformClasses(clazz);
             } catch (UnmodifiableClassException e) {
                 // 处理类无法被修改的情况
-                logger.warn("Class " + clazz.getName() + " cannot be retransformed because it is unmodifiable.");
+                logger.warn("Class " + clazz.getName() + " cannot be reTransformed because it is unmodifiable.");
             } catch (Throwable t) {
                 logger.error("Failed to reTransform class " + clazz.getName() + ": " + t.getMessage(), t);
             }
@@ -220,6 +206,12 @@ public class HookTransformer implements ClassFileTransformer {
                 if (this.transformClasses.contains(normalizeClass)) {
                     if (LogTool.isDebugEnabled()) {
                         logger.warn("Class has been transformed,class name:" + clazz.getName());
+                    }
+                    continue;
+                }
+                if (ClassUtils.shouldSkipProxyClass(normalizeClass)) {
+                    if (LogTool.isDebugEnabled()) {
+                        logger.warn("Class is proxy,skip proxy class，class name:" + clazz.getName());
                     }
                     continue;
                 }
