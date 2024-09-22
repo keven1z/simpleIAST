@@ -3,6 +3,7 @@ package com.keven1z.core.hook.transforms;
 import com.keven1z.core.EngineController;
 import com.keven1z.core.hook.asm.HardcodedClassVisitor;
 import com.keven1z.core.hook.asm.IASTClassVisitor;
+import com.keven1z.core.hook.server.detectors.JettyDetector;
 import com.keven1z.core.hook.server.detectors.ServerDetector;
 import com.keven1z.core.hook.server.detectors.SpringbootDetector;
 import com.keven1z.core.hook.server.detectors.TomcatDetector;
@@ -215,17 +216,17 @@ public class HookTransformer implements ClassFileTransformer {
                     }
                     continue;
                 }
-                /*
-                 * 排除在黑名单中的class
-                 */
-                if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
-                    continue;
-                }
+//                /*
+//                 * 排除在黑名单中的class
+//                 */
+//                if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
+//                    continue;
+//                }
                 if (PolicyUtils.isHook(this.policy, clazz)) {
                     classes.add(clazz);
                 }
-            } catch (Throwable cause) {
-                logger.warn("remove from findForReTransform, because loading class:" + clazz.getName() + "occur an exception");
+            } catch (Exception e) {
+                logger.error("remove from findForReTransform, because loading class:" + clazz.getName() + "occur an exception", e);
             } finally {
                 TransformerProtector.instance.exitProtecting();
             }
@@ -242,6 +243,7 @@ public class HookTransformer implements ClassFileTransformer {
     static {
         SERVER_HOOKS.add(new TomcatDetector());
         SERVER_HOOKS.add(new SpringbootDetector());
+        SERVER_HOOKS.add(new JettyDetector());
     }
 
     private void identifyServerType(ClassLoader loader, String className, ProtectionDomain protectionDomain) {
