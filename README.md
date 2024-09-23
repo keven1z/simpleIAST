@@ -51,6 +51,8 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 
 * Tomcat
 * Springboot
+* Jetty
+* Weblogic
 
 ### 支持JDK
 * jdk 1.8
@@ -90,26 +92,7 @@ _\ \ | | | | | | |_) | |  __/ /\/ /_/  _  \_\ \ / /
 漏洞结果默认打印到控制台
 
 #### 服务器模式
-Config.java中增加服务器地址，默认漏洞上报api如下：
-```java
-    /**
-     * 服务注册
-     */
-    public static final String AGENT_REGISTER_URL = Config.IAST_SERVER + "/agent/register";
-    /**
-     * 服务器解绑
-     */
-    public static final String AGENT_DEREGISTER_URL = Config.IAST_SERVER + "/agent/deregister";
-
-    /**
-     * 发送报告的url
-     */
-    public static final String SEND_REPORT_URL = Config.IAST_SERVER + "/report/receive";
-    /**
-     * 获取服务端指令url
-     */
-    public static final String INSTRUCTION_GET_URL = Config.IAST_SERVER + "/instruction/get";
-```
+Config.java中增加服务器地址.
 
 ## 二次开发
 参考[二次开发](./二次开发.md)

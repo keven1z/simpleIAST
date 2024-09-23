@@ -3,10 +3,7 @@ package com.keven1z.core.hook.transforms;
 import com.keven1z.core.EngineController;
 import com.keven1z.core.hook.asm.HardcodedClassVisitor;
 import com.keven1z.core.hook.asm.IASTClassVisitor;
-import com.keven1z.core.hook.server.detectors.JettyDetector;
-import com.keven1z.core.hook.server.detectors.ServerDetector;
-import com.keven1z.core.hook.server.detectors.SpringbootDetector;
-import com.keven1z.core.hook.server.detectors.TomcatDetector;
+import com.keven1z.core.hook.server.detectors.*;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
@@ -216,12 +213,12 @@ public class HookTransformer implements ClassFileTransformer {
                     }
                     continue;
                 }
-//                /*
-//                 * 排除在黑名单中的class
-//                 */
-//                if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
-//                    continue;
-//                }
+                /*
+                 * 排除在黑名单中的class
+                 */
+                if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
+                    continue;
+                }
                 if (PolicyUtils.isHook(this.policy, clazz)) {
                     classes.add(clazz);
                 }
@@ -244,6 +241,7 @@ public class HookTransformer implements ClassFileTransformer {
         SERVER_HOOKS.add(new TomcatDetector());
         SERVER_HOOKS.add(new SpringbootDetector());
         SERVER_HOOKS.add(new JettyDetector());
+        SERVER_HOOKS.add(new WebLogicDetector());
     }
 
     private void identifyServerType(ClassLoader loader, String className, ProtectionDomain protectionDomain) {

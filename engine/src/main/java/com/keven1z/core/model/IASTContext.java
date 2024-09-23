@@ -103,8 +103,16 @@ public class IASTContext {
             // 如果黑名单为空，则认为不在黑名单中
             return false;
         }
-        return blackList.stream()
-                .anyMatch(blackStr -> className.startsWith(blackStr) || className.endsWith(blackStr));
+
+        int classNameLength = className.length();
+        for (String blackStr : blackList) {
+            int blackStrLength = blackStr.length();
+            if (classNameLength >= blackStrLength &&
+                    (className.startsWith(blackStr) || className.endsWith(blackStr))) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
