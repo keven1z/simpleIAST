@@ -242,6 +242,8 @@ public class HookTransformer implements ClassFileTransformer {
         SERVER_HOOKS.add(new SpringbootDetector());
         SERVER_HOOKS.add(new JettyDetector());
         SERVER_HOOKS.add(new WebLogicDetector());
+        SERVER_HOOKS.add(new GlassfishDetector());
+        SERVER_HOOKS.add(new WildFlyDetector());
     }
 
     private void identifyServerType(ClassLoader loader, String className, ProtectionDomain protectionDomain) {

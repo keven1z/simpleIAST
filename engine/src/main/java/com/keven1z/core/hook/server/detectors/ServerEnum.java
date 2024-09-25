@@ -4,5 +4,7 @@ public enum ServerEnum {
     TOMCAT,
     SPRINGBOOT,
     JETTY,
-    WEBLOGIC
+    WEBLOGIC,
+    GLASSFISH,
+    WILDFLY
 }
