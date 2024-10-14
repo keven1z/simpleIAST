@@ -53,6 +53,11 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 * Springboot
 * Jetty
 * Weblogic
+* glassfish
+* WildFly
+* TongWeb
+* Resin
+* Undertow
 
 ### 支持JDK
 * jdk 1.8

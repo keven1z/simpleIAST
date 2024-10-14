@@ -244,6 +244,9 @@ public class HookTransformer implements ClassFileTransformer {
         SERVER_HOOKS.add(new WebLogicDetector());
         SERVER_HOOKS.add(new GlassfishDetector());
         SERVER_HOOKS.add(new WildFlyDetector());
+        SERVER_HOOKS.add(new ResinDetector());
+        SERVER_HOOKS.add(new TongWebDetector());
+        SERVER_HOOKS.add(new UndertowDetector());
     }
 
     private void identifyServerType(ClassLoader loader, String className, ProtectionDomain protectionDomain) {

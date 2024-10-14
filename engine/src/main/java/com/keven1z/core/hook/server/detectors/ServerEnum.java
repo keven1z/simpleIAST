@@ -6,5 +6,9 @@ public enum ServerEnum {
     JETTY,
     WEBLOGIC,
     GLASSFISH,
-    WILDFLY
+    WILDFLY,
+    TongWeb,
+    Undertow,
+    Resin
+
 }
