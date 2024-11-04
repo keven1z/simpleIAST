@@ -14,7 +14,7 @@ import java.util.List;
 public class IASTContext {
     private IASTContext() {
     }
-
+    private String agentVersion;
     public static IASTContext getContext() {
         return Inner.context;
     }
@@ -142,5 +142,13 @@ public class IASTContext {
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
+    }
+
+    public String getAgentVersion() {
+        return agentVersion;
+    }
+
+    public void setAgentVersion(String agentVersion) {
+        this.agentVersion = agentVersion;
     }
 }

@@ -120,11 +120,11 @@ public class HttpSpy implements SimpleIASTSpy {
         } finally {
             enableHookLock.set(false);
             if (isRequestEnded.get()) {
-                TaintSpy.getInstance().clear();
                 HttpContext requestData = REQUEST_THREAD_LOCAL.get();
                 if (requestData != null) {
                     DETECT_LIMIT_SET.remove(requestData.getRequest().getRequestId());
                 }
+                TaintSpy.getInstance().clear();
             }
         }
     }

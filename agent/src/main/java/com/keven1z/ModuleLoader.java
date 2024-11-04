@@ -2,10 +2,14 @@ package com.keven1z;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.instrument.Instrumentation;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Objects;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 
 /**
@@ -67,7 +71,7 @@ public class ModuleLoader {
         }
     }
 
-//    public static boolean isCustomClassloader() {
+    //    public static boolean isCustomClassloader() {
 //        try {
 //            String classLoader = ClassLoader.getSystemClassLoader().getClass().getName();
 //            if (classLoader.startsWith("com.oracle") && classLoader.contains("weblogic")) {
@@ -78,6 +82,21 @@ public class ModuleLoader {
 //            return false;
 //        }
 //    }
+    public static void readVersion() throws IOException {
+        Class<?> clazz = Agent.class;
+        String className = clazz.getSimpleName() + ".class";
+        String classPath = Objects.requireNonNull(clazz.getResource(className)).toString();
+        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+        Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+        Attributes attr = manifest.getMainAttributes();
+        projectVersion = attr.getValue("Project-Version");
+        buildTime = attr.getValue("Build-Time");
+        gitCommit = attr.getValue("Git-Commit");
+
+        projectVersion = (projectVersion == null ? "UNKNOWN" : projectVersion);
+        buildTime = (buildTime == null ? "UNKNOWN" : buildTime);
+        gitCommit = (gitCommit == null ? "UNKNOWN" : gitCommit);
+    }
 
     public static boolean isModularityJdk() {
         String javaVersion = System.getProperty("java.version");
@@ -112,6 +131,7 @@ public class ModuleLoader {
      */
     public static synchronized void load(String action, String appName, boolean isDebug, Instrumentation inst) throws Exception {
         if (Module.START_ACTION_INSTALL.equals(action)) {
+            readVersion();
             if (instance == null) {
                 instance = new ModuleLoader(appName, isDebug);
                 instance.start(inst);

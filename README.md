@@ -9,14 +9,6 @@
 simpleIAST是一种交互式应用程序安全测试工具。
 </p>
 
-# 目录
-- [快速开始](#快速开始)
-- [兼容](#兼容)
-- [开始运行](#开始运行)
-- [二次开发-暂不适用](#二次开发)
-
-
-
 
 ## 快速开始
 
@@ -24,8 +16,7 @@ simpleIAST是一种交互式应用程序安全测试工具。
 
 ```shell
 # clone安装包
-wget https://github.com/keven1z/simpleIAST/archive/refs/heads/master.zip
-
+git clone https://github.com/keven1z/simpleIAST.git
 ```
 
 ```shell
@@ -103,11 +94,11 @@ Config.java中增加服务器地址.
 参考[二次开发](./二次开发.md)
 
 ## 计划
-- [x] 心跳包
+- [ ] 心跳包采用websocket
 - [x] API改造
 - [x] 漏洞检测数量，覆盖[ant-application-security-testing-benchmark](https://github.com/alipay/ant-application-security-testing-benchmark)
-- [ ] 服务端交互界面（预计24年底）
-- [ ] 支持多种中间件
+- [ ] 服务端交互界面(11月底)
+- [x] 支持多种中间件
 
 ## 鸣谢
 > [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。

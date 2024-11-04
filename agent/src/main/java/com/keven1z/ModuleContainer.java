@@ -32,8 +32,8 @@ public class ModuleContainer implements Module {
     }
 
     public void start(Instrumentation inst) throws Exception {
-        Method method = engineObject.getClass().getMethod("start", Instrumentation.class, String.class, Boolean.class);
-        method.invoke(engineObject, inst, appName, isDebug);
+        Method method = engineObject.getClass().getMethod("start", Instrumentation.class, String.class, Boolean.class, String.class);
+        method.invoke(engineObject, inst, appName, isDebug, projectVersion);
     }
 
     public void shutdown() throws Throwable {

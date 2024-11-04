@@ -19,10 +19,12 @@ public class TaintData {
     /**
      * 污点类调用的唯一标志
      */
+    @JsonIgnore
     private final int invokeId;
     private String className;
     private String method;
     private String desc;
+    @JsonIgnore
     private String name;
     @JsonIgnore
     private Object thisObject;
@@ -38,7 +40,7 @@ public class TaintData {
      * 若是漏洞，标记其漏洞名称
      */
     @JsonIgnore
-    private String VulnType;
+    private String vulnType;
     /**
      * 过滤节点信息表
      */
@@ -71,7 +73,7 @@ public class TaintData {
      * 是否进行过滤处理
      */
     @JsonIgnore
-    private boolean isSanitizer;
+    private boolean hasSanitizer;
     private List<String> stackList;
 
     public TaintData(String className, String method, String desc, PolicyTypeEnum policyType) {
@@ -138,11 +140,11 @@ public class TaintData {
     }
 
     public String getVulnType() {
-        return VulnType;
+        return vulnType;
     }
 
     public void setVulnType(String vulnType) {
-        VulnType = vulnType;
+        this.vulnType = vulnType;
     }
 
 
@@ -155,15 +157,11 @@ public class TaintData {
     }
 
     public boolean isHasSanitizer() {
-        return isSanitizer;
+        return hasSanitizer;
     }
 
-    public boolean isSource() {
-        return PolicyTypeEnum.SOURCE.name().equals(getStage());
-    }
-
-    public void setSanitizer(boolean sanitizer) {
-        isSanitizer = sanitizer;
+    public void setHasSanitizer(boolean hasSanitizer) {
+        this.hasSanitizer = hasSanitizer;
     }
 
     public List<TaintData> getSanitizerNodes() {

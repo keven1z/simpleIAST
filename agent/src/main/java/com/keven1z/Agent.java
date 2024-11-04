@@ -1,14 +1,9 @@
 package com.keven1z;
 
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.instrument.Instrumentation;
-import java.net.URL;
-import java.util.Objects;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
+import java.lang.reflect.InvocationTargetException;
 import static com.keven1z.Module.*;
 import static com.keven1z.ModuleLoader.release;
 
@@ -43,31 +38,22 @@ public class Agent {
     public static synchronized void init(String action, String appName, boolean isDebug, Instrumentation inst) {
         try {
             JarFileHelper.addJarToBootstrap(inst);
-            readVersion();
+//            readVersion();
             ModuleLoader.load(action, appName, isDebug, inst);
-        } catch (Exception e) {
+        }catch (InvocationTargetException invocationTargetException){
             PrintStream err = System.err;
-            err.println("[SimpleIAST] Failed to initialize, will continue without simpleIAST.");
+            err.println("[SimpleIAST] Failed to load engine, will continue without simpleIAST.");
+            invocationTargetException.printStackTrace(err);
+            release();
+        }
+        catch (Exception e) {
+            PrintStream err = System.err;
+            err.println("[SimpleIAST] Failed to initialize agent, will continue without simpleIAST.");
             e.printStackTrace(err);
             release();
         }
     }
 
-    public static void readVersion() throws IOException {
-        Class<?> clazz = Agent.class;
-        String className = clazz.getSimpleName() + ".class";
-        String classPath = Objects.requireNonNull(clazz.getResource(className)).toString();
-        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
-        Manifest manifest = new Manifest(new URL(manifestPath).openStream());
-        Attributes attr = manifest.getMainAttributes();
-        projectVersion = attr.getValue("Project-Version");
-        buildTime = attr.getValue("Build-Time");
-        gitCommit = attr.getValue("Git-Commit");
-
-        projectVersion = (projectVersion == null ? "UNKNOWN" : projectVersion);
-        buildTime = (buildTime == null ? "UNKNOWN" : buildTime);
-        gitCommit = (gitCommit == null ? "UNKNOWN" : gitCommit);
-    }
 
     public static String getAgentBindAppName() {
         return System.getProperty("iast.app.name", DEFAULT_APP_NAME);

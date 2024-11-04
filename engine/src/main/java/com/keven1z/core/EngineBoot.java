@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import java.lang.instrument.Instrumentation;
 
 import static com.keven1z.Agent.*;
+import static com.keven1z.ModuleLoader.readVersion;
 
 /**
  * @author keven1z
@@ -21,12 +22,12 @@ import static com.keven1z.Agent.*;
 public class EngineBoot {
     EngineController engineController = null;
 
-    public void start(Instrumentation inst, String appName, Boolean isDebug) {
+    public void start(Instrumentation inst, String appName, Boolean isDebug,String projectVersion) {
 
         try {
             addShutdownHook();
             engineController = new EngineController();
-            engineController.start(inst, appName, isDebug);
+            engineController.start(inst, appName, isDebug,projectVersion);
         } catch (Exception e) {
             throw new RuntimeException("Engine load error," + e.getMessage());
         }

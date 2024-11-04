@@ -46,7 +46,7 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
                 continue;
             }
             TaintData fromTaintData = parentNode.getTaintData();
-            fromTaintData.setSanitizer(true);
+            fromTaintData.setHasSanitizer(true);
 
             if (taintData == null) {
                 taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);

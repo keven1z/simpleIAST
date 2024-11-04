@@ -52,7 +52,7 @@ public class TaintUtils {
         List<Integer> sourceHashCodes = source.getToObjectHashCode();
         Object sourceObject = source.getReturnObject();
         for (TaintData taint : taintDataLinkedList) {
-            if (taint.isSource()) {
+            if (PolicyTypeEnum.SOURCE.name().equals(taint.getStage())) {
                 continue;
             }
             Object fromObject = taint.getFromObject();

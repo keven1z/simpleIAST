@@ -38,7 +38,7 @@ public class EngineController {
     public static final IASTContext context = IASTContext.getContext();
     private static final Logger logger = Logger.getLogger(EngineController.class);
 
-    public void start(Instrumentation inst, String appName, boolean isDebug) throws Exception {
+    public void start(Instrumentation inst, String appName, boolean isDebug, String projectVersion) throws Exception {
         /*
          * 打印banner
          */
@@ -46,7 +46,7 @@ public class EngineController {
         /*
          * 构建agent上下文对象
          */
-        buildContext(inst, appName, isDebug);
+        buildContext(inst, appName, isDebug, projectVersion);
         /*
          * 加载日志
          */
@@ -119,12 +119,7 @@ public class EngineController {
      * 向服务器注册该应用
      */
     public static boolean register() throws Exception {
-        String agentId = ApplicationModel.getAgentId();
-        String hostName = ApplicationModel.getHostName();
-        String os = ApplicationModel.getOS();
-        String webServerPath = ApplicationModel.getPath();
-        AgentDTO agentDTO = new AgentDTO(agentId, hostName, os, webServerPath, ApplicationModel.getWebClass());
-        agentDTO.setAppName(context.getBindApplicationName());
+        AgentDTO agentDTO = buildRegisterInformation();
         boolean isSuccess = IASTHttpClient.getClient().register(JsonUtils.toString(agentDTO));
         if (isSuccess) {
             if (LogTool.isDebugEnabled()) {
@@ -142,11 +137,12 @@ public class EngineController {
      * @param inst    Instrumentation
      * @param appName 绑定的应用名
      */
-    private void buildContext(Instrumentation inst, String appName, boolean isDebug) {
+    private void buildContext(Instrumentation inst, String appName, boolean isDebug, String projectVersion) {
         loadProperties();
         context.setInstrumentation(inst);
         context.setBindApplicationName(appName);
         context.setDebug(isDebug);
+        context.setAgentVersion(projectVersion);
     }
 
     /**
@@ -195,14 +191,26 @@ public class EngineController {
         context.setBlackList(blackList);
     }
 
+    private static AgentDTO buildRegisterInformation() {
+        String agentId = ApplicationModel.getAgentId();
+        String hostName = ApplicationModel.getHostName();
+        String os = ApplicationModel.getOS();
+        String path = ApplicationModel.getPath();
+        AgentDTO agentDTO = new AgentDTO(agentId, hostName, os, path, ApplicationModel.getWebClass());
+        agentDTO.setVersion(context.getAgentVersion());
+        agentDTO.setAppName(context.getBindApplicationName());
+        agentDTO.setJdkVersion(ApplicationModel.getJdkVersion());
+        return agentDTO;
+    }
+
     /**
      * 初始化类字节码的转换器
      */
     private void initTransformer() {
         Instrumentation instrumentation = context.getInstrumentation();
-        HookTransformer hookTransformer = new HookTransformer(context.getPolicy(),instrumentation );
-        if(instrumentation.isNativeMethodPrefixSupported()){
-            instrumentation.setNativeMethodPrefix(hookTransformer,hookTransformer.getNativePrefix());
+        HookTransformer hookTransformer = new HookTransformer(context.getPolicy(), instrumentation);
+        if (instrumentation.isNativeMethodPrefixSupported()) {
+            instrumentation.setNativeMethodPrefix(hookTransformer, hookTransformer.getNativePrefix());
         }
         hookTransformer.reTransform();
 
@@ -212,6 +220,11 @@ public class EngineController {
      * 打印banner信息
      */
     private void banner() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         String s = " __ _                 _         _____  _    __  _____ \n" +
                 "/ _(_)_ __ ___  _ __ | | ___    \\_   \\/_\\  / _\\/__   \\\n" +
                 "\\ \\| | '_ ` _ \\| '_ \\| |/ _ \\    / /\\//_\\\\ \\ \\   / /\\/\n" +

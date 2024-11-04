@@ -6,6 +6,8 @@ public class AgentDTO {
     private String hostName;
     private String serverPath;
     private String webClass;
+    private String jdkVersion;
+    private String version;
     /**
      * agent所在的应用名
      */
@@ -57,5 +59,29 @@ public class AgentDTO {
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+    public String getWebClass() {
+        return webClass;
+    }
+
+    public void setWebClass(String webClass) {
+        this.webClass = webClass;
+    }
+
+    public String getJdkVersion() {
+        return jdkVersion;
+    }
+
+    public void setJdkVersion(String jdkVersion) {
+        this.jdkVersion = jdkVersion;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
