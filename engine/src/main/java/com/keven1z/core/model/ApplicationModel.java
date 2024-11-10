@@ -1,18 +1,13 @@
 package com.keven1z.core.model;
 
-import com.keven1z.core.EngineController;
-import com.keven1z.core.utils.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.keven1z.core.consts.CommonConst.DEFAULT_APPLICATION_NAME;
-
 /**
  * 检测的应用的信息
  */
@@ -85,7 +80,7 @@ public class ApplicationModel {
     }
 
     public static String getHostName() {
-        if (isLinux()) {
+        if (isLinux() || isMacOS()) {
             try {
                 return (InetAddress.getLocalHost()).getHostName();
             } catch (UnknownHostException uhe) {
@@ -184,6 +179,10 @@ public class ApplicationModel {
     private static boolean isLinux() {
         String serverName = System.getProperty("os.name");
         return StringUtils.startsWith(serverName, "Linux");
+    }
+    private static boolean isMacOS() {
+        String serverName = System.getProperty("os.name");
+        return StringUtils.startsWith(serverName, "Mac");
     }
 
     public static void clear() {
