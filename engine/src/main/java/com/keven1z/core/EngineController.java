@@ -220,11 +220,6 @@ public class EngineController {
      * 打印banner信息
      */
     private void banner() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         String s = " __ _                 _         _____  _    __  _____ \n" +
                 "/ _(_)_ __ ___  _ __ | | ___    \\_   \\/_\\  / _\\/__   \\\n" +
                 "\\ \\| | '_ ` _ \\| '_ \\| |/ _ \\    / /\\//_\\\\ \\ \\   / /\\/\n" +
