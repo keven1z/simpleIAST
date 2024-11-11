@@ -2,7 +2,7 @@ package com.keven1z.core;
 
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
-import com.keven1z.core.monitor.FindingReportMonitor;
+import com.keven1z.core.monitor.TrafficReadingVulnerabilityReportMonitor;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
 import com.keven1z.core.log.ErrorType;
@@ -12,7 +12,7 @@ import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.monitor.InstructionMonitor;
 import com.keven1z.core.monitor.MonitorManager;
-import com.keven1z.core.monitor.ReportMonitor;
+import com.keven1z.core.monitor.DirectVulnerabilityReportMonitor;
 import com.keven1z.core.pojo.AgentDTO;
 import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.utils.FileUtils;
@@ -89,7 +89,7 @@ public class EngineController {
         /*
          * 启动监控进程
          */
-        MonitorManager.start(new ReportMonitor(), new FindingReportMonitor(), new InstructionMonitor());
+        MonitorManager.start(new DirectVulnerabilityReportMonitor(), new TrafficReadingVulnerabilityReportMonitor(), new InstructionMonitor());
         /*
          * agent设置为启动状态
          */

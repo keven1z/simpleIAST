@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+
 import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.Api;
 import com.keven1z.core.log.ErrorType;
@@ -54,9 +55,9 @@ public class IASTHttpClient {
         private static final IASTHttpClient client = new IASTHttpClient();
     }
 
-    private String doGet(String url) throws IOException {
+    private String doGet(String url, boolean isKeepAlive) throws IOException {
 
-        CloseableHttpResponse response = get(url);
+        CloseableHttpResponse response = get(url, isKeepAlive);
         InputStream inputStream = null;
         String responseString = null;
         try {
@@ -78,8 +79,13 @@ public class IASTHttpClient {
         return responseString;
     }
 
-    private CloseableHttpResponse get(String url) throws IOException {
+    private CloseableHttpResponse get(String url, boolean isKeepAlive) throws IOException {
         HttpGet request = new HttpGet(url);
+        if (!isKeepAlive) {
+            request.addHeader("Connection", "close");
+        } else {
+            request.addHeader("Connection", "keep-alive");
+        }
         String token = EngineController.context.getToken();
         if (token != null) {
             request.addHeader("Authorization", token);
@@ -182,7 +188,7 @@ public class IASTHttpClient {
         }
         CloseableHttpResponse response = null;
         try {
-            response = get(getRequestHost() + Api.AGENT_DEREGISTER_URL + "?agentId=" + ApplicationModel.getAgentId());
+            response = get(getRequestHost() + Api.AGENT_DEREGISTER_URL + "?agentId=" + ApplicationModel.getAgentId(), false);
             return response.getStatusLine().getStatusCode() == 200;
 
         } catch (Exception e) {
@@ -202,7 +208,7 @@ public class IASTHttpClient {
             return null;
         }
         try {
-            return doGet(getRequestHost() + Api.INSTRUCTION_GET_URL + "?agentId=" + ApplicationModel.getAgentId());
+            return doGet(getRequestHost() + Api.INSTRUCTION_GET_URL + "?agentId=" + ApplicationModel.getAgentId(), true);
         } catch (Exception e) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.error(ErrorType.REQUEST_ERROR, "Failed to get instruction", e);
