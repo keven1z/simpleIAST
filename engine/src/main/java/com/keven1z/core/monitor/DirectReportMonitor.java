@@ -12,12 +12,12 @@ import static com.keven1z.core.hook.HookThreadLocal.REPORT_QUEUE;
 /**
  * 直接漏洞上报
  */
-public class DirectVulnerabilityReportMonitor extends Monitor {
+public class DirectReportMonitor extends Monitor {
 
 
     @Override
     public String getThreadName() {
-        return "SimpleIAST-Report-Thread";
+        return "SimpleIAST-Direct-Report-Thread";
     }
 
     @Override
@@ -33,7 +33,7 @@ public class DirectVulnerabilityReportMonitor extends Monitor {
             report(reportData);
             //降低漏洞处理频率，减少cpu 持续消耗
             Thread.sleep(1000);
-        } catch (Exception e) {
+        } catch (Exception ignore) {
 
         }
     }

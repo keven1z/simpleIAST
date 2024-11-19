@@ -18,21 +18,19 @@ import com.keven1z.core.vulnerability.report.ReportBuilder;
 import com.keven1z.core.vulnerability.report.ReportPrinter;
 import com.keven1z.core.vulnerability.report.ReportSender;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 /**
  * 通过读取流量漏洞上报
  */
-public class TrafficReadingVulnerabilityReportMonitor extends Monitor {
+public class TrafficReadingReportMonitor extends Monitor {
 
 
     @Override
     public String getThreadName() {
-        return "SimpleIAST-Finding-Report-Thread";
+        return "SimpleIAST-Traffic-Report-Thread";
     }
 
     @Override
@@ -72,8 +70,12 @@ public class TrafficReadingVulnerabilityReportMonitor extends Monitor {
             }
             return findingDataList;
         }
+        Set<String> processedSinkClass = new HashSet<>();
         FlowProcessingStation station = FlowProcessingStation.getInstance();
         for (TaintNode sinkNode : taintFindings) {
+            if (isDuplicateSink(sinkNode, processedSinkClass)) {
+                continue;
+            }
             String vulnType = sinkNode.getTaintData().getVulnType();
             Detector detector = station.getDetector(vulnType);
             if (detector == null) {
@@ -89,16 +91,33 @@ public class TrafficReadingVulnerabilityReportMonitor extends Monitor {
                 //设置漏洞等级
                 findingData.setLevel(detector.getLevel());
                 findingDataList.add(findingData);
+                processedSinkClass.add(sinkNode.getTaintData().getThisObject().getClass().getName());
             }
         }
+        processedSinkClass.clear();
         return findingDataList;
+    }
+
+    private boolean isDuplicateSink(TaintNode sinkNode, Set<String> processedSinkClass) {
+        if (processedSinkClass.isEmpty()) {
+            return false;
+        }
+        List<String> stackList = sinkNode.getTaintData().getStackList();
+        for (String stack : stackList) {
+            for (String processSinkClass : processedSinkClass) {
+                if (stack.contains(processSinkClass)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void buildAndReport(FindingReportBo findingReportBo) throws JsonProcessingException {
         List<FindingData> findingDataList = check(findingReportBo);
         findingDataList.addAll(findingReportBo.getSingleFindingDataList());
         if (findingDataList.isEmpty()) {
-            if (LogTool.isDebugEnabled()){
+            if (LogTool.isDebugEnabled()) {
                 logger.warn("Failed to report finding,no vulnerabilities were detected.");
             }
             return;

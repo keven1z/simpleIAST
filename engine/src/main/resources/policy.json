@@ -178,7 +178,8 @@
       "to": "R",
       "inter": true,
       "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper",
+        "org/apache/catalina/connector/RequestFacade"
       ],
       "enter": 0,
       "exit": 1
@@ -193,7 +194,8 @@
       "to": "R",
       "inter": true,
       "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper","org/apache/catalina/connector/RequestFacade"
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper",
+        "org/apache/catalina/connector/RequestFacade"
       ],
       "enter": 0,
       "exit": 1
@@ -208,7 +210,8 @@
       "to": "R",
       "inter": true,
       "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper","org/apache/catalina/connector/RequestFacade"
+        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper",
+        "org/apache/catalina/connector/RequestFacade"
       ],
       "enter": 0,
       "exit": 1
@@ -763,6 +766,17 @@
       "exit": 1
     },
     {
+      "name": "InputStreamReader",
+      "className": "java/io/InputStreamReader",
+      "method": "<init>",
+      "desc": "(Ljava/io/InputStream;)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
+      "enter": 0,
+      "exit": 1
+    },
+    {
       "name": "Base64$Decoder",
       "className": "java/util/Base64$Decoder",
       "method": "decode",
@@ -947,6 +961,17 @@
       "from": "O",
       "to": "R",
       "inter": true,
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "BufferedReader.<init>",
+      "className": "java/io/BufferedReader",
+      "method": "<init>",
+      "desc": "(Ljava/io/Reader;I)V",
+      "state": 1,
+      "from": "P1",
+      "to": "O",
       "enter": 0,
       "exit": 1
     },
@@ -1198,13 +1223,14 @@
     },
     {
       "name": "url_redirect",
-      "className": "org/apache/catalina/connector/ResponseFacade",
+      "className": "javax/servlet/http/HttpServletResponse",
       "method": "sendRedirect",
       "desc": "(Ljava/lang/String;)V",
       "state": 1,
       "from": "P1",
       "enter": 1,
-      "exit": 0
+      "exit": 0,
+      "inter": true
     },
     {
       "name": "url_redirect",
@@ -1285,7 +1311,8 @@
       "state": 1,
       "from": "P1",
       "enter": 1,
-      "exit": 0
+      "exit": 0,
+      "inter": true
     },
     {
       "name": "xxe",
@@ -1417,13 +1444,14 @@
     },
     {
       "name": "xxe",
-      "className": "org/apache/xerces/jaxp/DocumentBuilderImpl",
+      "className": "javax/xml/parsers/DocumentBuilder",
       "method": "parse",
       "desc": "(Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document;",
       "state": 1,
       "from": "P1",
       "enter": 1,
-      "exit": 0
+      "exit": 0,
+      "inter": true
     },
     {
       "name": "xxe",
@@ -1453,16 +1481,6 @@
       "method": "parse",
       "desc": "(Lorg/xml/sax/InputSource;Lorg/xml/sax/HandlerBase;)V",
       "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/sun/org/apache/xerces/internal/parsers/AbstractSAXParser",
-      "method": "parse",
-      "desc": "(Lorg/xml/sax/InputSource;)V",
-      "state": 0,
       "from": "P1",
       "enter": 1,
       "exit": 0
