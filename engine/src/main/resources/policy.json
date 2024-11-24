@@ -580,6 +580,17 @@
       "exit": 1
     },
     {
+      "name": "string append-jdk11",
+      "className": "java/lang/StringConcatHelper",
+      "method": "prepend",
+      "desc": "(J[BLjava/lang/String;)J",
+      "state": 1,
+      "from": "P3",
+      "to": "P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
       "name": "string newString-jdk11",
       "className": "java/lang/StringConcatHelper",
       "method": "newString",
