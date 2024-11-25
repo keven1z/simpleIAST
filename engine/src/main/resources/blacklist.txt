@@ -1210,3 +1210,4 @@ com/zaxxer/hikari/pool/HikariProxyStatement
 com/jayway/
 net/minidev/
 org/springframework/transaction/annotation
+$JAXPSAXParser

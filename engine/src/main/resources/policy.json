@@ -1488,16 +1488,6 @@
     },
     {
       "name": "xxe",
-      "className": "javax/xml/parsers/SAXParser",
-      "method": "parse",
-      "desc": "(Lorg/xml/sax/InputSource;Lorg/xml/sax/HandlerBase;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
       "className": "com/sun/org/apache/xalan/internal/xsltc/trax/TransformerFactoryImpl",
       "method": "newTransformerHandler",
       "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/transform/sax/TransformerHandler;",

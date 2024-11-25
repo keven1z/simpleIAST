@@ -91,8 +91,11 @@ public class TrafficReadingReportMonitor extends Monitor {
                 //设置漏洞等级
                 findingData.setLevel(detector.getLevel());
                 findingDataList.add(findingData);
-                processedSinkClass.add(sinkNode.getTaintData().getThisObject().getClass().getName());
             }
+            /*
+             * 添加已detect过的同一个调用栈上的类
+             */
+            processedSinkClass.add(sinkNode.getTaintData().getThisObject().getClass().getName());
         }
         processedSinkClass.clear();
         return findingDataList;
