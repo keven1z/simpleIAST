@@ -1,6 +1,6 @@
 <div align="center">
 
-#  simpleIAST  ![1.0.beta (shields.io)](https://img.shields.io/badge/1.0.beta-brightgreen.svg)
+#  simpleIAST  ![0.1.0 (shields.io)](https://img.shields.io/badge/0.1.0-brightgreen.svg)
 
 </div>
 
@@ -12,25 +12,36 @@ simpleIAST是一种交互式应用程序安全测试工具。
 
 ## 快速开始
 
-- **下载并自行打包**
+### 1. clone项目
 
 ```shell
-# clone安装包
 git clone https://github.com/keven1z/simpleIAST.git
 ```
-
+### 2. docker运行
 ```shell
-mvn clean package
+cd ./simpleIAST/docker/
+docker-compose up -d
 ```
-- **运行**
->将iast-agent.jar和iast-engine.jar 放在同一目录
+### 3. 访问
+访问地址: http://\[your_ip\]:8443/
+默认用户名: admin
+默认密码: 123456
 
-1. 跟随应用启动运行
+> 前端端口:  8443
+> 
+> 后端端口: 81
+> 
+> 数据库端口: 33060
+> 
+> redis端口: 63790
+
+## Agent启动
+> 将iast-agent.jar和iast-engine.jar 放在同一目录
+### 跟随应用启动运行
 ```shell
 java -javaagent:iast-agent.jar -jar [app.jar] # 
 ```
-
-2. 应用启动后attach方式运行
+### 应用启动完成attach方式运行
 ```shell
 # attach方式安装agent
 java -jar iast-engine.jar -m install -p [pid] 
@@ -68,36 +79,14 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 * XPATH注入
 * 硬编码漏洞
 
-## 开始运行
-### 启动页面
-启动成功默认显示以下banner
-```text
- __ _                 _         _____  _    __  _____ 
-/ _(_)_ __ ___  _ __ | | ___    \_   \/_\  / _\/__   \
-\ \| | '_ ` _ \| '_ \| |/ _ \    / /\//_\\ \ \   / /\/
-_\ \ | | | | | | |_) | |  __/ /\/ /_/  _  \_\ \ / /   
-\__/_|_| |_| |_| .__/|_|\___| \____/\_/ \_/\__/ \/    
-               |_|                                    
-```
-### 启动模式
->配置路径：src/main/java/com/keven1z/Agent.java 修改START_MODE
-> 默认以下两种模式:
->   START_MODE_OFFLINE:离线模式. 
->   START_MODE_SERVER:服务器模式.
-#### 离线模式（默认）
-漏洞结果默认打印到控制台
-
-#### 服务器模式
-Config.java中增加服务器地址.
-
-## 二次开发
-参考[二次开发](./二次开发.md)
+## 使用文档
+> 快马加鞭编写中...
 
 ## 计划
 - [ ] 心跳包采用websocket
 - [x] API改造
 - [x] 漏洞检测数量，覆盖[ant-application-security-testing-benchmark](https://github.com/alipay/ant-application-security-testing-benchmark)
-- [ ] 服务端交互界面(11月底)
+- [x] 服务端交互界面(11月底)
 - [x] 支持多种中间件
 
 ## 鸣谢
@@ -109,4 +98,3 @@ Config.java中增加服务器地址.
 
 ## License
 本项目采用 Apache License 2.0 开源授权许可证。
- 

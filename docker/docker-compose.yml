@@ -1,0 +1,40 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "63790:6379"
+    environment:
+      - REDIS_PASSWORD=123456
+    command: redis-server --requirepass 123456
+  mysql:
+    image: mysql:5.7.34
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: iast
+    ports:
+      - "33060:3306"
+    volumes:
+      - ./mysql/:/docker-entrypoint-initdb.d/
+  backend:
+    image: openjdk:11
+    command: java -jar /app/app.jar
+    volumes:
+      - ./backend/:/app/
+    depends_on:
+      - mysql
+      - redis
+    ports: 
+      - "81:8989"
+  frontend:
+    image: nginx:latest
+    volumes:
+      - ./frontend/web/dist:/usr/share/nginx/html
+      - ./frontend/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./logs/:/var/log/nginx/
+    command: nginx -g "daemon off;"
+    ports:
+      - "8443:80"
+    depends_on:
+      - backend
+
