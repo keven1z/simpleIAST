@@ -79,6 +79,9 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 * XPATH注入
 * 硬编码漏洞
 
+## 漏洞详情展示
+![img.png](img/detail.png)
+
 ## 使用文档
 > 快马加鞭编写中...
 
