@@ -83,7 +83,11 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 ![img.png](img/detail.png)
 
 ## 使用文档
-> 快马加鞭编写中...
+* [快速开始](https://github.com/keven1z/simpleIAST/wiki/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
+* [应用](https://github.com/keven1z/simpleIAST/wiki/%E5%BA%94%E7%94%A8)
+* [Agent](https://github.com/keven1z/simpleIAST/wiki/Agent)
+* [漏洞](https://github.com/keven1z/simpleIAST/wiki/%E6%BC%8F%E6%B4%9E)
+* [设置](https://github.com/keven1z/simpleIAST/wiki/%E8%AE%BE%E7%BD%AE)
 
 ## 计划
 - [ ] 心跳包采用websocket
