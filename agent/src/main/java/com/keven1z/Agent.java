@@ -1,10 +1,9 @@
 package com.keven1z;
 
 
-import java.io.PrintStream;
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.InvocationTargetException;
 import static com.keven1z.Module.*;
+import static com.keven1z.ModuleLoader.readVersion;
 import static com.keven1z.ModuleLoader.release;
 
 /**
@@ -38,18 +37,12 @@ public class Agent {
     public static synchronized void init(String action, String appName, boolean isDebug, Instrumentation inst) {
         try {
             JarFileHelper.addJarToBootstrap(inst);
-//            readVersion();
+            readVersion();
             ModuleLoader.load(action, appName, isDebug, inst);
-        }catch (InvocationTargetException invocationTargetException){
-            PrintStream err = System.err;
-            err.println("[SimpleIAST] Failed to load engine, will continue without simpleIAST.");
-            invocationTargetException.printStackTrace(err);
-            release();
         }
         catch (Exception e) {
-            PrintStream err = System.err;
-            err.println("[SimpleIAST] Failed to initialize agent, will continue without simpleIAST.");
-            e.printStackTrace(err);
+            System.err.println("[SimpleIAST] Failed to initialize agent, will continue without simpleIAST.");
+            e.printStackTrace();
             release();
         }
     }

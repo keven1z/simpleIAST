@@ -64,45 +64,59 @@ public class InstructionMonitor extends Monitor {
         Thread.sleep(30 * 1000);
     }
 
-    private void handlerAgentState(String value) throws Exception {
-        int state = Integer.parseInt(value);
-        if (CommonConst.ON == state) {
-            if (ApplicationModel.isRunning()) {
-                return;
-            }
-            ApplicationModel.start();
-            boolean isSuccess = EngineController.register();
-            if (isSuccess) {
-                System.out.println("[SimpleIAST] Received instruction:  turn on agent successfully");
-                if (LogTool.isDebugEnabled()) {
-                    logger.info("Received instruction: turn on agent successfully");
-                }
-            } else {
-                System.out.println("[SimpleIAST] Received instruction:  turn on agent failed");
-                if (LogTool.isDebugEnabled()) {
-                    logger.info("Received instruction: turn on agent failed");
-                }
-            }
+    private void handlerAgentState(String value) {
+        try {
+            int state = Integer.parseInt(value);
 
-
-        } else if (CommonConst.OFF == state) {
-            if (!ApplicationModel.isRunning()) {
-                return;
+            switch (state) {
+                case CommonConst.ON:
+                    handleAgentStart();
+                    break;
+                case CommonConst.OFF:
+                    handleAgentStop();
+                    break;
+                default:
+                    logger.warn(String.format("Received unsupported agent state: %s", state));
             }
-            ApplicationModel.stop();
-            boolean deregister = IASTHttpClient.getClient().deregister();
-            if (deregister) {
-                System.out.println("[SimpleIAST] Received instruction: close agent successfully");
-                if (LogTool.isDebugEnabled()) {
-                    logger.info("Received instruction: close agent successfully");
-                }
-            } else {
-                System.out.println("[SimpleIAST] Received instruction: close agent failed");
-                if (LogTool.isDebugEnabled()) {
-                    logger.info("Received instruction: close agent failed");
-                }
-            }
+        } catch (Exception e) {
+            logger.error(String.format("Error processing agent state: %s", value), e);
+        }
+    }
 
+    private void handleAgentStart() {
+        if (ApplicationModel.isRunning()) {
+            logger.info("[SimpleIAST] Agent is already running.");
+            return;
+        }
+
+        ApplicationModel.start();
+        try {
+            EngineController.register();
+            logAgentStatus("turn on agent", true);
+        } catch (Exception e) {
+            logAgentStatus("turn on agent", false);
+            logger.error("Failed to turn on agent", e);
+        }
+    }
+
+    private void handleAgentStop() {
+        if (!ApplicationModel.isRunning()) {
+            logger.info("[SimpleIAST] Agent is already stopped.");
+            return;
+        }
+
+        ApplicationModel.stop();
+        boolean deregister = IASTHttpClient.getClient().deregister();
+        logAgentStatus("close agent", deregister);
+    }
+
+    private void logAgentStatus(String action, boolean success) {
+        String statusMessage = success ? "successfully" : "failed";
+        String logMessage = String.format("[SimpleIAST] Received instruction: %s %s", action, statusMessage);
+
+        System.out.println(logMessage);
+        if (LogTool.isDebugEnabled()) {
+            logger.debug(logMessage);
         }
     }
 }

@@ -21,6 +21,9 @@ public class ModuleContainer implements Module {
     public ModuleContainer(String jarName, String appName, boolean isDebug) {
         try {
             File originFile = new File(baseDirectory + File.separator + jarName);
+            if (!originFile.exists()) {
+                throw new RuntimeException("[SimpleIAST] The file " + originFile.getAbsolutePath() + " does not exist.");
+            }
             ModuleLoader.classLoader = new SimpleIASTClassLoader(originFile.getAbsolutePath());
             Class<?> classOfEngine = classLoader.loadClass(CLASS_OF_CORE_ENGINE);
             engineObject = classOfEngine.getDeclaredConstructor().newInstance();

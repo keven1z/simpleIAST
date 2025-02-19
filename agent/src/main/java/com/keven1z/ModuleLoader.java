@@ -24,8 +24,6 @@ public class ModuleLoader {
     private static ModuleLoader instance;
     public static SimpleIASTClassLoader classLoader;
     public static String projectVersion;
-    public static String buildTime;
-    public static String gitCommit;
     private final ModuleContainer engineContainer;
 
 
@@ -90,12 +88,7 @@ public class ModuleLoader {
         Manifest manifest = new Manifest(new URL(manifestPath).openStream());
         Attributes attr = manifest.getMainAttributes();
         projectVersion = attr.getValue("Project-Version");
-        buildTime = attr.getValue("Build-Time");
-        gitCommit = attr.getValue("Git-Commit");
-
         projectVersion = (projectVersion == null ? "UNKNOWN" : projectVersion);
-        buildTime = (buildTime == null ? "UNKNOWN" : buildTime);
-        gitCommit = (gitCommit == null ? "UNKNOWN" : gitCommit);
     }
 
     public static boolean isModularityJdk() {
@@ -131,7 +124,6 @@ public class ModuleLoader {
      */
     public static synchronized void load(String action, String appName, boolean isDebug, Instrumentation inst) throws Exception {
         if (Module.START_ACTION_INSTALL.equals(action)) {
-            readVersion();
             if (instance == null) {
                 instance = new ModuleLoader(appName, isDebug);
                 instance.start(inst);

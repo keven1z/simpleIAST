@@ -3,19 +3,19 @@ package com.keven1z.core.pojo;
 public class AgentDTO {
     private String agentId;
     private String os;
-    private String hostName;
+    private String hostname;
     private String serverPath;
     private String webClass;
     private String jdkVersion;
     private String version;
     /**
-     * agent所在的应用名
+     * agent所绑定的项目名
      */
-    private String appName;
-
-    public AgentDTO(String agentId, String hostName, String os,String serverPath,String webClass) {
+    private String projectName;
+    private String process;
+    public AgentDTO(String agentId, String hostname, String os,String serverPath,String webClass) {
         this.agentId = agentId;
-        this.hostName = hostName;
+        this.hostname = hostname;
         this.os = os;
         this.serverPath = serverPath;
         this.webClass = webClass;
@@ -29,12 +29,12 @@ public class AgentDTO {
         this.agentId = agentId;
     }
 
-    public String getHostName() {
-        return hostName;
+    public String getHostname() {
+        return hostname;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 
     public String getOs() {
@@ -51,14 +51,6 @@ public class AgentDTO {
 
     public void setServerPath(String serverPath) {
         this.serverPath = serverPath;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
     }
 
     public String getWebClass() {
@@ -83,5 +75,21 @@ public class AgentDTO {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProcess() {
+        return process;
+    }
+
+    public void setProcess(String process) {
+        this.process = process;
     }
 }

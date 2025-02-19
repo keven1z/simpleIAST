@@ -18,23 +18,18 @@ public class TransformerProtector {
 
     /**
      * 进入守护区域
-     *
-     * @return 守护区域当前引用计数
      */
-    public int enterProtecting() {
+    public void enterProtecting() {
         final int referenceCount = isInProtectingThreadLocal.get().getAndIncrement();
         if (LogTool.isDebugEnabled()) {
             logger.debug("thread:" + Thread.currentThread() + " enter protect:" + referenceCount);
         }
-        return referenceCount;
     }
 
     /**
      * 离开守护区域
-     *
-     * @return 守护区域当前引用计数
      */
-    public int exitProtecting() {
+    public void exitProtecting() {
         final int referenceCount = isInProtectingThreadLocal.get().decrementAndGet();
         // assert referenceCount >= 0;
         if (referenceCount == 0) {
@@ -49,7 +44,6 @@ public class TransformerProtector {
         } else {
             logger.warn("thread:" + Thread.currentThread() + " exit protect:" + referenceCount + "with error!");
         }
-        return referenceCount;
     }
 
     /**

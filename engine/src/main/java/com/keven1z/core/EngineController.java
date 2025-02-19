@@ -1,8 +1,12 @@
 package com.keven1z.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
 import com.keven1z.core.monitor.TrafficReadingReportMonitor;
+import com.keven1z.core.pojo.AuthenticationDTO;
+import com.keven1z.core.pojo.ResponseDTO;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
 import com.keven1z.core.log.ErrorType;
@@ -38,7 +42,7 @@ public class EngineController {
     public static final IASTContext context = IASTContext.getContext();
     private static final Logger logger = Logger.getLogger(EngineController.class);
 
-    public void start(Instrumentation inst, String appName, boolean isDebug, String projectVersion) throws Exception {
+    public void start(Instrumentation inst, String projectName, boolean isDebug, String projectVersion) throws Exception {
         /*
          * 打印banner
          */
@@ -46,7 +50,7 @@ public class EngineController {
         /*
          * 构建agent上下文对象
          */
-        buildContext(inst, appName, isDebug, projectVersion);
+        buildContext(inst, projectName, isDebug, projectVersion);
         /*
          * 加载日志
          */
@@ -56,26 +60,18 @@ public class EngineController {
          * 判定是否为debug模式，若不为debug模式，则进行正常注册
          */
         if (!context.isOfflineEnabled()) {
-            try {
-                /*
-                 * 设置服务器地址
-                 */
-                IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
-                if (!register()) {
-                    System.err.println("[SimpleIAST] Failed to register,server url:" + context.getServerUrl());
-                    throw new RuntimeException("The failure occurred when registering,server url:" + context.getServerUrl());
-                } else {
-                    System.out.println("[SimpleIAST] IAST agent successfully registered,server url:" + context.getServerUrl());
-                }
-            } catch (Exception e) {
-                LogTool.error(ErrorType.REGISTER_ERROR, "Register failed,hostName:" + ApplicationModel.getHostName(), e);
-                throw new RuntimeException("Exception occurred during registration");
-            }
+            /*
+             * 设置服务器地址
+             */
+            IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
+            register();
+            System.out.println(String.format("[SimpleIAST] IAST agent successfully registered, server url: %s", context.getServerUrl()));
+
         } else {
             ApplicationModel.setAgentId(OFFLINE_AGENT_NAME);
         }
         /*
-         * 加载策略
+         * 加载hook策略
          */
         loadPolicy();
         /*
@@ -102,8 +98,10 @@ public class EngineController {
             logger.info("OS:" + ApplicationModel.getOS());
             logger.info("PID:" + ApplicationModel.getPID());
             logger.info("Jdk version:" + ApplicationModel.getJdkVersion());
+            logger.info("Server path:" + ApplicationModel.getPath());
+
             if (!context.isOfflineEnabled()) {
-                logger.info("Bind app name:" + context.getBindApplicationName());
+                logger.info("Bind project name:" + context.getBindProjectName());
             }
             logger.info("The number of Policy:" + context.getPolicyContainer().getPolicySize());
             logger.info("The number of hook black list:" + context.getBlackList().size());
@@ -116,31 +114,67 @@ public class EngineController {
     }
 
     /**
-     * 向服务器注册该应用
+     * 发送注册请求
      */
-    public static boolean register() throws Exception {
-        AgentDTO agentDTO = buildRegisterInformation();
-        boolean isSuccess = IASTHttpClient.getClient().register(JsonUtils.toString(agentDTO));
-        if (isSuccess) {
-            if (LogTool.isDebugEnabled()) {
-                Logger.getLogger(EngineController.class).info("Register successful,agentId:" + ApplicationModel.getAgentId());
+    public static void register() throws RegistrationException {
+        try {
+            // 构建注册信息并发送请求
+            AgentDTO agentDTO = buildRegisterInformation();
+            String requestBody = JsonUtils.toString(agentDTO);
+            String responseBody = IASTHttpClient.getClient().register(requestBody);
+
+            // 解析响应
+            ResponseDTO<Object> responseDTO = JsonUtils.toObject(responseBody, ResponseDTO.class);
+            // 处理失败响应
+            if (!responseDTO.isFlag()) {
+                String errorMsg = String.format("Registration failed. Reason: %s", responseDTO.getMessage());
+                logger.warn(errorMsg);
+                throw new RegistrationException(errorMsg);
             }
-            return true;
+            // 校验响应数据类型
+            AuthenticationDTO authData = JsonUtils.convertObject(responseDTO.getData(), AuthenticationDTO.class);
+            if (authData == null || authData.getAgentId() == null || authData.getToken() == null) {
+                String errorMsg = "Incomplete authentication data. AgentId or Token is missing.";
+                logger.error(errorMsg);
+                throw new RegistrationException(errorMsg);
+            }
+
+            // 更新应用配置
+            ApplicationModel.setAgentId(authData.getAgentId());
+            EngineController.context.setToken(authData.getToken());
+
+            // 记录成功日志
+            if (logger.isDebugEnabled()) {
+                logger.debug(String.format("Registration successful. AgentID: %s", authData.getAgentId()));
+            }
+        } catch (JsonProcessingException e) {
+            String errorMsg = "JSON serialization/deserialization failed during registration.";
+            logger.error(errorMsg, e);
+            throw new RegistrationException(errorMsg, e); // 重新抛出自定义异常
+
+        } catch (IOException e) {
+            String errorMsg = "Network communication error during registration.";
+            logger.error(errorMsg, e);
+            throw new RegistrationException(errorMsg, e); // 重新抛出自定义异常
+
+        } catch (RegistrationException e) {
+            throw e;
+        } catch (Exception e) {
+            String errorMsg = "Unexpected error during registration process.";
+            logger.error(errorMsg, e);
+            throw new RegistrationException(errorMsg, e); // 重新抛出自定义异常
         }
-        if (LogTool.isDebugEnabled()) {
-            Logger.getLogger(EngineController.class).info("Register failed,Server url:" + context.getServerUrl());
-        }
-        return false;
     }
 
+
     /**
-     * @param inst    Instrumentation
-     * @param appName 绑定的应用名
+     * @param inst        Instrumentation
+     * @param projectName 绑定的项目名
      */
-    private void buildContext(Instrumentation inst, String appName, boolean isDebug, String projectVersion) {
+    private void buildContext(Instrumentation inst, String projectName, boolean isDebug, String projectVersion) {
         loadProperties();
         context.setInstrumentation(inst);
-        context.setBindApplicationName(appName);
+        context.setBindProjectName(projectName);
         context.setDebug(isDebug);
         context.setAgentVersion(projectVersion);
     }
@@ -192,14 +226,12 @@ public class EngineController {
     }
 
     private static AgentDTO buildRegisterInformation() {
-        String agentId = ApplicationModel.getAgentId();
-        String hostName = ApplicationModel.getHostName();
-        String os = ApplicationModel.getOS();
-        String path = ApplicationModel.getPath();
-        AgentDTO agentDTO = new AgentDTO(agentId, hostName, os, path, ApplicationModel.getWebClass());
+        AgentDTO agentDTO = new AgentDTO(ApplicationModel.getAgentId(),
+                ApplicationModel.getHostName(), ApplicationModel.getOS(), ApplicationModel.getPath(), ApplicationModel.getWebClass());
         agentDTO.setVersion(context.getAgentVersion());
-        agentDTO.setAppName(context.getBindApplicationName());
+        agentDTO.setProjectName(context.getBindProjectName());
         agentDTO.setJdkVersion(ApplicationModel.getJdkVersion());
+        agentDTO.setProcess(ApplicationModel.getPID());
         return agentDTO;
     }
 
@@ -228,6 +260,4 @@ public class EngineController {
                 "               |_|                                    ";
         System.out.println(s);
     }
-
-
 }

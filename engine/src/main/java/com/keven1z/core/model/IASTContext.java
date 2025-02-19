@@ -35,9 +35,9 @@ public class IASTContext {
      */
     private String token;
     /**
-     * agent绑定的应用名称
+     * agent绑定的项目名称
      */
-    private String bindApplicationName;
+    private String bindProjectName;
     /**
      * 是否启动debug日志
      */
@@ -71,12 +71,12 @@ public class IASTContext {
         this.instrumentation = instrumentation;
     }
 
-    public String getBindApplicationName() {
-        return bindApplicationName;
+    public String getBindProjectName() {
+        return bindProjectName;
     }
 
-    public void setBindApplicationName(String bindApplicationName) {
-        this.bindApplicationName = bindApplicationName;
+    public void setBindProjectName(String bindProjectName) {
+        this.bindProjectName = bindProjectName;
     }
 
     public boolean isOfflineEnabled() {

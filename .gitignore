@@ -8,4 +8,3 @@ agent/dependency-reduced-pom.xml
 *.jar
 /agent/target/*
 /engine/target/*
-

@@ -2,12 +2,14 @@ package com.keven1z.core.model;
 
 
 import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * 检测的应用的信息
  */
@@ -18,12 +20,11 @@ public class ApplicationModel {
     public static final String LINUX = "linux";
     public static final String MAC = "MAC";
     public static final String HOST_NAME = "hostname";
-    public static final String UNKNOWN_HOST = "UnknownHost";
+    public static final String UNKNOWN = "Unknown";
     public static final String OS = "os";
     public static final String PID = "pid";
-    public static final String AGENT_ID = "agentId";
+    public static final String AGENT_ID = "agent_id";
     public static final String WEB_CLASS = "web_class";
-
     private static final Map<String, String> applicationInfo;
 
     private static Map<String, String> systemEnvInfo;
@@ -58,6 +59,7 @@ public class ApplicationModel {
         applicationInfo.put(SERVER_PATH, getPath());
         applicationInfo.put(WEB_CLASS, getWebClass());
         applicationInfo.put("jdk", System.getProperty("java.version"));
+
     }
 
     public static String getOS() {
@@ -91,10 +93,10 @@ public class ApplicationModel {
                         return host.substring(0, colon);
                     }
                 }
-                return UNKNOWN_HOST;
+                return UNKNOWN;
             }
         } else {
-            return System.getenv("COMPUTERNAME") == null ? UNKNOWN_HOST : System.getenv("COMPUTERNAME");
+            return System.getenv("COMPUTERNAME") == null ? UNKNOWN : System.getenv("COMPUTERNAME");
         }
     }
 
@@ -142,6 +144,8 @@ public class ApplicationModel {
         }
         return result;
     }
+
+
     /**
      * jdk版本
      */
@@ -180,6 +184,7 @@ public class ApplicationModel {
         String serverName = System.getProperty("os.name");
         return StringUtils.startsWith(serverName, "Linux");
     }
+
     private static boolean isMacOS() {
         String serverName = System.getProperty("os.name");
         return StringUtils.startsWith(serverName, "Mac");

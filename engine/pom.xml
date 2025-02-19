@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>simpleIAST</artifactId>
         <groupId>com.keven1z</groupId>
+        <artifactId>simpleIAST</artifactId>
         <version>${iast.version}</version>
     </parent>
     <artifactId>iast-engine</artifactId>
@@ -19,7 +19,6 @@
             <groupId>com.keven1z</groupId>
             <artifactId>iast-agent</artifactId>
             <version>${iast.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
         <dependency>
@@ -72,7 +71,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.14.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
         <dependency>
@@ -90,11 +89,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.14.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.86.Final</version>
         </dependency>
 
         <dependency>
@@ -133,12 +127,7 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.keven1z</groupId>
-            <artifactId>iast-agent</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

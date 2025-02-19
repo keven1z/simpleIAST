@@ -10,10 +10,14 @@ import net.bytebuddy.agent.VirtualMachine;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.net.URL;
+import java.util.Objects;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import static com.keven1z.Agent.*;
-import static com.keven1z.ModuleLoader.readVersion;
 
 /**
  * @author keven1z
@@ -22,12 +26,12 @@ import static com.keven1z.ModuleLoader.readVersion;
 public class EngineBoot {
     EngineController engineController = null;
 
-    public void start(Instrumentation inst, String appName, Boolean isDebug,String projectVersion) {
+    public void start(Instrumentation inst, String appName, Boolean isDebug, String projectVersion) {
 
         try {
             addShutdownHook();
             engineController = new EngineController();
-            engineController.start(inst, appName, isDebug,projectVersion);
+            engineController.start(inst, appName, isDebug, projectVersion);
         } catch (Exception e) {
             throw new RuntimeException("Engine load error," + e.getMessage());
         }
@@ -91,11 +95,10 @@ public class EngineBoot {
             }
         }
         if (INSTALL.equals(mode)) {
-            System.out.println("[SimpleIAST] Agent install successfully,Application pid:" + targetJvmPid);
+            System.out.printf("[SimpleIAST] Agent installation initiated. Action: %s. Target JVM PID: %s. Proceeding with installation.%n", mode, targetJvmPid);
         } else {
-            System.out.println("[SimpleIAST] Agent uninstall successfully.Application pid:" + targetJvmPid);
+            System.out.printf("[SimpleIAST] Agent uninstallation initiated. Target JVM PID: %s. Proceeding with uninstallation.%n",targetJvmPid);
         }
-
     }
 
     private static final String INSTALL = "install";
@@ -109,9 +112,8 @@ public class EngineBoot {
             CommandLine cmd = parser.parse(options, args);
             if (cmd.hasOption("v")) {
                 readVersion();
-                System.out.println("Version:       " + projectVersion + "\n" +
-                        "Build Time:    " + buildTime + "\n" +
-                        "Git Commit ID: " + gitCommit);
+                System.out.printf("Version:       %s%nBuild Time:    %s%nGit Commit ID: %s%n", projectVersion, buildTime, gitCommit);
+
             } else if (cmd.hasOption("h")) {
                 helpFormatter.printHelp("java -jar iast-engine.jar", options, true);
             } else if (cmd.hasOption("m")) {
@@ -153,6 +155,22 @@ public class EngineBoot {
         if (!INSTALL.equals(mode) && !UNINSTALL.equals(mode)) {
             throw new RuntimeException("Illegal parameter mode，Please please add the parameter -m/--mode,only install or uninstall");
         }
+    }
+
+    public static void readVersion() throws IOException {
+        Class<?> clazz = EngineBoot.class;
+        String className = clazz.getSimpleName() + ".class";
+        String classPath = Objects.requireNonNull(clazz.getResource(className)).toString();
+        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+        Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+        Attributes attr = manifest.getMainAttributes();
+        projectVersion = attr.getValue("Project-Version");
+        buildTime = attr.getValue("Build-Time");
+        gitCommit = attr.getValue("Git-Commit");
+
+        projectVersion = (projectVersion == null ? "UNKNOWN" : projectVersion);
+        buildTime = (buildTime == null ? "UNKNOWN" : buildTime);
+        gitCommit = (gitCommit == null ? "UNKNOWN" : gitCommit);
     }
 
 }

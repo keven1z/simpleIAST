@@ -3,14 +3,12 @@ package com.keven1z.core.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
 
 import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.Api;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.pojo.ResponseDTO;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -93,37 +91,25 @@ public class IASTHttpClient {
         return client.execute(request);
     }
 
-    private String post(String url, String payload) throws IOException {
-        HttpResponse response = postNormal(url, payload);
-        HttpEntity entity = response.getEntity();
-        String responseString = null;
-        if (entity != null) {
-            InputStream inputStream = entity.getContent();
-            try {
-                responseString = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-            } finally {
-                inputStream.close();
-            }
-        }
-        EntityUtils.consume(entity);
-        return responseString;
-    }
 
-    private CloseableHttpResponse postGzipBody(String url, String payload) throws IOException {
-        HttpPost request = new HttpPost(url);
-        request.setEntity(new GzipCompressingEntity(new StringEntity(payload, ContentType.APPLICATION_JSON)));
-        return client.execute(request);
-    }
-
-    private CloseableHttpResponse postNormal(String url, String payload) throws IOException {
+    private CloseableHttpResponse post(String url, String payload, boolean isGzip) throws IOException {
         HttpPost request = new HttpPost(url);
         String token = EngineController.context.getToken();
         if (token != null) {
             request.addHeader("Authorization", token);
         }
-        request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
-        return client.execute(request);
+
+        HttpEntity entity;
+        if (isGzip) {
+            entity = new GzipCompressingEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+        } else {
+            entity = new StringEntity(payload, ContentType.APPLICATION_JSON);
+        }
+        request.setEntity(entity);
+
+        return  client.execute(request);
     }
+
 
     private CloseableHttpClient createHttpClient() {
         HttpClientBuilder hcb = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier());
@@ -146,7 +132,7 @@ public class IASTHttpClient {
         }
         CloseableHttpResponse response = null;
         try {
-            response = postGzipBody(getRequestHost() + Api.SEND_REPORT_URL, payload);
+            response = post(getRequestHost() + Api.SEND_REPORT_URL, payload, true);
 
             return response.getStatusLine().getStatusCode() == 200;
         } finally {
@@ -161,22 +147,26 @@ public class IASTHttpClient {
      *
      * @param information 注册信息
      */
-    public boolean register(String information) throws IOException {
+    public String register(String information) throws IOException {
         if (requestHost == null) {
-            return false;
+            return null;
         }
-        String response = post(getRequestHost() + Api.AGENT_REGISTER_URL, information);
-        ResponseDTO<LinkedHashMap<String, String>> responseDTO = JsonUtils.toObject(response, ResponseDTO.class);
-        if (responseDTO.isFlag()) {
-            LinkedHashMap<String, String> data = responseDTO.getData();
-            if (data == null) {
-                return false;
+        HttpResponse response = post(getRequestHost() + Api.AGENT_REGISTER_URL, information,false);
+        HttpEntity entity = response.getEntity();
+        String responseString = null;
+        try {
+            if (entity != null) {
+                try (InputStream inputStream = entity.getContent()) {
+                    responseString = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                }
             }
-            ApplicationModel.setAgentId(data.get("agentId"));
-            String token = data.get("token");
-            EngineController.context.setToken(token);
+        } finally {
+            // 确保资源被释放
+            if (entity != null) {
+                EntityUtils.consume(entity);  // 释放实体资源
+            }
         }
-        return responseDTO.isFlag();
+        return responseString;
     }
 
     /**

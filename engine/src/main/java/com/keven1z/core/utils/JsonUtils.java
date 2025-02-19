@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
+
     static {
         //在反序列化时忽略在 json 中存在但 Java 对象不存在的属性
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -22,19 +24,32 @@ public class JsonUtils {
         //在序列化时忽略值为 null 的属性
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
+
     public static <T> T toObject(String jsonString, Class<T> cls) throws JsonProcessingException {
         checkJsonStringQuietly(jsonString);
-        return mapper.readValue(jsonString,cls);
+        return mapper.readValue(jsonString, cls);
     }
+
+    public static <T> T convertObject(Object jsonObject, Class<T> cls) throws JsonProcessingException {
+        return mapper.convertValue(jsonObject, cls);
+    }
+
+    public static <T> T toObject(String json, TypeReference<T> typeReference) throws IOException {
+        return mapper.readValue(json, typeReference);
+    }
+
     public static String toString(Object object) throws JsonProcessingException {
         return mapper.writeValueAsString(object);
     }
+
     public static <T> List<T> toList(String json, TypeReference<List<T>> listTypeReference) throws JsonProcessingException {
-        return mapper.readValue(json,listTypeReference);
+        return mapper.readValue(json, listTypeReference);
     }
+
     /**
      * json字符串转换成List集合
      * (需要实体类)
+     *
      * @param json
      */
     public static <T> T toArrayQuietly(String json, Class<T> cla) {

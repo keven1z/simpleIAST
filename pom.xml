@@ -25,34 +25,41 @@
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-                <!-- support for JDK 6 -->
-                <version>2.1.5</version>
+                <version>4.0.0</version> <!-- 使用最新版本 -->
                 <executions>
                     <execution>
                         <id>git-commit-id</id>
                         <goals>
-                            <goal>revision</goal>
+                            <goal>revision</goal> <!-- 获取 Git 提交信息 -->
                         </goals>
-                        <phase>validate</phase>
+                        <phase>validate</phase> <!-- 在 validate 阶段执行 -->
                         <configuration>
-                            <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                            <prefix>git-commit-id</prefix>
-                            <skipPoms>false</skipPoms>
-                            <dotGitDirectory>${session.executionRootDirectory}/../../.git/</dotGitDirectory>
-                            <gitDescribe>
-                                <skip>true</skip>
-                            </gitDescribe>
+                            <failOnNoGitDirectory>false</failOnNoGitDirectory> <!-- 如果没有 Git 仓库则不失败 -->
+                            <prefix>git</prefix> <!-- 设置前缀，防止与其他 Maven 变量冲突 -->
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>package</phase> <!-- 在 package 阶段执行 -->
                         <goals>
                             <goal>shade</goal>
                         </goals>
@@ -62,17 +69,17 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Project-Version>${project.version}</Project-Version>
+                                        <Git-Commit>${git.commit.id.abbrev}</Git-Commit> <!-- 简短提交哈希 -->
+                                        <Git-Branch>${git.branch}</Git-Branch> <!-- 当前 Git 分支 -->
+                                        <Last-Commit-User-Name>${git.commit.user.name}
+                                        </Last-Commit-User-Name> <!-- 提交者用户名 -->
+                                        <Last-Commit-User-Email>${git.commit.user.email}
+                                        </Last-Commit-User-Email> <!-- 提交者邮箱 -->
                                         <Build-Time>${maven.build.timestamp}</Build-Time>
-                                        <Git-Commit>${git-commit-id.commit.id.abbrev}</Git-Commit>
-                                        <Git-Branch>${git-commit-id.branch}</Git-Branch>
-                                        <Last-Commit-User-Name>${git-commit-id.commit.user.name}</Last-Commit-User-Name>
-                                        <Last-Commit-User-Email>${git-commit-id.commit.user.email}
-                                        </Last-Commit-User-Email>
                                         <Build-By>keven1z</Build-By>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
-
                         </configuration>
                     </execution>
                 </executions>
