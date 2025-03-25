@@ -7,7 +7,7 @@ package com.keven1z.core.monitor;
  /**
   * 心跳线程
   * @author keven1z
-  * @date 2023/11/3
+  * @since 2023/11/3
   */
 
 public class HeartBeatMonitor extends Monitor {

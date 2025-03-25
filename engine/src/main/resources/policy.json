@@ -1018,6 +1018,77 @@
       "to": "R",
       "enter": 0,
       "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/String",
+      "method": "subSequence",
+      "desc": "(II)Ljava/lang/CharSequence;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/String",
+      "method": "substring",
+      "desc": "(II)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/String",
+      "method": "substring",
+      "desc": "(I)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "substring",
+      "desc": "(II)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "substring",
+      "className": "java/lang/String",
+      "method": "substring",
+      "desc": "(II)Ljava/lang/String;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "sub",
+      "className": "java/lang/AbstractStringBuilder",
+      "method": "subSequence",
+      "desc": "(II)Ljava/lang/CharSequence;",
+      "state": 1,
+      "from": "O",
+      "to": "R",
+      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
     }
   ],
   "sink": [
@@ -1689,7 +1760,7 @@
       "className": "java/util/regex/Matcher",
       "method": "matches",
       "desc": "()Z",
-      "state": 1,
+      "state": 0,
       "from": "O",
       "enter": 0,
       "exit": 1
@@ -1840,17 +1911,7 @@
       "enter": 0,
       "exit": 1
     },
-    {
-      "name": "substring",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
+
     {
       "name": "replace",
       "className": "java/lang/String",
@@ -1859,66 +1920,6 @@
       "state": 1,
       "from": "P1,P2",
       "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/String",
-      "method": "subSequence",
-      "desc": "(II)Ljava/lang/CharSequence;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(I)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "subSequence",
-      "desc": "(II)Ljava/lang/CharSequence;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
       "enter": 0,
       "exit": 1
     },

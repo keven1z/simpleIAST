@@ -17,7 +17,7 @@ import static com.keven1z.core.hook.HookThreadLocal.REPORT_QUEUE;
 
 /**
  * @author keven1z
- * @date 2024/07/28
+ * @since 2024/07/28
  */
 public class HardcodedClassVisitor extends ClassVisitor {
 

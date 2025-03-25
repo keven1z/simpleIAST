@@ -18,7 +18,7 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  * 无害处理阶段的解析器
  *
  * @author keven1z
- * @date 2023/01/15
+ * @since 2023/01/15
  */
 public class SanitizerClassResolver implements HandlerHookClassResolver {
     @Override

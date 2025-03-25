@@ -5,7 +5,7 @@ import java.util.Base64;
 
 /**
  * @author keven1z
- * @date 2024/07/28
+ * @since 2024/07/28
  */
 public class Base64Utils {
     /**

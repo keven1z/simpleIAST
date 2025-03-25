@@ -2,7 +2,7 @@ package com.keven1z.core.consts;
 
 /**
  * @author keven1z
- * @date 2023/10/22
+ * @since 2023/10/22
  */
 public class HTTPConst {
     /*

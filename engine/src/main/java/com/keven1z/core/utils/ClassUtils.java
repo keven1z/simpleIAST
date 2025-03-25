@@ -12,7 +12,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 /**
  * @author keven1z
- * @date 2023/02/06
+ * @since 2023/02/06
  */
 public class ClassUtils {
     private static final String[] IGNORE_OBJECT_CLASS = new String[]{"java.lang.Object", "java.lang.Cloneable", "java.io.Serializable", "java.lang.Iterable"};

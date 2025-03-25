@@ -12,7 +12,7 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 /**
  * @author keven1z
- * @date 2023/01/15
+ * @since 2023/01/15
  * Hook分发初始化类
  */
 public class HandlerHookClassResolverInitializer {

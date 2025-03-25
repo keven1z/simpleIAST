@@ -8,7 +8,7 @@ import static com.keven1z.ModuleLoader.release;
 
 /**
  * @author keven1z
- * @date 2023/5/16
+ * @since 2023/5/16
  */
 public class Agent {
     public static String projectVersion;

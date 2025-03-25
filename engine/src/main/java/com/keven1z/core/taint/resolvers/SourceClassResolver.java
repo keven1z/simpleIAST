@@ -28,7 +28,7 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  * 污染源的解析器
  *
  * @author keven1z
- * @date 2023/01/15
+ * @since 2023/01/15
  */
 public class SourceClassResolver implements HandlerHookClassResolver {
     private static final String[] USER_PACKAGE_PREFIX = new String[]{"java", "javax", " org.spring".substring(1), " org.apache".substring(1), " io.undertow".substring(1)};
@@ -50,12 +50,16 @@ public class SourceClassResolver implements HandlerHookClassResolver {
             resolveBeanHook(className, method, desc, returnObject, fromMap);
             return;
         }
-
+        int returnIdentityHashCode = System.identityHashCode(returnObject);
+        //如果已经存在同一污点,不继续加入该污染源
+        if (TAINT_GRAPH_THREAD_LOCAL.get().isTaint(returnIdentityHashCode)) {
+            return;
+        }
         TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
         searchAndFillSourceFromReturnObject(returnObject, taintData);
         taintData.setFromValue(getSourceFromName(fromMap));
         //加入原始对象的hashcode
-        taintData.setToObjectHashCode(System.identityHashCode(returnObject));
+        taintData.setToObjectHashCode(returnIdentityHashCode);
         TaintUtils.buildTaint(returnObject, taintData, true);
     }
 

@@ -7,7 +7,7 @@ import java.security.ProtectionDomain;
 
 /**
  * @author keven1z
- * @date 2024/09/22
+ * @since 2024/09/22
  */
 public class ResinDetector extends ServerDetector {
     private static final String SERVER_FLAG_CLASS = " com/caucho/server/resin/Resin".substring(1);

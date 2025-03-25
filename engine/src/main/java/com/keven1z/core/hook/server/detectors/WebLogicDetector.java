@@ -8,7 +8,7 @@ import java.security.ProtectionDomain;
 
 /**
  * @author keven1z
- * @date 2024/09/22
+ * @since 2024/09/22
  */
 public class WebLogicDetector extends ServerDetector {
     private static final String SERVER_FLAG_CLASS = " weblogic/Server".substring(1);

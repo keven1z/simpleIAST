@@ -4,7 +4,7 @@ import static com.keven1z.core.consts.VulnEnum.HARD_CODE;
 
 /**
  * @author keven1z
- * @date 2024/07/28
+ * @since 2024/07/28
  */
 public class HardcodedFindingData extends FindingData {
     // 类名
