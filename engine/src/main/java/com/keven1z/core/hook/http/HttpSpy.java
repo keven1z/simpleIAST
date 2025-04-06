@@ -11,7 +11,7 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.taint.TaintSpy;
-import com.keven1z.core.vulnerability.FlowProcessingStation;
+import com.keven1z.core.vulnerability.DetectorFactory;
 import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
@@ -115,7 +115,7 @@ public class HttpSpy implements SimpleIASTSpy {
                 logger.info("[" + requestData .getRequest().getRequestId() + "] Request exit,URL:" + REQUEST_THREAD_LOCAL.get().getRequest().getRequestURLString());
             }
             isRequestEnded.set(true);
-            FlowProcessingStation.getInstance().processAndReportFindings();
+            DetectorFactory.getInstance().processAndReportFindings();
 
         } finally {
             enableHookLock.set(false);

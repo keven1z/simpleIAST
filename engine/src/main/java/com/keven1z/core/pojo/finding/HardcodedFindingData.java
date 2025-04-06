@@ -1,7 +1,6 @@
 package com.keven1z.core.pojo.finding;
 
-import static com.keven1z.core.consts.VulnEnum.HARD_CODE;
-
+import com.keven1z.core.consts.VulnerabilityLevel;
 /**
  * @author keven1z
  * @since 2024/07/28
@@ -23,7 +22,7 @@ public class HardcodedFindingData extends FindingData {
         this.parameterName = parameterName;
         this.parameterValue = parameterValue;
         this.sourceFile = sourceFile;
-        super.setLevel(HARD_CODE.getLevel());
+        super.setLevel(VulnerabilityLevel.MIDDLE.getPriority());
     }
 
     public String getClassName() {

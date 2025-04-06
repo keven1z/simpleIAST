@@ -1,7 +1,6 @@
 package com.keven1z.core.monitor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.CommonConst;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
@@ -91,7 +90,6 @@ public class InstructionMonitor extends Monitor {
 
         ApplicationModel.start();
         try {
-            EngineController.register();
             logAgentStatus("turn on agent", true);
         } catch (Exception e) {
             logAgentStatus("turn on agent", false);

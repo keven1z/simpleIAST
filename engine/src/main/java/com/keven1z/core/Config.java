@@ -62,11 +62,14 @@ public class Config {
      */
     public static final int MAX_STACK_DEPTH = 5;
 
-    public boolean isDebug() {
-//        if (logDebugProperties == null) {
-//            return false;
-//        }
-//        return logDebugProperties.equals(String.valueOf(CommonConst.ON));
-        return true;
-    }
+    /**
+     * 是否离线启动
+     */
+    public  boolean isOfflineStart = true;
+
+    /**
+     * 是否记录详细日志
+     */
+    public boolean enableDetailedLogging = true;
+
 }

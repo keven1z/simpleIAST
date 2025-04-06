@@ -39,9 +39,9 @@ public class IASTContext {
      */
     private String bindProjectName;
     /**
-     * 是否启动debug日志
+     * 是否记录详细日志
      */
-    private boolean isDebug;
+    private Boolean enableDetailedLogging;
     /*
      * 服务器端url
      */
@@ -80,7 +80,7 @@ public class IASTContext {
     }
 
     public boolean isOfflineEnabled() {
-        return Config.getConfig().isDebug();
+        return Config.getConfig().isOfflineStart;
     }
 
     public void clear() {
@@ -116,12 +116,16 @@ public class IASTContext {
     }
 
 
-    public boolean isDebug() {
-        return isDebug;
+    public boolean isEnableDetailedLogging() {
+        return enableDetailedLogging;
     }
 
-    public void setDebug(boolean debug) {
-        isDebug = debug;
+    public void setEnableDetailedLogging(Boolean enableDetailedLogging) {
+        if (enableDetailedLogging == null) {
+            this.enableDetailedLogging = Config.getConfig().enableDetailedLogging;
+        }else {
+            this.enableDetailedLogging = enableDetailedLogging;
+        }
     }
 
     public String getToken() {

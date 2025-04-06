@@ -19,4 +19,11 @@ public class AuthenticationDTO {
     public void setAgentId(String agentId) {
         this.agentId = agentId;
     }
+
+    @Override
+    public String toString() {
+        return "AuthenticationDTO{" +
+                "agentId='" + agentId + '\'' +
+                '}';
+    }
 }

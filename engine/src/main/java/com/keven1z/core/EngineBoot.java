@@ -26,12 +26,12 @@ import static com.keven1z.Agent.*;
 public class EngineBoot {
     EngineController engineController = null;
 
-    public void start(Instrumentation inst, String appName, Boolean isDebug, String projectVersion) {
+    public void start(Instrumentation inst, String appName, Boolean enableDetailedLogging, String projectVersion) {
 
         try {
             addShutdownHook();
             engineController = new EngineController();
-            engineController.start(inst, appName, isDebug, projectVersion);
+            engineController.start(inst, appName, enableDetailedLogging, projectVersion);
         } catch (Exception e) {
             throw new RuntimeException("Engine load error," + e.getMessage());
         }

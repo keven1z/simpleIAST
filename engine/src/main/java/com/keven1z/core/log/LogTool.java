@@ -28,7 +28,7 @@ public class LogTool {
     }
 
     public static boolean isDebugEnabled() {
-        return EngineController.context.isDebug();
+        return EngineController.context.isEnableDetailedLogging();
     }
 
 }

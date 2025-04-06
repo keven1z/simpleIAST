@@ -9,7 +9,7 @@ import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 import java.lang.spy.SimpleIASTSpy;
 import static com.keven1z.core.Config.MAX_REPORT_QUEUE_SIZE;
-import static com.keven1z.core.consts.VulnEnum.WEAK_PASSWORD_IN_SQL;
+import static com.keven1z.core.consts.VulnerabilityType.WEAK_PASSWORD_IN_SQL;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 public class TaintSpy implements SimpleIASTSpy {

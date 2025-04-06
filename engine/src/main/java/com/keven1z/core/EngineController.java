@@ -1,12 +1,10 @@
 package com.keven1z.core;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
 import com.keven1z.core.monitor.TrafficReadingReportMonitor;
-import com.keven1z.core.pojo.AuthenticationDTO;
-import com.keven1z.core.pojo.ResponseDTO;
+
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
 import com.keven1z.core.log.ErrorType;
@@ -21,7 +19,6 @@ import com.keven1z.core.pojo.AgentDTO;
 import com.keven1z.core.policy.PolicyContainer;
 import com.keven1z.core.utils.FileUtils;
 import com.keven1z.core.utils.IASTHttpClient;
-import com.keven1z.core.utils.JsonUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -30,6 +27,7 @@ import java.lang.instrument.Instrumentation;
 import java.util.List;
 
 import static com.keven1z.core.consts.CommonConst.*;
+import static com.keven1z.core.utils.IASTHttpClient.register;
 
 
 /**
@@ -42,140 +40,75 @@ public class EngineController {
     public static final IASTContext context = IASTContext.getContext();
     private static final Logger logger = Logger.getLogger(EngineController.class);
 
-    public void start(Instrumentation inst, String projectName, boolean isDebug, String projectVersion) throws Exception {
+    public void start(Instrumentation inst, String projectName, Boolean enableDetailedLogging, String projectVersion) throws Exception {
         /*
          * 打印banner
          */
-        banner();
+        printBanner();
         /*
          * 构建agent上下文对象
          */
-        buildContext(inst, projectName, isDebug, projectVersion);
+        initializeContext(inst, projectName, enableDetailedLogging, projectVersion);
         /*
          * 加载日志
          */
-        loadLog();
+        initializeLoggingSystem();
 
         /*
          * 判定是否为debug模式，若不为debug模式，则进行正常注册
          */
-        if (!context.isOfflineEnabled()) {
-            /*
-             * 设置服务器地址
-             */
-            IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
-            register();
-            System.out.println(String.format("[SimpleIAST] IAST agent successfully registered, server url: %s", context.getServerUrl()));
-
-        } else {
-            ApplicationModel.setAgentId(OFFLINE_AGENT_NAME);
-        }
-        /*
-         * 加载hook策略
-         */
-        loadPolicy();
-        /*
-         * 加载hook黑名单
-         */
-        loadBlackList();
-        /*
-         * 加载转化类
-         */
-        loadTransform();
+        handleRegistration();
+        loadAgentComponents();
         /*
          * 启动监控进程
          */
-        MonitorManager.start(new DirectReportMonitor(), new TrafficReadingReportMonitor(), new InstructionMonitor());
+        startMonitoringSystem();
         /*
-         * agent设置为启动状态
+         * 完成初始化
          */
-        ApplicationModel.start();
-
-        System.out.println("[SimpleIAST] IAST run successfully");
-        Logger.getLogger(getClass()).info("SimpleIAST run successfully,hostName:" + ApplicationModel.getHostName());
-        if (LogTool.isDebugEnabled()) {
-            logger.info("HostName:" + ApplicationModel.getHostName());
-            logger.info("OS:" + ApplicationModel.getOS());
-            logger.info("PID:" + ApplicationModel.getPID());
-            logger.info("Jdk version:" + ApplicationModel.getJdkVersion());
-            logger.info("Server path:" + ApplicationModel.getPath());
-
-            if (!context.isOfflineEnabled()) {
-                logger.info("Bind project name:" + context.getBindProjectName());
-            }
-            logger.info("The number of Policy:" + context.getPolicyContainer().getPolicySize());
-            logger.info("The number of hook black list:" + context.getBlackList().size());
-        }
+        finalizeInitialization();
     }
 
-    private void loadTransform() {
+    private void loadClassTransformers() {
         initSpy();
         initTransformer();
     }
-
-    /**
-     * 发送注册请求
-     */
-    public static void register() throws RegistrationException {
-        try {
-            // 构建注册信息并发送请求
-            AgentDTO agentDTO = buildRegisterInformation();
-            String requestBody = JsonUtils.toString(agentDTO);
-            String responseBody = IASTHttpClient.getClient().register(requestBody);
-
-            // 解析响应
-            ResponseDTO<Object> responseDTO = JsonUtils.toObject(responseBody, ResponseDTO.class);
-            // 处理失败响应
-            if (!responseDTO.isFlag()) {
-                String errorMsg = String.format("Registration failed. Reason: %s", responseDTO.getMessage());
-                logger.warn(errorMsg);
-                throw new RegistrationException(errorMsg);
-            }
-            // 校验响应数据类型
-            AuthenticationDTO authData = JsonUtils.convertObject(responseDTO.getData(), AuthenticationDTO.class);
-            if (authData == null || authData.getAgentId() == null || authData.getToken() == null) {
-                String errorMsg = "Incomplete authentication data. AgentId or Token is missing.";
-                logger.error(errorMsg);
-                throw new RegistrationException(errorMsg);
-            }
-
-            // 更新应用配置
-            ApplicationModel.setAgentId(authData.getAgentId());
-            EngineController.context.setToken(authData.getToken());
-
-            // 记录成功日志
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Registration successful. AgentID: %s", authData.getAgentId()));
-            }
-        } catch (JsonProcessingException e) {
-            String errorMsg = "JSON serialization/deserialization failed during registration.";
-            logger.error(errorMsg, e);
-            throw new RegistrationException(errorMsg, e); // 重新抛出自定义异常
-
-        } catch (IOException e) {
-            String errorMsg = "Network communication error during registration.";
-            logger.error(errorMsg, e);
-            throw new RegistrationException(errorMsg, e); // 重新抛出自定义异常
-
-        } catch (RegistrationException e) {
-            throw e;
-        } catch (Exception e) {
-            String errorMsg = "Unexpected error during registration process.";
-            logger.error(errorMsg, e);
-            throw new RegistrationException(errorMsg, e); // 重新抛出自定义异常
+    private void handleRegistration() throws RegistrationException {
+        if (context.isOfflineEnabled()) {
+            ApplicationModel.setAgentId(OFFLINE_AGENT_NAME);
+            return;
         }
+
+        configureServerConnection();
+        performRegistration();
     }
-
-
+    private void configureServerConnection() {
+        IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
+    }
+    private void performRegistration() throws RegistrationException {
+        register(buildRegisterInformation());
+    }
+    private void loadAgentComponents() throws IOException {
+        loadHookPolicies();
+        loadHookBlacklist();
+        loadClassTransformers();
+    }
+    private void startMonitoringSystem() {
+        MonitorManager.start(
+                new DirectReportMonitor(),
+                new TrafficReadingReportMonitor(),
+                new InstructionMonitor()
+        );
+    }
     /**
      * @param inst        Instrumentation
      * @param projectName 绑定的项目名
      */
-    private void buildContext(Instrumentation inst, String projectName, boolean isDebug, String projectVersion) {
+    private void initializeContext(Instrumentation inst, String projectName, Boolean enableDetailedLogging, String projectVersion) {
         loadProperties();
         context.setInstrumentation(inst);
         context.setBindProjectName(projectName);
-        context.setDebug(isDebug);
+        context.setEnableDetailedLogging(enableDetailedLogging);
         context.setAgentVersion(projectVersion);
     }
 
@@ -190,7 +123,7 @@ public class EngineController {
     /**
      * 加载日志类
      */
-    private void loadLog() {
+    private void initializeLoggingSystem() {
         try {
             LogConfig.ConfigFileAppender();
         } catch (Exception e) {
@@ -211,7 +144,7 @@ public class EngineController {
     /**
      * 加载策略
      */
-    private void loadPolicy() throws IOException {
+    private void loadHookPolicies() throws IOException {
         PolicyContainer policyContainer = FileUtils.load(this.getClass().getClassLoader());
         if (policyContainer == null) {
             LogTool.error(ErrorType.POLICY_ERROR, "policyContainer is null");
@@ -220,7 +153,7 @@ public class EngineController {
         context.setPolicyContainer(policyContainer);
     }
 
-    private void loadBlackList() throws IOException {
+    private void loadHookBlacklist() throws IOException {
         List<String> blackList = FileUtils.loadBlackList(this.getClass().getClassLoader());
         context.setBlackList(blackList);
     }
@@ -251,7 +184,7 @@ public class EngineController {
     /**
      * 打印banner信息
      */
-    private void banner() {
+    private void printBanner() {
         String s = " __ _                 _         _____  _    __  _____ \n" +
                 "/ _(_)_ __ ___  _ __ | | ___    \\_   \\/_\\  / _\\/__   \\\n" +
                 "\\ \\| | '_ ` _ \\| '_ \\| |/ _ \\    / /\\//_\\\\ \\ \\   / /\\/\n" +
@@ -259,5 +192,42 @@ public class EngineController {
                 "\\__/_|_| |_| |_| .__/|_|\\___| \\____/\\_/ \\_/\\__/ \\/    \n" +
                 "               |_|                                    ";
         System.out.println(s);
+    }
+    private void finalizeInitialization() {/*
+         * agent设置为启动状态
+         */
+        ApplicationModel.start();
+
+        final String mode = context.isOfflineEnabled() ? "离线模式" : "在线模式";
+        final String hostName = ApplicationModel.getHostName();
+        System.out.printf("[SimpleIAST] IAST启动成功. 模式=%s, 主机=%s%n", mode, hostName);
+
+        // 核心启动日志（INFO级别）
+        logger.info(String.format("[SimpleIAST] IAST启动成功. 模式=%s, 主机=%s", mode, hostName));
+
+        if (logger.isDebugEnabled()) {
+            // 调试信息（DEBUG级别）
+            String debugMsg = String.format(
+                    "IAST启动详情 => 模式=%s | 主机=%s | 系统=%s | PID=%s | JDK=%s | 路径=%s",
+                    mode,
+                    hostName,
+                    ApplicationModel.getOS(),
+                    ApplicationModel.getPID(),
+                    ApplicationModel.getJdkVersion(),
+                    ApplicationModel.getPath()
+            );
+            logger.debug(debugMsg);
+
+            // 项目绑定信息
+            String projectMsg = context.isOfflineEnabled()
+                    ? "离线模式运行，未绑定项目"
+                    : String.format("绑定项目: %s", context.getBindProjectName());
+            logger.debug(projectMsg);
+
+            // 策略信息
+            logger.debug(String.format("安全策略: 总数=%d, Hook黑名单=%d",
+                    context.getPolicyContainer().getPolicySize(),
+                    context.getBlackList().size()));
+        }
     }
 }

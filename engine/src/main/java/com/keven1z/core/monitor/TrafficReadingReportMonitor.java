@@ -1,6 +1,7 @@
 package com.keven1z.core.monitor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.keven1z.core.consts.VulnerabilityType;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
@@ -12,8 +13,9 @@ import com.keven1z.core.pojo.finding.FindingData;
 import com.keven1z.core.pojo.finding.FindingReportBo;
 import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.finding.TaintFindingData;
+import com.keven1z.core.vulnerability.DetectContext;
 import com.keven1z.core.vulnerability.Detector;
-import com.keven1z.core.vulnerability.FlowProcessingStation;
+import com.keven1z.core.vulnerability.DetectorFactory;
 import com.keven1z.core.vulnerability.report.ReportBuilder;
 import com.keven1z.core.vulnerability.report.ReportPrinter;
 import com.keven1z.core.vulnerability.report.ReportSender;
@@ -27,6 +29,7 @@ import static com.keven1z.core.hook.HookThreadLocal.*;
  */
 public class TrafficReadingReportMonitor extends Monitor {
 
+    private final  DetectorFactory detectorFactory = DetectorFactory.getInstance();
 
     @Override
     public String getThreadName() {
@@ -71,25 +74,29 @@ public class TrafficReadingReportMonitor extends Monitor {
             return findingDataList;
         }
         Set<String> processedSinkClass = new HashSet<>();
-        FlowProcessingStation station = FlowProcessingStation.getInstance();
         for (TaintNode sinkNode : taintFindings) {
             if (isDuplicateSink(sinkNode, processedSinkClass)) {
                 continue;
             }
-            String vulnType = sinkNode.getTaintData().getVulnType();
-            Detector detector = station.getDetector(vulnType);
+            VulnerabilityType vulnerabilityType = sinkNode.getTaintData().getVulnType();
+            Detector detector = detectorFactory.getDetector(vulnerabilityType);
             if (detector == null) {
-                LogTool.warn(ErrorType.DETECT_VULNERABILITY_ERROR, "Failed to get detector for SinkNode vulnType,vulnType is " + vulnType);
+                LogTool.warn(ErrorType.DETECT_VULNERABILITY_ERROR, "Failed to get detector for SinkNode vulnType,vulnType is " + vulnerabilityType);
                 continue;
             }
 
             LinkedList<TaintData> flowLinks = taintGraph.bfs(sinkNode);
-            if (detector.detect(flowLinks, findingReportBo.getRequestData(), findingReportBo.getResponseData())) {
+            DetectContext taintContext = new DetectContext.Builder()
+                    .flowLinks(flowLinks)
+                    .requestData(findingReportBo.getRequestData())
+                    .responseData(findingReportBo.getResponseData())
+                    .build();
+            if (detector.detect(taintContext)) {
                 TaintFindingData findingData = new TaintFindingData();
                 findingData.setFlowData(flowLinks);
-                findingData.setVulnerableType(vulnType);
+                findingData.setVulnerableType(vulnerabilityType.name());
                 //设置漏洞等级
-                findingData.setLevel(detector.getLevel());
+                findingData.setLevel(detector.getLevel().getPriority());
                 findingDataList.add(findingData);
             }
             /*

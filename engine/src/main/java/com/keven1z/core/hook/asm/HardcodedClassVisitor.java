@@ -12,7 +12,7 @@ import org.objectweb.asm.Opcodes;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
-import static com.keven1z.core.consts.VulnEnum.HARD_CODE;
+import static com.keven1z.core.consts.VulnerabilityType.HARD_CODE;
 import static com.keven1z.core.hook.HookThreadLocal.REPORT_QUEUE;
 
 /**
@@ -22,9 +22,9 @@ import static com.keven1z.core.hook.HookThreadLocal.REPORT_QUEUE;
 public class HardcodedClassVisitor extends ClassVisitor {
 
 
-    private final Pattern e = Pattern.compile("^[a-zA-Z]+\\.[\\.a-zA-Z]*[a-zA-Z]+$");
+    private final Pattern e = Pattern.compile("^[a-zA-Z]+\\.[.a-zA-Z]*[a-zA-Z]+$");
 
-    private final Pattern f = Pattern.compile("^[a-zA-Z]+\\_[\\_a-zA-Z]*[a-zA-Z]+$");
+    private final Pattern f = Pattern.compile("^[a-zA-Z]+_[_a-zA-Z]*[a-zA-Z]+$");
 
     private final String[] keyArray = {"key", "aes", "des", "iv", "secret", "blowfish"};
     private final String[] passArray = {"PASSWORD", "PASSKEY", "PASSPHRASE", "SECRET", "ACCESS_TOKEN",
@@ -102,7 +102,7 @@ public class HardcodedClassVisitor extends ClassVisitor {
     private void reportFinding(String parameterName, String parameterValue) {
         HardcodedFindingData hardcodedFindingData = new HardcodedFindingData(this.className, parameterName, parameterValue, source);
         ReportData reportMessage = new ReportData(ApplicationModel.getAgentId());
-        hardcodedFindingData.setVulnerableType(HARD_CODE.getName());
+        hardcodedFindingData.setVulnerableType(HARD_CODE.name());
         reportMessage.addFindingDataList(hardcodedFindingData);
         REPORT_QUEUE.offer(reportMessage);
     }

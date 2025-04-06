@@ -98,10 +98,10 @@ public class LogConfig {
                     File file = new File(log4jBaseDir);
                     if (!file.exists() && file.isDirectory()) {
                         if (!file.mkdirs()) {
-                            System.err.println("[SimpleIAST] Log Dir:" + log4jBaseDir + " create failed");
+                            System.err.printf("Failed to create log directory: %s. Please check permissions or disk space.", log4jBaseDir);
                         }
                     }
-                    System.out.println("[SimpleIAST] IAST log dir:" + log4jBaseDir);
+                    System.out.printf("[SimpleIAST] Successfully created log directory:%s", log4jBaseDir);
 
                     String path = log4jBaseDir + type.getTargetPath();
                     BasicConfigurator.configure(createFileAppender(type.getAppender(), path));

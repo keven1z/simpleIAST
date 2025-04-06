@@ -78,7 +78,7 @@ public class HandlerHookClassResolverInitializer {
             return;
         }
 
-        HandlerHookClassResolver resolver = resolverMap.get(PolicyTypeEnum.valueOf(type));
+        HandlerHookClassResolver resolver = resolverMap.get(PolicyTypeEnum.valueOf(type.toUpperCase()));
         if (resolver == null) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.RESOLVE_ERROR, "Not found resolver,policy type is " + type);

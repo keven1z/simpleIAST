@@ -1093,7 +1093,7 @@
   ],
   "sink": [
     {
-      "name": "sqli",
+      "name": "sql_injection",
       "className": "java/sql/Statement",
       "method": "executeQuery",
       "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
@@ -1112,7 +1112,7 @@
       "inter": true
     },
     {
-      "name": "sqli",
+      "name": "sql_injection",
       "className": "java/sql/Statement",
       "method": "executeUpdate",
       "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
@@ -1131,7 +1131,7 @@
       "inter": true
     },
     {
-      "name": "sqli",
+      "name": "sql_injection",
       "className": "java/sql/Statement",
       "method": "executeLargeUpdate",
       "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
@@ -1150,7 +1150,7 @@
       "inter": true
     },
     {
-      "name": "sqli",
+      "name": "sql_injection",
       "className": "java/sql/Statement",
       "method": "execute",
       "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
@@ -1169,7 +1169,7 @@
       "inter": true
     },
     {
-      "name": "sqli",
+      "name": "sql_injection",
       "className": "java/sql/Connection",
       "method": "prepareStatement",
       "desc": "(Ljava/lang/String;II)Ljava/sql/PreparedStatement;",
@@ -1186,7 +1186,7 @@
       "inter": true
     },
     {
-      "name": "sqli",
+      "name": "sql_injection",
       "className": "java/sql/Connection",
       "method": "prepareStatement",
       "desc": "(Ljava/lang/String;IIZ)Ljava/sql/PreparedStatement;",
@@ -1274,7 +1274,7 @@
       "inter": true
     },
     {
-      "name": "cmdi",
+      "name": "cmd_injection",
       "className": "java/lang/ProcessBuilder",
       "method": "start",
       "desc": "()Ljava/lang/Process;",
@@ -1284,7 +1284,7 @@
       "exit": 0
     },
     {
-      "name": "cmdi",
+      "name": "cmd_injection",
       "className": "java/lang/Runtime",
       "method": "exec",
       "desc": "(Ljava/lang/String;[Ljava/lang/String;Ljava/io/File;)Ljava/lang/Process;",
@@ -1740,6 +1740,16 @@
       "enter": 1,
       "exit": 0,
       "inter": true
+    },
+    {
+      "name": "fastjson",
+      "className": "com/alibaba/fastjson/JSON",
+      "method": "parseObject",
+      "desc": "(Ljava/lang/String;)Lcom/alibaba/fastjson/JSONObject;",
+      "state": 1,
+      "from": "P1",
+      "enter": 1,
+      "exit": 0
     }
   ],
   "sanitizers": [

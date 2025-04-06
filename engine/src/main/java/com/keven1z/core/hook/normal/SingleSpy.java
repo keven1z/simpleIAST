@@ -1,28 +1,24 @@
 package com.keven1z.core.hook.normal;
 
 
+import com.keven1z.core.consts.VulnerabilityType;
+import com.keven1z.core.error.DetectorNotFoundException;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.finding.SingleFindingData;
-import com.keven1z.core.vulnerability.NormalDetector;
-import com.keven1z.core.vulnerability.detectors.WeakPasswordInSqlDetector;
+import com.keven1z.core.vulnerability.DetectContext;
+import com.keven1z.core.vulnerability.Detector;
+import com.keven1z.core.vulnerability.DetectorFactory;
 import org.apache.log4j.Logger;
 
 import java.lang.spy.SimpleIASTSpy;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 
 public class SingleSpy implements SimpleIASTSpy {
     Logger logger = Logger.getLogger(SingleSpy.class);
-    public static final List<NormalDetector> normalDetectorComposite = new ArrayList<>();
-
-    static {
-        //非污点跟踪漏洞
-        normalDetectorComposite.add(new WeakPasswordInSqlDetector());
-    }
+    private final DetectorFactory detectorFactory = DetectorFactory.getInstance();
 
     @Override
     public void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
@@ -35,7 +31,7 @@ public class SingleSpy implements SimpleIASTSpy {
             if (!ApplicationModel.isRunning()) {
                 return;
             }
-            doDetect(returnObject, thisObject, parameters, className, method, desc, type, policyName, isRequireHttp);
+            doDetect(returnObject, thisObject, parameters, className, method, desc,  policyName, isRequireHttp);
         } catch (Exception e) {
             logger.warn("Failed to handle " + className, e);
         } finally {
@@ -43,28 +39,41 @@ public class SingleSpy implements SimpleIASTSpy {
         }
     }
 
-    private void doDetect(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
-
-        for (NormalDetector normalDetector : normalDetectorComposite) {
-            if (!normalDetector.getType().equals(policyName)) {
-                continue;
+    private void doDetect(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc,  String policyName, boolean isRequireHttp) throws DetectorNotFoundException {
+        VulnerabilityType vulnerabilityType;
+        try {
+            vulnerabilityType = VulnerabilityType.valueOf(policyName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            logger.error(String.format("无效漏洞类型: {}", policyName));
+            return;
+        }
+        Detector detector = detectorFactory.getDetector(vulnerabilityType);
+        if (detector == null) {
+            throw new DetectorNotFoundException(vulnerabilityType.name());
+        }
+        DetectContext normalContext = new DetectContext.Builder()
+                .returnObject(returnObject)
+                .thisObject(thisObject)
+                .parameters(parameters)
+                .build();
+        boolean isDetect = detector.detect(normalContext);
+        if (!isDetect) {
+            if (logger.isDebugEnabled()) {
+                logger.warn("Not found vulnerability for " + policyName);
             }
-            boolean isDetected = normalDetector.detect(returnObject, thisObject, parameters);
-            if (!isDetected) {
-                continue;
-            }
-            Object reportDesc = normalDetector.getReportDesc();
-            SingleFindingData singleFindingData = new SingleFindingData(className, method, desc, reportDesc);
-            singleFindingData.setVulnerableType(policyName);
-            singleFindingData.setLevel(normalDetector.getLevel());
-            //如果该漏洞不依赖HTTP流量则直接上报
-            if (!isRequireHttp) {
-                ReportData reportMessage = new ReportData(ApplicationModel.getAgentId());
-                reportMessage.addFindingDataList(singleFindingData);
-                REPORT_QUEUE.offer(reportMessage);
-            } else if (REQUEST_THREAD_LOCAL.get() != null) {
-                SINGLE_FINDING_THREADLOCAL.get().add(singleFindingData);
-            }
+            return;
+        }
+        Object reportDesc = detector.getReportDesc();
+        SingleFindingData singleFindingData = new SingleFindingData(className, method, desc, reportDesc);
+        singleFindingData.setVulnerableType(policyName);
+        singleFindingData.setLevel(detector.getLevel().getPriority());
+        //如果该漏洞不依赖HTTP流量则直接上报
+        if (!isRequireHttp) {
+            ReportData reportMessage = new ReportData(ApplicationModel.getAgentId());
+            reportMessage.addFindingDataList(singleFindingData);
+            REPORT_QUEUE.offer(reportMessage);
+        } else if (REQUEST_THREAD_LOCAL.get() != null) {
+            SINGLE_FINDING_THREADLOCAL.get().add(singleFindingData);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.keven1z.core.model.graph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.keven1z.core.consts.VulnerabilityType;
 import com.keven1z.core.policy.PolicyTypeEnum;
 import com.keven1z.core.utils.TaintUtils;
 
@@ -40,7 +41,7 @@ public class TaintData {
      * 若是漏洞，标记其漏洞名称
      */
     @JsonIgnore
-    private String vulnType;
+    private VulnerabilityType vulnType;
     /**
      * 过滤节点信息表
      */
@@ -139,12 +140,12 @@ public class TaintData {
         this.stage = stage;
     }
 
-    public String getVulnType() {
+    public VulnerabilityType getVulnType() {
         return vulnType;
     }
 
     public void setVulnType(String vulnType) {
-        this.vulnType = vulnType;
+        this.vulnType = VulnerabilityType.valueOf(vulnType.toUpperCase());
     }
 
 
