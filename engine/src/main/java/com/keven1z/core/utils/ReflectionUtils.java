@@ -73,6 +73,17 @@ public class ReflectionUtils {
     }
 
     /**
+     * 反射获取class的静态字段
+     * @param clazz 被提取字段的class
+     * @param fieldName 字段名称
+     * @return 字段的值
+     */
+    public static Object getStaticField(Class<?> clazz, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(null);
+    }
+    /**
      * 反射获取父类对象的字段包括私有的
      *
      * @param paramClass 被提取字段的对象

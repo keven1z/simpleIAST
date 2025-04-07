@@ -5,7 +5,9 @@ import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.policy.PolicyContainer;
 
 import java.lang.instrument.Instrumentation;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  */
 public class IASTContext {
     private IASTContext() {
+        userClasses = new HashSet<>();
     }
     private String agentVersion;
     public static IASTContext getContext() {
@@ -46,6 +49,7 @@ public class IASTContext {
      * 服务器端url
      */
     private String serverUrl;
+    private final Set<String> userClasses;
 
     public PolicyContainer getPolicy() {
         return policyContainer;
@@ -89,6 +93,7 @@ public class IASTContext {
         }
         TaintSpy.getInstance().clear();
         ApplicationModel.clear();
+        userClasses.clear();
     }
 
     public void setBlackList(List<String> blackList) {
@@ -115,6 +120,13 @@ public class IASTContext {
         return false;
     }
 
+    public Set<String> getUserClasses() {
+        return userClasses;
+    }
+
+    public void addUserClass(String userClasses) {
+        this.userClasses.add(userClasses);
+    }
 
     public boolean isEnableDetailedLogging() {
         return enableDetailedLogging;

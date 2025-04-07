@@ -39,6 +39,7 @@ public enum ErrorType {
     REFLECT_ERROR(20021, "Reflect Method Error"),
     SHUTDOWN_ERROR(20022, "Shutdown Error"),
     REQUEST_START_ERROR(20023, "Request start error"),
+    TRANSFORM_WARN(20024, "Transform Warning"),
     UNEXPECTED_ERROR(20099, "Unexpected Error");
     private final int code;
     private final String message;
