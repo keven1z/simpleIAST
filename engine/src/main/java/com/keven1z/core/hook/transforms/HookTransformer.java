@@ -7,7 +7,7 @@ import com.keven1z.core.hook.server.detectors.*;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.*;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
@@ -32,7 +32,7 @@ import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
  * 自定义Transformer，用于修改被hook的class
  */
 public class HookTransformer implements ClassFileTransformer {
-    private final PolicyContainer policy;
+    private final HookPolicyContainer policy;
     private final Instrumentation instrumentation;
     /**
      * transform class计数
@@ -50,9 +50,9 @@ public class HookTransformer implements ClassFileTransformer {
      */
     public static final String SANDBOX_SPECIAL_PREFIX = "$$SIMPLE$$";
 
-    public HookTransformer(PolicyContainer policyContainer,
+    public HookTransformer(HookPolicyContainer hookPolicyContainer,
                            Instrumentation instrumentation) {
-        this.policy = policyContainer;
+        this.policy = hookPolicyContainer;
         this.instrumentation = instrumentation;
         this.instrumentation.addTransformer(this, true);
         this.hasTransformedClasses = new HashSet<>();

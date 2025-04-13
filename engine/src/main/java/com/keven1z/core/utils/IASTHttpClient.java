@@ -31,7 +31,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-
+@Deprecated
 public class IASTHttpClient {
     private static final Logger logger = Logger.getLogger(IASTHttpClient.class);
 
@@ -154,7 +154,7 @@ public class IASTHttpClient {
      */
     public static void register(AgentDTO agentDTO) throws RegistrationException {
         try {
-            String requestBody = JsonUtils.toString(agentDTO);
+            String requestBody = JsonUtils.toJsonString(agentDTO);
             String responseBody = IASTHttpClient.getClient().register(requestBody);
 
             // 解析响应
@@ -166,7 +166,7 @@ public class IASTHttpClient {
                 throw new RegistrationException(errorMsg);
             }
             // 校验响应数据类型
-            AuthenticationDTO authData = JsonUtils.convertObject(responseDTO.getData(), AuthenticationDTO.class);
+            AuthenticationDTO authData = JsonUtils.parseObject(responseDTO.getData(), AuthenticationDTO.class);
             if (authData == null || authData.getAgentId() == null || authData.getToken() == null) {
                 String errorMsg = "Incomplete authentication data. AgentId or Token is missing.";
                 logger.error(errorMsg);

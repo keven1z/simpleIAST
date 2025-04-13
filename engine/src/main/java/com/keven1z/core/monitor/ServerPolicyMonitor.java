@@ -1,18 +1,18 @@
 package com.keven1z.core.monitor;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.keven1z.core.consts.CommonConst;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.pojo.InstructionDTO;
+import com.keven1z.core.policy.PolicyUpdateResult;
+import com.keven1z.core.policy.ServerPolicyManager;
 import com.keven1z.core.utils.IASTHttpClient;
-import com.keven1z.core.utils.JsonUtils;
 
-import java.util.List;
 
-public class InstructionMonitor extends Monitor {
-    private static final String INSTRUCTION_CHANGE_STATE = "state";
-
+public class ServerPolicyMonitor extends Monitor {
+    private final ServerPolicyManager serverPolicyManager;
+    public ServerPolicyMonitor() {
+        this.serverPolicyManager = ServerPolicyManager.getInstance();
+    }
     @Override
     public String getThreadName() {
         return "SimpleIAST-InstructionMonitor-Thread";
@@ -25,41 +25,8 @@ public class InstructionMonitor extends Monitor {
 
     @Override
     public void doRun() throws Exception {
-        Thread.sleep(30 * 1000);
-        String instruction = IASTHttpClient.getClient().getInstruction();
-        if (instruction == null) {
-            if (ApplicationModel.isRunning()) {
-                ApplicationModel.stop();
-            }
-            //如果获取失败，120s后再请求
-            Thread.sleep(120 * 1000);
-            return;
-        } else {
-            if (ApplicationModel.isRunning()) {
-                ApplicationModel.start();
-            }
-        }
-
-        List<InstructionDTO> instructions = JsonUtils.toList(instruction, new TypeReference<List<InstructionDTO>>() {
-        });
-
-        if (instructions.isEmpty()) {
-            return;
-        }
-        if (LogTool.isDebugEnabled()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (InstructionDTO instructionDTO : instructions) {
-                stringBuilder.append(instructionDTO).append(",");
-            }
-            stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
-            logger.info("Received instruction: " + stringBuilder);
-        }
-        for (InstructionDTO instructionDTO : instructions) {
-            String name = instructionDTO.getName();
-            if (INSTRUCTION_CHANGE_STATE.equals(name)) {
-                handlerAgentState(instructionDTO.getValue());
-            }
-        }
+        PolicyUpdateResult policyUpdateResult = serverPolicyManager.checkUpdate();
+        boolean isUpdated = policyUpdateResult.isUpdated();
         Thread.sleep(30 * 1000);
     }
 

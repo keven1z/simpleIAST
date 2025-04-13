@@ -1,5 +1,7 @@
 package com.keven1z.core.policy;
 
+import com.keven1z.core.consts.PolicyType;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -9,14 +11,14 @@ import java.util.Set;
  * @author keven1z
  * @since 2023/02/22
  */
-public class Policy implements Serializable,Comparable<Policy> {
-    public Policy(String className, String method, String desc) {
+public class HookPolicy implements Serializable,Comparable<HookPolicy> {
+    public HookPolicy(String className, String method, String desc) {
         this.className = className;
         this.method = method;
         this.desc = desc;
     }
 
-    public Policy() {
+    public HookPolicy() {
 
     }
 
@@ -60,7 +62,7 @@ public class Policy implements Serializable,Comparable<Policy> {
     /**
      * 策略类型
      */
-    private PolicyTypeEnum type;
+    private PolicyType type;
     private boolean inter;
     private String conditions;
     private Set<String> exclude = new HashSet<>();
@@ -146,11 +148,11 @@ public class Policy implements Serializable,Comparable<Policy> {
         this.to = to;
     }
 
-    public void setType(PolicyTypeEnum type) {
+    public void setType(PolicyType type) {
         this.type = type;
     }
 
-    public PolicyTypeEnum getType() {
+    public PolicyType getType() {
         return type;
     }
 
@@ -214,8 +216,8 @@ public class Policy implements Serializable,Comparable<Policy> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Policy policy = (Policy) o;
-        return className.equals(policy.className) && method.equals(policy.method) && desc.equals(policy.desc);
+        HookPolicy hookPolicy = (HookPolicy) o;
+        return className.equals(hookPolicy.className) && method.equals(hookPolicy.method) && desc.equals(hookPolicy.desc);
     }
     @Override
     public int hashCode() {
@@ -223,7 +225,7 @@ public class Policy implements Serializable,Comparable<Policy> {
     }
 
     @Override
-    public int compareTo(Policy other) {
+    public int compareTo(HookPolicy other) {
         int classNameComparison = this.className.compareTo(other.className);
         if (classNameComparison != 0) {
             return classNameComparison;

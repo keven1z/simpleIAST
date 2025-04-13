@@ -3,7 +3,7 @@ package com.keven1z.core.taint.resolvers;
 import com.keven1z.core.model.graph.TaintData;
 import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.model.graph.TaintNode;
-import com.keven1z.core.policy.PolicyTypeEnum;
+import com.keven1z.core.consts.PolicyType;
 import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.TaintUtils;
 
@@ -49,7 +49,7 @@ public class SanitizerClassResolver implements HandlerHookClassResolver {
             fromTaintData.setHasSanitizer(true);
 
             if (taintData == null) {
-                taintData = new TaintData(className, method, desc, PolicyTypeEnum.SANITIZER);
+                taintData = new TaintData(className, method, desc, PolicyType.SANITIZER);
                 taintData.setName(policyName);
 //                taintData.setConditions(getConditionString(policy.getConditions(), parameters, returnObject, thisObject));
             }

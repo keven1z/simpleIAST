@@ -7,8 +7,8 @@ import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.model.graph.TaintNode;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
-import com.keven1z.core.policy.Policy;
-import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.policy.HookPolicy;
+import com.keven1z.core.policy.HookPolicyContainer;
 
 import java.io.IOException;
 import java.util.*;
@@ -23,13 +23,13 @@ public class PolicyUtils {
      * 判断是否是hook点或者是hook接口的实现类
      *
      * @param className       待判断的类名
-     * @param policyContainer 策略集
+     * @param hookPolicyContainer 策略集
      * @param interfaces      待判断类的单一接口
      * @param loader          classloader
      * @return 是否是hook点或者是hook接口的实现类
      */
-    public static boolean isHook(String className, PolicyContainer policyContainer, String[] interfaces, String superClass, ClassLoader loader) throws IOException {
-        if (PolicyUtils.isHookedByClassName(className, policyContainer, true)) {
+    public static boolean isHook(String className, HookPolicyContainer hookPolicyContainer, String[] interfaces, String superClass, ClassLoader loader) throws IOException {
+        if (PolicyUtils.isHookedByClassName(className, hookPolicyContainer, true)) {
             return true;
         }
         if (superClassCache.containsKey(className)) {
@@ -37,7 +37,7 @@ public class PolicyUtils {
         }
 
         Set<String> allInterfaces = getAllInterfaces(interfaces, superClass, loader);
-        boolean isHooked = PolicyUtils.isHookedByAncestors(className, allInterfaces, policyContainer);
+        boolean isHooked = PolicyUtils.isHookedByAncestors(className, allInterfaces, hookPolicyContainer);
         superClassCache.put(className, isHooked);
         return isHooked;
 
@@ -49,17 +49,17 @@ public class PolicyUtils {
         return ClassUtils.getAllInterfaces(ancestors, loader, 0);
     }
 
-    public static boolean isHook(PolicyContainer policyContainer, Class<?> clazz) {
+    public static boolean isHook(HookPolicyContainer hookPolicyContainer, Class<?> clazz) {
         String className = clazz.getName();
         className = className.replace(".", "/");
-        if (PolicyUtils.isHookedByClassName(className, policyContainer, false)) {
+        if (PolicyUtils.isHookedByClassName(className, hookPolicyContainer, false)) {
             return true;
         }
         if (superClassCache.containsKey(className)) {
             return superClassCache.get(className);
         }
         Set<String> allInterfaces = ClassUtils.getAllInterfaces(clazz);
-        boolean isHooked = PolicyUtils.isHookedByAncestors(className, allInterfaces, policyContainer);
+        boolean isHooked = PolicyUtils.isHookedByAncestors(className, allInterfaces, hookPolicyContainer);
         superClassCache.put(className, isHooked);
         return isHooked;
     }
@@ -70,30 +70,30 @@ public class PolicyUtils {
      * @param className 类名(.分割)
      * @return 是否在hook点中。
      */
-    private static boolean isHookedByClassName(String className, PolicyContainer policyContainer, boolean isSetHooked) {
-        List<Policy> https = policyContainer.getHttp();
+    private static boolean isHookedByClassName(String className, HookPolicyContainer hookPolicyContainer, boolean isSetHooked) {
+        List<HookPolicy> https = hookPolicyContainer.getHttp();
         if (isHookedByClassName(className, https, isSetHooked)) {
             return true;
         }
-        List<Policy> sources = policyContainer.getSource();
+        List<HookPolicy> sources = hookPolicyContainer.getSource();
         if (isHookedByClassName(className, sources, isSetHooked)) {
             return true;
         }
-        List<Policy> sanitizers = policyContainer.getSanitizers();
+        List<HookPolicy> sanitizers = hookPolicyContainer.getSanitizers();
         if (isHookedByClassName(className, sanitizers, isSetHooked)) {
             return true;
         }
-        List<Policy> sinks = policyContainer.getSink();
+        List<HookPolicy> sinks = hookPolicyContainer.getSink();
         if (isHookedByClassName(className, sinks, isSetHooked)) {
             return true;
         }
-        List<Policy> propagations = policyContainer.getPropagation();
+        List<HookPolicy> propagations = hookPolicyContainer.getPropagation();
 
         return isHookedByClassName(className, propagations, isSetHooked);
     }
 
-    public static boolean isHookedByClassName(String className, List<Policy> policies, boolean isSetHooked) {
-        for (Policy hookPolicy : policies) {
+    public static boolean isHookedByClassName(String className, List<HookPolicy> policies, boolean isSetHooked) {
+        for (HookPolicy hookPolicy : policies) {
             //如果为接口hook类或者已经hook，不进行hook
             if (hookPolicy.getState() == OFF || hookPolicy.getInter() || hookPolicy.isHooked()) {
                 continue;
@@ -112,8 +112,8 @@ public class PolicyUtils {
     /**
      * 是否存在于hook策略集合中
      */
-    public static boolean isExistInPolicy(String className, List<Policy> policies) {
-        for (Policy hookPolicy : policies) {
+    public static boolean isExistInPolicy(String className, List<HookPolicy> policies) {
+        for (HookPolicy hookPolicy : policies) {
             String name = hookPolicy.getClassName();
             if (name.equals(className)) {
                 return true;
@@ -128,17 +128,17 @@ public class PolicyUtils {
      * @param className 类名(.分割)
      * @return 是否在hook点中。
      */
-    public static boolean isHookedByAncestors(String className, Set<String> ancestors, PolicyContainer policyContainer) {
+    public static boolean isHookedByAncestors(String className, Set<String> ancestors, HookPolicyContainer hookPolicyContainer) {
         if (ancestors.isEmpty()) {
             return false;
         }
-        List<Policy> interfacePolicy = policyContainer.getInterfacePolicy();
-        return isHookedByAncestors(className, ancestors, interfacePolicy, policyContainer);
+        List<HookPolicy> interfaceHookPolicy = hookPolicyContainer.getInterfacePolicy();
+        return isHookedByAncestors(className, ancestors, interfaceHookPolicy, hookPolicyContainer);
     }
 
-    private static boolean isHookedByAncestors(String className, Set<String> ancestors, List<Policy> policies, PolicyContainer policyContainer) {
+    private static boolean isHookedByAncestors(String className, Set<String> ancestors, List<HookPolicy> policies, HookPolicyContainer hookPolicyContainer) {
         boolean isHit = false;
-        for (Policy hookPolicy : policies) {
+        for (HookPolicy hookPolicy : policies) {
             String name = hookPolicy.getClassName();
             for (String ancestor : ancestors) {
                 if (hookPolicy.getState() == OFF) {
@@ -151,32 +151,32 @@ public class PolicyUtils {
                     continue;
                 }
 
-                Policy childPolicy = createPolicy(className, hookPolicy, ancestor);
+                HookPolicy childHookPolicy = createPolicy(className, hookPolicy, ancestor);
 
-                policyContainer.addPolicy(childPolicy);
+                hookPolicyContainer.addPolicy(childHookPolicy);
                 isHit = true;
             }
         }
         return isHit;
     }
 
-    private static Policy createPolicy(String className, Policy hookPolicy, String ancestor) {
-        Policy childPolicy = new Policy();
-        childPolicy.setConditions(hookPolicy.getConditions());
-        childPolicy.setClassName(className);
-        childPolicy.setMethod(hookPolicy.getMethod());
-        childPolicy.setDesc(hookPolicy.getDesc());
-        childPolicy.setEnter(hookPolicy.getEnter());
-        childPolicy.setFrom(hookPolicy.getFrom());
-        childPolicy.setName(hookPolicy.getName());
-        childPolicy.setExit(hookPolicy.getExit());
-        childPolicy.setType(hookPolicy.getType());
-        childPolicy.setState(CommonConst.ON);
-        childPolicy.setInter(false);
-        childPolicy.setHooked(true);
-        childPolicy.setOriginClassName(ancestor);
-        childPolicy.setTo(hookPolicy.getTo());
-        return childPolicy;
+    private static HookPolicy createPolicy(String className, HookPolicy hookPolicy, String ancestor) {
+        HookPolicy childHookPolicy = new HookPolicy();
+        childHookPolicy.setConditions(hookPolicy.getConditions());
+        childHookPolicy.setClassName(className);
+        childHookPolicy.setMethod(hookPolicy.getMethod());
+        childHookPolicy.setDesc(hookPolicy.getDesc());
+        childHookPolicy.setEnter(hookPolicy.getEnter());
+        childHookPolicy.setFrom(hookPolicy.getFrom());
+        childHookPolicy.setName(hookPolicy.getName());
+        childHookPolicy.setExit(hookPolicy.getExit());
+        childHookPolicy.setType(hookPolicy.getType());
+        childHookPolicy.setState(CommonConst.ON);
+        childHookPolicy.setInter(false);
+        childHookPolicy.setHooked(true);
+        childHookPolicy.setOriginClassName(ancestor);
+        childHookPolicy.setTo(hookPolicy.getTo());
+        return childHookPolicy;
     }
 
     /**
@@ -185,9 +185,9 @@ public class PolicyUtils {
      * @param desc      方法描述
      * @return hook点的策略信息
      */
-    public static Policy getHookedPolicy(String className, String method, String desc, List<Policy> policies) {
+    public static HookPolicy getHookedPolicy(String className, String method, String desc, List<HookPolicy> policies) {
 
-        for (Policy p : policies) {
+        for (HookPolicy p : policies) {
             if (p.getState() == OFF) {
                 continue;
             }
@@ -203,16 +203,16 @@ public class PolicyUtils {
     /**
      *
      */
-    public static Policy getHookedPolicyByBisection(String className, String method, String desc, List<Policy> policies) {
-        Policy target = new Policy(className, method, desc);
+    public static HookPolicy getHookedPolicyByBisection(String className, String method, String desc, List<HookPolicy> policies) {
+        HookPolicy target = new HookPolicy(className, method, desc);
         Collections.sort(policies);
         // Perform binary search
         int index = Collections.binarySearch(policies, target);
 
         if (index >= 0) {
-            Policy foundPolicy = policies.get(index);
-            if (foundPolicy.getState() != OFF) {
-                return foundPolicy;
+            HookPolicy foundHookPolicy = policies.get(index);
+            if (foundHookPolicy.getState() != OFF) {
+                return foundHookPolicy;
             }
         }
         return null;

@@ -2,8 +2,8 @@ package com.keven1z.core.utils;
 
 import com.keven1z.core.model.graph.TaintData;
 import com.keven1z.core.model.graph.TaintGraph;
-import com.keven1z.core.policy.PolicyTypeEnum;
-import com.keven1z.core.policy.SanitizerTypeEnum;
+import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.SanitizerType;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public class TaintUtils {
         List<Integer> sourceHashCodes = source.getToObjectHashCode();
         Object sourceObject = source.getReturnObject();
         for (TaintData taint : taintDataLinkedList) {
-            if (PolicyTypeEnum.SOURCE.name().equals(taint.getStage())) {
+            if (PolicyType.SOURCE.name().equals(taint.getStage())) {
                 continue;
             }
             Object fromObject = taint.getFromObject();
@@ -70,7 +70,7 @@ public class TaintUtils {
     public static List<TaintData> getSourceList(LinkedList<TaintData> taintDataLinkedList) {
         ArrayList<TaintData> sourceDataList = new ArrayList<>();
         for (TaintData taintData : taintDataLinkedList) {
-            if (PolicyTypeEnum.SOURCE.name().equals(taintData.getStage())) {
+            if (PolicyType.SOURCE.name().equals(taintData.getStage())) {
                 sourceDataList.add(taintData);
             }
         }
@@ -81,22 +81,22 @@ public class TaintUtils {
      * 判断给定的TaintDataList中是否包含指定类型的Sanitizer，且数量达到或超过requiredOccurrenceNum。
      *
      * @param taintDataList 包含TaintData对象的列表
-     * @param sanitizerTypeEnum 需要匹配的Sanitizer类型枚举
+     * @param sanitizerType 需要匹配的Sanitizer类型枚举
      * @param requiredOccurrenceNum 需要的Sanitizer数量
      * @return 如果在taintDataList中找到指定类型的Sanitizer数量达到或超过requiredOccurrenceNum，则返回true；否则返回false
      */
-    public static boolean containSanitizer(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int requiredOccurrenceNum) {
+    public static boolean containSanitizer(List<TaintData> taintDataList, SanitizerType sanitizerType, int requiredOccurrenceNum) {
         int occurrenceNum = requiredOccurrenceNum;
 
         for (TaintData taintData : taintDataList) {
-            if (PolicyTypeEnum.SANITIZER.name().equals(taintData.getStage()) && sanitizerTypeEnum.name().equals(taintData.getName())) {
+            if (PolicyType.SANITIZER.name().equals(taintData.getStage()) && sanitizerType.name().equals(taintData.getName())) {
                 occurrenceNum--;
             }
 
             List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
             if (sanitizerNodes != null) {
                 for (TaintData sanitizerNode : sanitizerNodes) {
-                    if (sanitizerTypeEnum.name().equals(sanitizerNode.getName())) {
+                    if (sanitizerType.name().equals(sanitizerNode.getName())) {
                         occurrenceNum--;
                     }
                 }
@@ -113,17 +113,17 @@ public class TaintUtils {
      * 判断给定的TaintDataList中是否连续包含指定类型的Sanitizer，且数量达到或超过requiredOccurrenceNum。
      *
      * @param taintDataList 包含TaintData对象的列表
-     * @param sanitizerTypeEnum 需要匹配的Sanitizer类型枚举
+     * @param sanitizerType 需要匹配的Sanitizer类型枚举
      * @param requiredOccurrenceNum 需要的Sanitizer连续出现的次数
      * @return 如果在taintDataList中存在连续出现的sanitizerTypeEnum类型的Sanitizer数量达到或超过requiredOccurrenceNum，则返回true；否则返回false
      */
-    public static boolean containSanitizerInContinuousCode(List<TaintData> taintDataList, SanitizerTypeEnum sanitizerTypeEnum, int requiredOccurrenceNum) {
+    public static boolean containSanitizerInContinuousCode(List<TaintData> taintDataList, SanitizerType sanitizerType, int requiredOccurrenceNum) {
         for (TaintData taintData : taintDataList) {
             List<TaintData> sanitizerNodes = taintData.getSanitizerNodes();
             if (sanitizerNodes != null) {
                 int currentOccurrenceNum = requiredOccurrenceNum;
                 for (TaintData sanitizerNode : sanitizerNodes) {
-                    if (sanitizerTypeEnum.name().equals(sanitizerNode.getName())) {
+                    if (sanitizerType.name().equals(sanitizerNode.getName())) {
                         currentOccurrenceNum--;
                     }
                     if (currentOccurrenceNum <= 0) {

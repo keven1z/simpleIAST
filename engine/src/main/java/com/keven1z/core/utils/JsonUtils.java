@@ -6,11 +6,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+/**
+ * json工具类
+ * @author keven1z
+ */
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -30,15 +32,15 @@ public class JsonUtils {
         return mapper.readValue(jsonString, cls);
     }
 
-    public static <T> T convertObject(Object jsonObject, Class<T> cls) throws JsonProcessingException {
+    public static <T> T parseObject(Object jsonObject, Class<T> cls){
         return mapper.convertValue(jsonObject, cls);
     }
 
-    public static <T> T toObject(String json, TypeReference<T> typeReference) throws IOException {
+    public static <T> T parseObject(String json, TypeReference<T> typeReference) throws JsonProcessingException {
         return mapper.readValue(json, typeReference);
     }
 
-    public static String toString(Object object) throws JsonProcessingException {
+    public static String toJsonString(Object object) throws JsonProcessingException {
         return mapper.writeValueAsString(object);
     }
 

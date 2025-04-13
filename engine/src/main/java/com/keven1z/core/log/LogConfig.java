@@ -41,7 +41,7 @@ public class LogConfig {
         fileAppenderAddBurstFilter();
     }
 
-    /**
+    /*
      * 管理syslog
      */
 //    public static void syslogManager() {
@@ -205,7 +205,7 @@ public class LogConfig {
         if (isCloud) {
             return path;
         } else {
-            return System.getProperty("user.home") + File.separator + "logs" + File.separator + "simpleIAST";
+            return System.getProperty("user.home") + File.separator + "simpleIAST" + File.separator + "logs";
         }
     }
 

@@ -1,6 +1,6 @@
-package com.keven1z.core.policy;
+package com.keven1z.core.consts;
 
-public enum PolicyTypeEnum {
+public enum PolicyType {
     NONE,
     HTTP,
     SOURCE,

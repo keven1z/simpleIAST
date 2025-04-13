@@ -1,6 +1,6 @@
-package com.keven1z.core.policy;
+package com.keven1z.core.consts;
 
-public enum SanitizerTypeEnum {
+public enum SanitizerType {
     pattern,//正则匹配
     escape,//编码
     replace,//替换

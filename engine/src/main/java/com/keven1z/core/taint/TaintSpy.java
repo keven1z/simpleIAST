@@ -4,7 +4,7 @@ import com.keven1z.core.EngineController;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 import java.lang.spy.SimpleIASTSpy;
@@ -13,7 +13,7 @@ import static com.keven1z.core.consts.VulnerabilityType.WEAK_PASSWORD_IN_SQL;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 public class TaintSpy implements SimpleIASTSpy {
-    private PolicyContainer policyContainer;
+    private HookPolicyContainer hookPolicyContainer;
     private final TaintSpyHandler spyHandler = TaintSpyHandler.getInstance();
     private static final Logger logger = Logger.getLogger(TaintSpy.class);
 
@@ -24,8 +24,8 @@ public class TaintSpy implements SimpleIASTSpy {
         return Inner.taintSpy;
     }
 
-    public PolicyContainer getPolicyContainer() {
-        return policyContainer;
+    public HookPolicyContainer getPolicyContainer() {
+        return hookPolicyContainer;
     }
 
     private static class Inner {
@@ -80,8 +80,8 @@ public class TaintSpy implements SimpleIASTSpy {
                 return;
             }
 
-            if (policyContainer == null) {
-                policyContainer = EngineController.context.getPolicyContainer();
+            if (hookPolicyContainer == null) {
+                hookPolicyContainer = EngineController.context.getPolicyContainer();
             }
             spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type, policyName, from, to);
         } catch (Exception e) {

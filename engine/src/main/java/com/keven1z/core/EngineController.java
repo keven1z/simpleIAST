@@ -3,8 +3,10 @@ package com.keven1z.core;
 import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
-import com.keven1z.core.monitor.TrafficReadingReportMonitor;
+import com.keven1z.core.monitor.*;
 
+import com.keven1z.core.pojo.AuthenticationDTO;
+import com.keven1z.core.policy.ServerPolicyManager;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
 import com.keven1z.core.log.ErrorType;
@@ -12,22 +14,24 @@ import com.keven1z.core.log.LogConfig;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.IASTContext;
-import com.keven1z.core.monitor.InstructionMonitor;
-import com.keven1z.core.monitor.MonitorManager;
-import com.keven1z.core.monitor.DirectReportMonitor;
 import com.keven1z.core.pojo.AgentDTO;
-import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.FileUtils;
 import com.keven1z.core.utils.IASTHttpClient;
+import com.keven1z.core.utils.http.*;
 import org.apache.log4j.Logger;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.spy.SimpleIASTSpyManager;
 import java.lang.instrument.Instrumentation;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.keven1z.core.consts.CommonConst.*;
-import static com.keven1z.core.utils.IASTHttpClient.register;
 
 
 /**
@@ -83,13 +87,30 @@ public class EngineController {
         performRegistration();
     }
     private void configureServerConnection() {
+        Map<Class<?>, Supplier<? extends Closeable>> clients = Collections.unmodifiableMap(new HashMap<Class<?>, Supplier<? extends Closeable>>() {{
+            put(AuthClient.class, () -> new AuthClient(context.getServerUrl()));
+            put(ReportClient.class, () -> new ReportClient(context.getServerUrl()));
+            put(HttpHeartbeatClient.class, () -> new HttpHeartbeatClient(context.getServerUrl()));
+            put(PolicyClient.class, () -> new PolicyClient(context.getServerUrl()));
+        }});
+        HttpClientRegistry.getInstance().initAll(clients);
         IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
     }
     private void performRegistration() throws RegistrationException {
-        register(buildRegisterInformation());
+        AuthClient authClient = HttpClientRegistry.getInstance().getClient(AuthClient.class);
+        AuthenticationDTO authenticationDTO = authClient.register(buildRegisterInformation());
+        if (authenticationDTO == null) {
+            throw new RegistrationException("Failed to register agent");
+        }
+        // 更新应用配置
+        ApplicationModel.setAgentId(authenticationDTO.getAgentId());
+        EngineController.context.setToken(authenticationDTO.getToken());
     }
     private void loadAgentComponents() throws IOException {
         loadHookPolicies();
+        if (!context.isOfflineEnabled()) {
+            ServerPolicyManager.getInstance().loadInitialPolicy();
+        }
         loadHookBlacklist();
         loadClassTransformers();
     }
@@ -97,7 +118,8 @@ public class EngineController {
         MonitorManager.start(
                 new DirectReportMonitor(),
                 new TrafficReadingReportMonitor(),
-                new InstructionMonitor()
+                new ServerPolicyMonitor(),
+                new HeartbeatMonitor()
         );
     }
     /**
@@ -145,12 +167,12 @@ public class EngineController {
      * 加载策略
      */
     private void loadHookPolicies() throws IOException {
-        PolicyContainer policyContainer = FileUtils.load(this.getClass().getClassLoader());
-        if (policyContainer == null) {
+        HookPolicyContainer hookPolicyContainer = FileUtils.load(this.getClass().getClassLoader());
+        if (hookPolicyContainer == null) {
             LogTool.error(ErrorType.POLICY_ERROR, "policyContainer is null");
             throw new RuntimeException("Policy load failed");
         }
-        context.setPolicyContainer(policyContainer);
+        context.setPolicyContainer(hookPolicyContainer);
     }
 
     private void loadHookBlacklist() throws IOException {

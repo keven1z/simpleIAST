@@ -2,7 +2,7 @@ package com.keven1z.core.model.graph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.keven1z.core.consts.VulnerabilityType;
-import com.keven1z.core.policy.PolicyTypeEnum;
+import com.keven1z.core.consts.PolicyType;
 import com.keven1z.core.utils.TaintUtils;
 
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ public class TaintData {
     private boolean hasSanitizer;
     private List<String> stackList;
 
-    public TaintData(String className, String method, String desc, PolicyTypeEnum policyType) {
+    public TaintData(String className, String method, String desc, PolicyType policyType) {
         this.className = className;
         this.method = method;
         this.desc = desc;
@@ -178,7 +178,7 @@ public class TaintData {
             return;
         }
 
-        if (PolicyTypeEnum.SINK.name().equals(this.stage)) {
+        if (PolicyType.SINK.name().equals(this.stage)) {
             this.fromValue = fromValue;
         } else {
             this.fromValue = TaintUtils.format(fromValue);

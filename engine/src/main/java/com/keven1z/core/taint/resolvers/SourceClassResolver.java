@@ -8,8 +8,8 @@ import com.keven1z.core.model.graph.TaintNode;
 import com.keven1z.core.taint.TaintSpy;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
-import com.keven1z.core.policy.Policy;
-import com.keven1z.core.policy.PolicyTypeEnum;
+import com.keven1z.core.policy.HookPolicy;
+import com.keven1z.core.consts.PolicyType;
 import com.keven1z.core.utils.*;
 
 import java.lang.instrument.Instrumentation;
@@ -55,7 +55,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         if (TAINT_GRAPH_THREAD_LOCAL.get().isTaint(returnIdentityHashCode)) {
             return;
         }
-        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+        TaintData taintData = new TaintData(className, method, desc, PolicyType.SOURCE);
         searchAndFillSourceFromReturnObject(returnObject, taintData);
         taintData.setFromValue(getSourceFromName(fromMap));
         //加入原始对象的hashcode
@@ -85,7 +85,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         if (parentNode == null) {
             return;
         }
-        TaintData taintData = new TaintData(className, method, desc, PolicyTypeEnum.SOURCE);
+        TaintData taintData = new TaintData(className, method, desc, PolicyType.SOURCE);
         taintGraph.addEdge(parentNode.getTaintData(), taintData, objectEntry.getKey());
 
         searchAndFillSourceFromReturnObject(returnObject, taintData);
@@ -114,15 +114,15 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         for (Method method : toBeTransformedMethods) {
             String name = method.getName();
             String taintClassName = method.getDeclaringClass().getName();
-            Policy policy = new Policy(taintClassName.replace(".", "/"), name, ClassUtils.classToSmali(method.getReturnType()));
-            policy.setFrom(PolicyConst.O);
-            policy.setTo(PolicyConst.R);
-            policy.setState(ON);
-            policy.setEnter(OFF);
-            policy.setExit(ON);
-            policy.setName(SOURCE_BEAN);
-            policy.setType(PolicyTypeEnum.SOURCE);
-            TaintSpy.getInstance().getPolicyContainer().addPolicy(policy);
+            HookPolicy hookPolicy = new HookPolicy(taintClassName.replace(".", "/"), name, ClassUtils.classToSmali(method.getReturnType()));
+            hookPolicy.setFrom(PolicyConst.O);
+            hookPolicy.setTo(PolicyConst.R);
+            hookPolicy.setState(ON);
+            hookPolicy.setEnter(OFF);
+            hookPolicy.setExit(ON);
+            hookPolicy.setName(SOURCE_BEAN);
+            hookPolicy.setType(PolicyType.SOURCE);
+            TaintSpy.getInstance().getPolicyContainer().addPolicy(hookPolicy);
             toBeTransformedClass.add(taintClassName);
         }
         for (String taintClassName : toBeTransformedClass) {
