@@ -7,7 +7,7 @@ import com.keven1z.core.hook.server.detectors.*;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.*;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
@@ -32,7 +32,7 @@ import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
  * 自定义Transformer，用于修改被hook的class
  */
 public class HookTransformer implements ClassFileTransformer {
-    private final PolicyContainer policy;
+    private final HookPolicyContainer policy;
     private final Instrumentation instrumentation;
     /**
      * transform class计数
@@ -43,19 +43,19 @@ public class HookTransformer implements ClassFileTransformer {
      */
     private final static int MAX_TRANSFORM_COUNT = 1000;
     private final Logger logger = Logger.getLogger(HookTransformer.class);
-    private final Set<String> transformClasses;
+    private final Set<String> hasTransformedClasses;
     private final String nativePrefix;
     /**
      * native代理方法的前缀
      */
     public static final String SANDBOX_SPECIAL_PREFIX = "$$SIMPLE$$";
 
-    public HookTransformer(PolicyContainer policyContainer,
+    public HookTransformer(HookPolicyContainer hookPolicyContainer,
                            Instrumentation instrumentation) {
-        this.policy = policyContainer;
+        this.policy = hookPolicyContainer;
         this.instrumentation = instrumentation;
         this.instrumentation.addTransformer(this, true);
-        this.transformClasses = new HashSet<>();
+        this.hasTransformedClasses = new HashSet<>();
         this.nativePrefix = SANDBOX_SPECIAL_PREFIX;
     }
 
@@ -67,20 +67,21 @@ public class HookTransformer implements ClassFileTransformer {
         }
 
         /* 如果transformer数量大于阈值，不进行transform，发出警告 */
-        if (transformCount > MAX_TRANSFORM_COUNT) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.error(ErrorType.TRANSFORM_ERROR, "TransformCount exceeded the threshold.current transformCount is " + transformCount + ",class:" + className);
-            }
+        if (isTransformCountExceeded(transformCount, className)) {
             return classfileBuffer;
         }
-        if (classBeingRedefined == null) {
-            if (ClassUtils.isComeFromIASTFamily(className, loader) || className.startsWith("org/objectweb") || EngineController.context.isClassNameBlacklisted(className)) {
-                return classfileBuffer;
-            }
-            if (ClassUtils.shouldSkipProxyClass(className)) {
-                return classfileBuffer;
+        /* 判断是否已经进行transform,如已进行,记录警告日志 */
+        if (hasTransformedClasses.contains(className)) {
+            if (LogTool.isDebugEnabled()) {
+                LogTool.warn(ErrorType.TRANSFORM_WARN, String.format("%s has already been instrumented, instrumenting it again with ClassLoader=%s", className, loader.getClass().getName()));
             }
         }
+
+        // 检查是否是特殊类需要跳过
+        if (shouldSkipSpecialClass(className, loader, classBeingRedefined)) {
+            return classfileBuffer;
+        }
+
         TransformerProtector.instance.enterProtecting();
         try {
             return doTransform(loader, className, protectionDomain, classfileBuffer);
@@ -104,6 +105,7 @@ public class HookTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
         hardcodedCheckBeforeHook(classReader, className);
+        logUserDefinedClasses(loader, protectionDomain, className);
         /* 判断是否需要hook */
         if (!PolicyUtils.isHook(className, policy, classReader.getInterfaces(), classReader.getSuperName(), loader)) {
             return classfileBuffer;
@@ -135,9 +137,36 @@ public class HookTransformer implements ClassFileTransformer {
                 ClassReader.EXPAND_FRAMES
         );
         // 记录已转换的类名
-        this.transformClasses.add(className);
+        this.hasTransformedClasses.add(className);
         // 如果需要，则导出类文件
         return dumpClassIfNecessary(className, classWriter.toByteArray());
+    }
+
+    private boolean isTransformCountExceeded(int transformCount, String className) {
+        if (transformCount > MAX_TRANSFORM_COUNT) {
+            if (LogTool.isDebugEnabled()) {
+                LogTool.error(ErrorType.TRANSFORM_ERROR,
+                        "TransformCount exceeded the threshold.current transformCount is " +
+                                transformCount + ",class:" + className);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean shouldSkipSpecialClass(String className, ClassLoader loader, Class<?> classBeingRedefined) {
+        if (classBeingRedefined == null) {
+            // 来自IAST家族的类、特定包下的类或在黑名单中的类
+            if (ClassUtils.isComeFromIASTFamily(className, loader) ||
+                    className.startsWith("org/objectweb") ||
+                    EngineController.context.isClassNameBlacklisted(className)) {
+                return true;
+            }
+
+            // 需要跳过的代理类
+            return ClassUtils.shouldSkipProxyClass(className);
+        }
+        return false;
     }
 
     private static byte[] dumpClassIfNecessary(String className, byte[] data) {
@@ -201,7 +230,7 @@ public class HookTransformer implements ClassFileTransformer {
                 if (clazz.getName().startsWith("java.lang.invoke.LambdaForm")) {
                     continue;
                 }
-                if (this.transformClasses.contains(normalizeClass)) {
+                if (this.hasTransformedClasses.contains(normalizeClass)) {
                     if (LogTool.isDebugEnabled()) {
                         logger.warn("Class has been transformed,class name:" + clazz.getName());
                     }
@@ -279,4 +308,25 @@ public class HookTransformer implements ClassFileTransformer {
         classReader.accept(classVisitor, ClassReader.SKIP_CODE);
     }
 
+    /**
+     * 记录用户代码类
+     */
+    private void logUserDefinedClasses(ClassLoader loader, ProtectionDomain protectionDomain, String className) {
+        if (loader == null || protectionDomain == null) {
+            return;
+        }
+        String loaderName = loader.getClass().getName();
+        if (loaderName.startsWith("jdk.internal.") ||  // JDK 内部加载器
+                loaderName.equals("sun.misc.Launcher$ExtClassLoader") || // 扩展类加载器
+                loaderName.startsWith("org.apache.")) { // 某些容器级加载器（如 Tomcat 的共享库加载器）)
+            return;
+        }
+        String codeLocation = protectionDomain.getCodeSource().getLocation().toString();
+        if (codeLocation.contains("BOOT-INF/classes")
+                || codeLocation.contains("WEB-INF/classes")
+                || codeLocation.contains("target/classes")
+                || codeLocation.contains("APP-INF/classes")) {
+            EngineController.context.addUserClass(className);
+        }
+    }
 }

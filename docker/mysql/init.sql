@@ -1,4 +1,6 @@
-
+-- MySQL dump 10.13  Distrib 5.7.44, for Linux (x86_64)
+--
+-- Host: localhost    Database: iast
 -- ------------------------------------------------------
 -- Server version	5.7.44
 
@@ -12,7 +14,7 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0 */;
 /*!40101 SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES = @@SQL_NOTES, SQL_NOTES = 0 */;
-SET GLOBAL time_zone = '+08:00';
+
 --
 -- Table structure for table `agent`
 --
@@ -33,6 +35,8 @@ CREATE TABLE `agent`
     `version`          varchar(10)          DEFAULT NULL COMMENT 'agent版本',
     `process`          varchar(10)          DEFAULT NULL,
     `detection_status` int(11)     NOT NULL DEFAULT '1',
+    memory_usage     double        null,
+    cpu_usage        double        null,
     PRIMARY KEY (`agent_id`),
     KEY `agent_application_id_fk` (`project_name`),
     KEY `agent_host_name_IDX` (`hostname`) USING BTREE
@@ -62,22 +66,24 @@ CREATE TABLE `blacklist`
 -- Table structure for table `instruction`
 --
 
-DROP TABLE IF EXISTS `instruction`;
-/*!40101 SET @saved_cs_client = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `instruction`
+DROP TABLE IF EXISTS `policy`;
+create table policy
 (
-    `id`       int(11) NOT NULL AUTO_INCREMENT,
-    `agent_id` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
-    `name`     varchar(10) CHARACTER SET latin1 DEFAULT NULL,
-    `value`    varchar(10) CHARACTER SET latin1 DEFAULT NULL,
-    `is_read`  tinyint(1)                       DEFAULT '0' COMMENT '是否已读',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `instruction_pk` (`agent_id`, `name`)
-) ENGINE = InnoDB
-  AUTO_INCREMENT = 7
-  DEFAULT CHARSET = utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+    id               int auto_increment
+        primary key,
+    agent_id         varchar(32)          not null,
+    agent_enabled    tinyint(1) default 1 null,
+    detect_enabled   tinyint(1) default 1 null,
+    max_memory_usage int        default 0 null comment '是否已读',
+    max_cpu_usage    int                  null,
+    modified_time    datetime             null,
+    constraint policy_unique
+        unique (agent_id),
+    constraint policy_agent_FK
+        foreign key (agent_id) references agent (agent_id)
+            on delete cascade
+)
+    charset = utf8;
 
 --
 -- Table structure for table `notify`

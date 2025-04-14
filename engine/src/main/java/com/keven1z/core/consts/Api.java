@@ -16,6 +16,10 @@ public class Api {
     /**
      * 获取服务端指令url
      */
-    public static final String INSTRUCTION_GET_URL = CLIENT + "/instruction/get";
+    public static final String POLICY_URL = CLIENT + "/policy/get";
+    /**
+     *
+     */
+    public static final String HEARTBEAT_URL = CLIENT + "/agent/heartbeat";
 
 }

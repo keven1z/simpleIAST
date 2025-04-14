@@ -1,6 +1,8 @@
 package com.keven1z.core;
 
 
+import java.io.File;
+
 public class Config {
     private Config() {
     }
@@ -8,6 +10,7 @@ public class Config {
     public static Config getConfig() {
         return Inner.CONFIG;
     }
+
     public final int MAX_BODY_SIZE = 4096;
 
     private static class Inner {
@@ -65,11 +68,24 @@ public class Config {
     /**
      * 是否离线启动
      */
-    public  boolean isOfflineStart = true;
+    private final boolean isOfflineStart = false;
 
     /**
      * 是否记录详细日志
      */
-    public boolean enableDetailedLogging = true;
+    private final boolean enableDetailedLogging = true;
 
+    private final String policyCacheDirectory = System.getProperty("user.home") + File.separator + "simpleIAST" + File.separator;
+
+    public boolean isOfflineStart() {
+        return isOfflineStart;
+    }
+
+    public boolean isEnableDetailedLogging() {
+        return enableDetailedLogging;
+    }
+
+    public String getPolicyCacheDirectory() {
+        return policyCacheDirectory;
+    }
 }

@@ -3,7 +3,7 @@ package com.keven1z.core.taint.resolvers;
 import com.keven1z.core.model.graph.TaintData;
 import com.keven1z.core.model.graph.TaintGraph;
 import com.keven1z.core.model.graph.TaintNode;
-import com.keven1z.core.policy.PolicyTypeEnum;
+import com.keven1z.core.consts.PolicyType;
 import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.TaintUtils;
 
@@ -36,7 +36,7 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
             }
             for (TaintNode parentNode : parentNodes) {
                 if (taintData == null) {
-                    taintData = new TaintData(className, method, desc, PolicyTypeEnum.PROPAGATION);
+                    taintData = new TaintData(className, method, desc, PolicyType.PROPAGATION);
                 }
                 taintData.setFromValue(fromObject.toString());
                 taintData.setFromObject(fromObject);

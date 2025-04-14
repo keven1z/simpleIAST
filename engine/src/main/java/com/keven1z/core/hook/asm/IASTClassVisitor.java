@@ -3,7 +3,7 @@ package com.keven1z.core.hook.asm;
 import com.keven1z.core.EngineController;
 import com.keven1z.core.hook.asm.adapter.*;
 import com.keven1z.core.log.LogTool;
-import com.keven1z.core.policy.Policy;
+import com.keven1z.core.policy.HookPolicy;
 import com.keven1z.core.utils.PolicyUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassVisitor;
@@ -85,25 +85,25 @@ public class IASTClassVisitor extends ClassVisitor {
 
         methodVisitor = new JSRInlinerAdapter(methodVisitor, access, name, descriptor, signature, exceptions);
 
-        Policy policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getSingles());
-        if (policy != null) {
+        HookPolicy hookPolicy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getSingles());
+        if (hookPolicy != null) {
             isVisitMethod = true;
             //打印错误日志
-            return visitNormalMethod(access, name, descriptor, methodVisitor, policy);
+            return visitNormalMethod(access, name, descriptor, methodVisitor, hookPolicy);
         }
 
-        policy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getHttp());
-        if (policy != null) {
+        hookPolicy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getHttp());
+        if (hookPolicy != null) {
             isVisitMethod = true;
             //打印错误日志
-            methodVisitor = visitHTTPMethod(access, name, descriptor, methodVisitor, policy);
+            methodVisitor = visitHTTPMethod(access, name, descriptor, methodVisitor, hookPolicy);
         }
 
-        policy = PolicyUtils.getHookedPolicyByBisection(className, name, descriptor, EngineController.context.getPolicy().getTaintPolicy());
-        if (policy != null) {
+        hookPolicy = PolicyUtils.getHookedPolicyByBisection(className, name, descriptor, EngineController.context.getPolicy().getTaintPolicy());
+        if (hookPolicy != null) {
             isVisitMethod = true;
             //打印错误日志
-            return visitTaintMethod(access, name, descriptor, methodVisitor, policy);
+            return visitTaintMethod(access, name, descriptor, methodVisitor, hookPolicy);
         }
         return methodVisitor;
     }
@@ -123,19 +123,19 @@ public class IASTClassVisitor extends ClassVisitor {
                                               final String descriptor,
                                               final String signature,
                                               final String[] exceptions) {
-        Policy policy = PolicyUtils.getHookedPolicyByBisection(className, name, descriptor, EngineController.context.getPolicy().getTaintPolicy());
-        if (policy == null) {
+        HookPolicy hookPolicy = PolicyUtils.getHookedPolicyByBisection(className, name, descriptor, EngineController.context.getPolicy().getTaintPolicy());
+        if (hookPolicy == null) {
             return super.visitMethod(access, name, descriptor, signature, exceptions);
         }
         //去掉native
         int newAccess = access & ~ACC_NATIVE;
         final MethodVisitor mv = super.visitMethod(newAccess, name, descriptor, signature, exceptions);
         return new HookAdviceAdapter(api, new JSRInlinerAdapter(mv, newAccess, name,
-                descriptor, signature, exceptions), newAccess, className, name, descriptor, policy) {
+                descriptor, signature, exceptions), newAccess, className, name, descriptor, hookPolicy) {
             @Override
             public void visitEnd() {
                 if (!name.startsWith(nativePrefix)) {
-                    if (policy.getEnter() == ON) {
+                    if (this.hookPolicy.getEnter() == ON) {
                         inject(-1, true);
                     }
                     final String proxyMethodName = nativePrefix + name;
@@ -153,7 +153,7 @@ public class IASTClassVisitor extends ClassVisitor {
                     }
 
                     proxyNativeAsmMethods.add(proxyMethod);
-                    if (policy.getExit() == ON) {
+                    if (this.hookPolicy.getExit() == ON) {
                         inject(getReturnType().getOpcode(IRETURN), false);
                     }
                     returnValue();
@@ -170,13 +170,13 @@ public class IASTClassVisitor extends ClassVisitor {
      * @param name 方法名
      * @param descriptor 方法的描述符
      * @param jsrInlinerAdapter 方法的MethodVisitor适配器
-     * @param policy 应用的策略
+     * @param hookPolicy 应用的策略
      * @return 返回适配后的MethodVisitor对象，如果策略不是HTTP_CIRCLE、HTTP_BODY或HTTP_BODY_READ则直接返回传入的jsrInlinerAdapter
      */
-    public MethodVisitor visitHTTPMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, Policy policy) {
-        String policyName = policy.getName();
+    public MethodVisitor visitHTTPMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, HookPolicy hookPolicy) {
+        String policyName = hookPolicy.getName();
         if (HTTP_CIRCLE.equals(policyName)) {
-            return new HttpAdviceAdapter(api, jsrInlinerAdapter, access, name, descriptor, policy);
+            return new HttpAdviceAdapter(api, jsrInlinerAdapter, access, name, descriptor, hookPolicy);
         } else if (HTTP_BODY.equals(policyName)) {
             return new HttpBodyAdviceAdapter(api, jsrInlinerAdapter, access, name, descriptor);
         } else if (HTTP_BODY_READ.equals(policyName)) {
@@ -188,17 +188,17 @@ public class IASTClassVisitor extends ClassVisitor {
     /**
      * 访问污点方法
      */
-    public MethodVisitor visitTaintMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, Policy policy) {
+    public MethodVisitor visitTaintMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, HookPolicy hookPolicy) {
 
-        return new TaintAdviceAdapter(Opcodes.ASM9, jsrInlinerAdapter, access, className, name, descriptor, policy);
+        return new TaintAdviceAdapter(Opcodes.ASM9, jsrInlinerAdapter, access, className, name, descriptor, hookPolicy);
     }
 
     /**
      * 访问普通hook点
      */
-    public MethodVisitor visitNormalMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, Policy policy) {
+    public MethodVisitor visitNormalMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, HookPolicy hookPolicy) {
 
-        return new SingleAdviceAdapter(Opcodes.ASM9, jsrInlinerAdapter, access, className, name, descriptor, policy);
+        return new SingleAdviceAdapter(Opcodes.ASM9, jsrInlinerAdapter, access, className, name, descriptor, hookPolicy);
     }
 
     /**

@@ -2,10 +2,12 @@ package com.keven1z.core.model;
 
 import com.keven1z.core.Config;
 import com.keven1z.core.taint.TaintSpy;
-import com.keven1z.core.policy.PolicyContainer;
+import com.keven1z.core.policy.HookPolicyContainer;
 
 import java.lang.instrument.Instrumentation;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  */
 public class IASTContext {
     private IASTContext() {
+        userClasses = new HashSet<>();
     }
     private String agentVersion;
     public static IASTContext getContext() {
@@ -26,7 +29,7 @@ public class IASTContext {
     /**
      * 策略
      */
-    private PolicyContainer policyContainer;
+    private HookPolicyContainer hookPolicyContainer;
 
     private Instrumentation instrumentation;
     private List<String> blackList;
@@ -46,21 +49,22 @@ public class IASTContext {
      * 服务器端url
      */
     private String serverUrl;
+    private final Set<String> userClasses;
 
-    public PolicyContainer getPolicy() {
-        return policyContainer;
+    public HookPolicyContainer getPolicy() {
+        return hookPolicyContainer;
     }
 
-    public void setPolicy(PolicyContainer policyContainer) {
-        this.policyContainer = policyContainer;
+    public void setPolicy(HookPolicyContainer hookPolicyContainer) {
+        this.hookPolicyContainer = hookPolicyContainer;
     }
 
-    public PolicyContainer getPolicyContainer() {
-        return policyContainer;
+    public HookPolicyContainer getPolicyContainer() {
+        return hookPolicyContainer;
     }
 
-    public void setPolicyContainer(PolicyContainer policyContainer) {
-        this.policyContainer = policyContainer;
+    public void setPolicyContainer(HookPolicyContainer hookPolicyContainer) {
+        this.hookPolicyContainer = hookPolicyContainer;
     }
 
     public Instrumentation getInstrumentation() {
@@ -80,15 +84,16 @@ public class IASTContext {
     }
 
     public boolean isOfflineEnabled() {
-        return Config.getConfig().isOfflineStart;
+        return Config.getConfig().isOfflineStart();
     }
 
     public void clear() {
-        if (this.policyContainer != null) {
-            this.policyContainer.clear();
+        if (this.hookPolicyContainer != null) {
+            this.hookPolicyContainer.clear();
         }
         TaintSpy.getInstance().clear();
         ApplicationModel.clear();
+        userClasses.clear();
     }
 
     public void setBlackList(List<String> blackList) {
@@ -115,6 +120,13 @@ public class IASTContext {
         return false;
     }
 
+    public Set<String> getUserClasses() {
+        return userClasses;
+    }
+
+    public void addUserClass(String userClasses) {
+        this.userClasses.add(userClasses);
+    }
 
     public boolean isEnableDetailedLogging() {
         return enableDetailedLogging;
@@ -122,7 +134,7 @@ public class IASTContext {
 
     public void setEnableDetailedLogging(Boolean enableDetailedLogging) {
         if (enableDetailedLogging == null) {
-            this.enableDetailedLogging = Config.getConfig().enableDetailedLogging;
+            this.enableDetailedLogging = Config.getConfig().isEnableDetailedLogging();
         }else {
             this.enableDetailedLogging = enableDetailedLogging;
         }

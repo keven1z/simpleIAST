@@ -2,9 +2,9 @@ package com.keven1z.core.utils;
 
 import com.keven1z.core.Config;
 import com.keven1z.core.EngineBoot;
-import com.keven1z.core.policy.Policy;
-import com.keven1z.core.policy.PolicyContainer;
-import com.keven1z.core.policy.PolicyTypeEnum;
+import com.keven1z.core.policy.HookPolicy;
+import com.keven1z.core.policy.HookPolicyContainer;
+import com.keven1z.core.consts.PolicyType;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -15,16 +15,16 @@ import java.util.Objects;
 import java.util.Properties;
 
 /**
- * 负责资源文件加载
+ * 资源文件加载工具类
  */
 public class FileUtils {
 
     /**
      * 从policy.json加载hook策略
      *
-     * @return {@link PolicyContainer}
+     * @return {@link HookPolicyContainer}
      */
-    public static PolicyContainer load(ClassLoader classLoader) throws IOException {
+    public static HookPolicyContainer load(ClassLoader classLoader) throws IOException {
         InputStream inputStream = null;
         try {
             inputStream = classLoader.getResourceAsStream(Config.POLICY_FILE_PATH);
@@ -33,57 +33,57 @@ public class FileUtils {
                 return null;
             }
 
-            PolicyContainer policyContainer = JsonUtils.toObject(jsonFile, PolicyContainer.class);
+            HookPolicyContainer hookPolicyContainer = JsonUtils.toObject(jsonFile, HookPolicyContainer.class);
 
-            if (policyContainer == null) {
+            if (hookPolicyContainer == null) {
                 return null;
             }
 
-            List<Policy> sources = policyContainer.getSource();
-            List<Policy> interfacePolicy = policyContainer.getInterfacePolicy();
-            for (Policy source : sources) {
+            List<HookPolicy> sources = hookPolicyContainer.getSource();
+            List<HookPolicy> interfaceHookPolicy = hookPolicyContainer.getInterfacePolicy();
+            for (HookPolicy source : sources) {
                 if (source.getInter()) {
-                    interfacePolicy.add(source);
+                    interfaceHookPolicy.add(source);
                 }
-                source.setType(PolicyTypeEnum.SOURCE);
+                source.setType(PolicyType.SOURCE);
             }
-            List<Policy> propagations = policyContainer.getPropagation();
-            for (Policy propagation : propagations) {
+            List<HookPolicy> propagations = hookPolicyContainer.getPropagation();
+            for (HookPolicy propagation : propagations) {
                 if (propagation.getInter()) {
-                    interfacePolicy.add(propagation);
+                    interfaceHookPolicy.add(propagation);
                 }
-                propagation.setType(PolicyTypeEnum.PROPAGATION);
+                propagation.setType(PolicyType.PROPAGATION);
             }
-            List<Policy> sinks = policyContainer.getSink();
-            for (Policy sink : sinks) {
+            List<HookPolicy> sinks = hookPolicyContainer.getSink();
+            for (HookPolicy sink : sinks) {
                 if (sink.getInter()) {
-                    interfacePolicy.add(sink);
+                    interfaceHookPolicy.add(sink);
                 }
-                sink.setType(PolicyTypeEnum.SINK);
+                sink.setType(PolicyType.SINK);
             }
-            List<Policy> https = policyContainer.getHttp();
-            for (Policy http : https) {
+            List<HookPolicy> https = hookPolicyContainer.getHttp();
+            for (HookPolicy http : https) {
                 if (http.getInter()) {
-                    interfacePolicy.add(http);
+                    interfaceHookPolicy.add(http);
                 }
-                http.setType(PolicyTypeEnum.HTTP);
+                http.setType(PolicyType.HTTP);
             }
-            List<Policy> sanitizers = policyContainer.getSanitizers();
-            for (Policy sanitizer : sanitizers) {
+            List<HookPolicy> sanitizers = hookPolicyContainer.getSanitizers();
+            for (HookPolicy sanitizer : sanitizers) {
                 if (sanitizer.getInter()) {
-                    interfacePolicy.add(sanitizer);
+                    interfaceHookPolicy.add(sanitizer);
                 }
-                sanitizer.setType(PolicyTypeEnum.SANITIZER);
+                sanitizer.setType(PolicyType.SANITIZER);
             }
-            List<Policy> singles = policyContainer.getSingles();
-            for (Policy single : singles) {
+            List<HookPolicy> singles = hookPolicyContainer.getSingles();
+            for (HookPolicy single : singles) {
                 if (single.getInter()) {
-                    interfacePolicy.add(single);
+                    interfaceHookPolicy.add(single);
                 }
-                single.setType(PolicyTypeEnum.SINGLE);
+                single.setType(PolicyType.SINGLE);
             }
 
-            return policyContainer;
+            return hookPolicyContainer;
         } finally {
             if (inputStream != null) {
                 inputStream.close();

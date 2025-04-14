@@ -13,6 +13,7 @@ import com.keven1z.core.pojo.finding.FindingData;
 import com.keven1z.core.pojo.finding.FindingReportBo;
 import com.keven1z.core.pojo.ReportData;
 import com.keven1z.core.pojo.finding.TaintFindingData;
+import com.keven1z.core.utils.CommonUtils;
 import com.keven1z.core.vulnerability.DetectContext;
 import com.keven1z.core.vulnerability.Detector;
 import com.keven1z.core.vulnerability.DetectorFactory;
@@ -102,7 +103,7 @@ public class TrafficReadingReportMonitor extends Monitor {
             /*
              * 添加已detect过的同一个调用栈上的类
              */
-            processedSinkClass.add(sinkNode.getTaintData().getThisObject().getClass().getName());
+            processedSinkClass.add(sinkNode.getTaintData().getClassName());
         }
         processedSinkClass.clear();
         return findingDataList;
@@ -115,7 +116,7 @@ public class TrafficReadingReportMonitor extends Monitor {
         List<String> stackList = sinkNode.getTaintData().getStackList();
         for (String stack : stackList) {
             for (String processSinkClass : processedSinkClass) {
-                if (stack.contains(processSinkClass)) {
+                if (stack.contains(CommonUtils.toJavaClassName(processSinkClass))) {
                     return true;
                 }
             }

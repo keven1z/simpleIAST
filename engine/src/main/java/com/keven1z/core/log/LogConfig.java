@@ -41,7 +41,7 @@ public class LogConfig {
         fileAppenderAddBurstFilter();
     }
 
-    /**
+    /*
      * 管理syslog
      */
 //    public static void syslogManager() {
@@ -98,10 +98,10 @@ public class LogConfig {
                     File file = new File(log4jBaseDir);
                     if (!file.exists() && file.isDirectory()) {
                         if (!file.mkdirs()) {
-                            System.err.printf("Failed to create log directory: %s. Please check permissions or disk space.", log4jBaseDir);
+                            System.err.printf("Failed to create log directory: %s. Please check permissions or disk space.\n", log4jBaseDir);
                         }
                     }
-                    System.out.printf("[SimpleIAST] Successfully created log directory:%s", log4jBaseDir);
+                    System.out.printf("[SimpleIAST] Successfully created log directory:%s\n", log4jBaseDir);
 
                     String path = log4jBaseDir + type.getTargetPath();
                     BasicConfigurator.configure(createFileAppender(type.getAppender(), path));
@@ -205,7 +205,7 @@ public class LogConfig {
         if (isCloud) {
             return path;
         } else {
-            return System.getProperty("user.home") + File.separator + "logs" + File.separator + "simpleIAST";
+            return System.getProperty("user.home") + File.separator + "simpleIAST" + File.separator + "logs";
         }
     }
 

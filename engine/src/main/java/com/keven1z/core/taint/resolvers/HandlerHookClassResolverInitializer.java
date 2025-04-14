@@ -2,7 +2,7 @@ package com.keven1z.core.taint.resolvers;
 
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
-import com.keven1z.core.policy.PolicyTypeEnum;
+import com.keven1z.core.consts.PolicyType;
 
 import java.net.URL;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class HandlerHookClassResolverInitializer {
     /**
      * 分发处理类map
      */
-    private final Map<PolicyTypeEnum, HandlerHookClassResolver> resolverMap = new ConcurrentHashMap<>();
+    private final Map<PolicyType, HandlerHookClassResolver> resolverMap = new ConcurrentHashMap<>();
 
     private HandlerHookClassResolverInitializer() {
         bind();
@@ -38,10 +38,10 @@ public class HandlerHookClassResolverInitializer {
      * 绑定不同类型的分发类
      */
     private void bind() {
-        resolverMap.put(PolicyTypeEnum.SOURCE, new SourceClassResolver());
-        resolverMap.put(PolicyTypeEnum.PROPAGATION, new PropagationClassResolver());
-        resolverMap.put(PolicyTypeEnum.SINK, new SinkClassResolver());
-        resolverMap.put(PolicyTypeEnum.SANITIZER, new SanitizerClassResolver());
+        resolverMap.put(PolicyType.SOURCE, new SourceClassResolver());
+        resolverMap.put(PolicyType.PROPAGATION, new PropagationClassResolver());
+        resolverMap.put(PolicyType.SINK, new SinkClassResolver());
+        resolverMap.put(PolicyType.SANITIZER, new SanitizerClassResolver());
 
     }
 
@@ -66,7 +66,7 @@ public class HandlerHookClassResolverInitializer {
         if (TAINT_GRAPH_THREAD_LOCAL.get() == null) {
             return;
         }
-        if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty() && !PolicyTypeEnum.SOURCE.name().equals(type)) {
+        if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty() && !PolicyType.SOURCE.name().equals(type)) {
             return;
 
         }
@@ -78,7 +78,7 @@ public class HandlerHookClassResolverInitializer {
             return;
         }
 
-        HandlerHookClassResolver resolver = resolverMap.get(PolicyTypeEnum.valueOf(type.toUpperCase()));
+        HandlerHookClassResolver resolver = resolverMap.get(PolicyType.valueOf(type.toUpperCase()));
         if (resolver == null) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.warn(ErrorType.RESOLVE_ERROR, "Not found resolver,policy type is " + type);

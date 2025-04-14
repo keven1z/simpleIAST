@@ -1,7 +1,7 @@
 package com.keven1z.core.hook.asm.adapter;
 
 import com.keven1z.core.hook.asm.AsmMethods;
-import com.keven1z.core.policy.Policy;
+import com.keven1z.core.policy.HookPolicy;
 import com.keven1z.core.utils.ClassUtils;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -18,7 +18,7 @@ public class HookAdviceAdapter extends IASTAdviceAdapter {
     protected final String methodName;
     protected final String desc;
     protected final String className;
-    protected final Policy policy;
+    protected final HookPolicy hookPolicy;
     protected final boolean isStatic;
     private final Type[] argumentTypeArray;
     /**
@@ -31,12 +31,12 @@ public class HookAdviceAdapter extends IASTAdviceAdapter {
      * @param name      the method's name.
      * @param desc      the method's descriptor (see {@link Type Type}).
      */
-    public HookAdviceAdapter(int api, MethodVisitor mv, int access, String className, String name, String desc, Policy policy) {
+    public HookAdviceAdapter(int api, MethodVisitor mv, int access, String className, String name, String desc, HookPolicy hookPolicy) {
         super(api, mv, access, name, desc);
         this.methodName = name;
         this.desc = desc;
         this.className = className;
-        this.policy = policy;
+        this.hookPolicy = hookPolicy;
         this.isStatic = ClassUtils.isStatic(access);
         this.argumentTypeArray = Type.getArgumentTypes(desc);
     }
@@ -66,10 +66,10 @@ public class HookAdviceAdapter extends IASTAdviceAdapter {
         push(className);
         push(methodName);
         push(desc);
-        push(this.policy.getType().name());
-        push(this.policy.getName());
-        push(this.policy.getFrom());
-        push(this.policy.getTo());
+        push(this.hookPolicy.getType().name());
+        push(this.hookPolicy.getName());
+        push(this.hookPolicy.getFrom());
+        push(this.hookPolicy.getTo());
         invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HOOKSCHEDULER$_taint);
     }
 }
