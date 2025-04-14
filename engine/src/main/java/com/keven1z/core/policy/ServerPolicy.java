@@ -25,7 +25,10 @@ public class ServerPolicy {
     private List<String> excludeClasses;
     private List<String> excludeUrls;
     // 修订时间
-    private long  modifiedTime;
+    private String  modifiedTime;
+
+    public ServerPolicy() {
+    }
 
     public List<String> getExcludeUrls() {
         return excludeUrls;
@@ -107,11 +110,11 @@ public class ServerPolicy {
         this.detectEnabled = detectEnabled;
     }
 
-    public long getModifiedTime() {
+    public String getModifiedTime() {
         return modifiedTime;
     }
 
-    public void setModifiedTime(long modifiedTime) {
+    public void setModifiedTime(String modifiedTime) {
         this.modifiedTime = modifiedTime;
     }
 }

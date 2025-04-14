@@ -3,7 +3,7 @@ package com.keven1z.core.utils.http;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.keven1z.core.consts.Api;
-import com.keven1z.core.error.InstructionException;
+import com.keven1z.core.error.PolicyException;
 import com.keven1z.core.pojo.ResponseDTO;
 import com.keven1z.core.policy.ServerPolicy;
 import com.keven1z.core.utils.JsonUtils;
@@ -20,23 +20,23 @@ public class PolicyClient extends BaseHttpClient {
         super(baseUrl);
     }
 
-    public ServerPolicy fetchPolicies() throws InstructionException {
+    public ServerPolicy fetchPolicies() throws PolicyException {
         try {
-            String url = baseUrl + Api.INSTRUCTION_GET_URL;
+            String url = baseUrl + Api.POLICY_URL;
             HttpGet request = new HttpGet(url);
             String response = executeRequest(request);
             return parsePolicies(response);
         } catch (IOException e) {
-            throw new InstructionException("获取指令失败", e);
+            throw new PolicyException("获取策略失败", e);
         }
     }
 
-    private ServerPolicy parsePolicies(String json) throws InstructionException {
+    private ServerPolicy parsePolicies(String json) throws PolicyException {
         try {
             return JsonUtils.parseObject(json,
                     new TypeReference<ResponseDTO<ServerPolicy>>() {}).getData();
         } catch (JsonProcessingException e) {
-            throw new InstructionException("policy解析失败", e);
+            throw new PolicyException("policy解析失败", e);
         }
     }
 }

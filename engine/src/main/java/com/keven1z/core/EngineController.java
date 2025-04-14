@@ -17,10 +17,8 @@ import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.pojo.AgentDTO;
 import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.FileUtils;
-import com.keven1z.core.utils.IASTHttpClient;
 import com.keven1z.core.utils.http.*;
 import org.apache.log4j.Logger;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.spy.SimpleIASTSpyManager;
@@ -94,7 +92,6 @@ public class EngineController {
             put(PolicyClient.class, () -> new PolicyClient(context.getServerUrl()));
         }});
         HttpClientRegistry.getInstance().initAll(clients);
-        IASTHttpClient.getClient().setRequestHost(context.getServerUrl());
     }
     private void performRegistration() throws RegistrationException {
         AuthClient authClient = HttpClientRegistry.getInstance().getClient(AuthClient.class);
@@ -109,7 +106,8 @@ public class EngineController {
     private void loadAgentComponents() throws IOException {
         loadHookPolicies();
         if (!context.isOfflineEnabled()) {
-            ServerPolicyManager.getInstance().loadInitialPolicy();
+            ServerPolicyManager serverPolicyManager = ServerPolicyManager.getInstance();
+            serverPolicyManager.loadInitialPolicy();
         }
         loadHookBlacklist();
         loadClassTransformers();

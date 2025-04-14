@@ -19,8 +19,8 @@ import java.util.function.Supplier;
  * 3. 线程安全的懒加载机制
  * </p>
  *
- * @author 技术团队
- * @since 1.0.0
+ * @author keven1z
+ * @since 2024/4/10
  */
 public final class HttpClientRegistry implements Closeable {
     private static final Logger LOGGER = Logger.getLogger(HttpClientRegistry.class);

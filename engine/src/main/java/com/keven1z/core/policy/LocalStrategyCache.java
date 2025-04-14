@@ -1,13 +1,12 @@
 package com.keven1z.core.policy;
 
 import com.keven1z.core.Config;
+import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.utils.JsonUtils;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
@@ -21,7 +20,7 @@ public class LocalStrategyCache {
     private final File cacheFile;
 
     public LocalStrategyCache() {
-        this.cacheFile = new File(Config.getConfig().getPolicyCacheDirectory(), CACHE_FILE_NAME);
+        this.cacheFile = new File(Config.getConfig().getPolicyCacheDirectory()+File.separator+ApplicationModel.getAgentId(), CACHE_FILE_NAME);
 
         // 确保缓存目录存在
         if (!cacheFile.getParentFile().exists()) {
@@ -39,14 +38,12 @@ public class LocalStrategyCache {
         if (policy == null) {
             return;
         }
-
         File tempFile = new File(cacheFile.getAbsolutePath() + ".tmp");
         try (FileOutputStream fos = new FileOutputStream(tempFile)) {
             byte[] data = JsonUtils.toJsonString(policy).getBytes();
             fos.write(data);
             fos.flush();
 
-            // 原子性替换
             Files.move(tempFile.toPath(), cacheFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.ATOMIC_MOVE);
@@ -64,13 +61,32 @@ public class LocalStrategyCache {
             return null;
         }
 
-        try (FileInputStream fis = new FileInputStream(cacheFile)) {
-            byte[] data = new byte[(int) cacheFile.length()];
-            fis.read(data);
-            return JsonUtils.parseObject(data, ServerPolicy.class);
+        try (FileInputStream fis = new FileInputStream(cacheFile);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(isr)) {
+
+            // 读取文件内容到StringBuilder
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+
+            // 解析JSON
+            if (content.length() > 0) {
+                String contentString = content.toString().replace("\n", "").replace("\r", "");
+                return JsonUtils.toObject(contentString, ServerPolicy.class);
+            } else {
+                LOGGER.warn("Empty cache file: " + cacheFile.getAbsolutePath());
+                return null;
+            }
+
         } catch (IOException e) {
-            LOGGER.warn("Failed to load strategy cache", e);
-            return null;
+            LOGGER.error("Failed to read cache file: " + cacheFile.getAbsolutePath(), e);
+            throw new IllegalStateException("Failed to load strategy cache", e);
+        } catch (Exception e) {
+            LOGGER.error("Unexpected error while loading strategy cache", e);
+            throw new IllegalStateException("Unexpected error", e);
         }
     }
 }

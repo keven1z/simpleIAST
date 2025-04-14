@@ -255,7 +255,7 @@ public class IASTHttpClient {
             return null;
         }
         try {
-            return doGet(getRequestHost() + Api.INSTRUCTION_GET_URL + "?agentId=" + ApplicationModel.getAgentId(), true);
+            return doGet(getRequestHost() + Api.POLICY_URL + "?agentId=" + ApplicationModel.getAgentId(), true);
         } catch (Exception e) {
             if (LogTool.isDebugEnabled()) {
                 LogTool.error(ErrorType.REQUEST_ERROR, "Failed to get instruction", e);

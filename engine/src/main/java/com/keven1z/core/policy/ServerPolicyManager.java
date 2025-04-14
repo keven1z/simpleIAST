@@ -4,6 +4,10 @@ import com.keven1z.core.utils.http.HttpClientRegistry;
 import com.keven1z.core.utils.http.PolicyClient;
 import org.apache.log4j.Logger;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
+
 /**
  * 策略管理核心类
  */
@@ -69,9 +73,9 @@ public class ServerPolicyManager {
                     return PolicyUpdateResult.noUpdate();
                 }
 
-                // 版本比较（阿里规约：使用compareTo而不是equals）
+                // 版本比较
                 if (currentPolicy == null ||
-                        remoteServerPolicy.getModifiedTime() > currentPolicy.getModifiedTime()) {
+                        remoteServerPolicy.getModifiedTime().compareTo(currentPolicy.getModifiedTime()) > 0) {
                     localCache.save(remoteServerPolicy);
                     ServerPolicy oldPolicy = currentPolicy;
                     currentPolicy = remoteServerPolicy;
@@ -106,7 +110,10 @@ public class ServerPolicyManager {
     public ServerPolicy createHardcodedFallback() {
         // 默认策略配置
         ServerPolicy fallback = new ServerPolicy();
-        fallback.setModifiedTime(System.currentTimeMillis());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(TimeZone.getTimeZone("Asia/Shanghai").toZoneId());
+        String timestamp = LocalDateTime.now().format(formatter);
+        fallback.setModifiedTime(timestamp);
         fallback.setAgentEnabled(true);
         fallback.setDetectEnabled(true);
         fallback.setDebugMode(false);//回退策略默认不打开debug模式
