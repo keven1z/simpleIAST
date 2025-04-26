@@ -1,7 +1,7 @@
 package com.keven1z.core.monitor;
 
 
-import com.keven1z.core.pojo.HeartbeatMessage;
+import com.keven1z.core.model.server.HeartbeatMessage;
 import com.keven1z.core.utils.OSUtils;
 import com.keven1z.core.utils.http.HttpClientRegistry;
 import com.keven1z.core.utils.http.HttpHeartbeatClient;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class HeartbeatMonitor extends Monitor {
-    private final HttpHeartbeatClient heartbeatClient;  // 心跳客户端（如Socket/HTTP实现）
+    private HttpHeartbeatClient heartbeatClient;  // 心跳客户端（如Socket/HTTP实现）
     private final CircuitBreaker circuitBreaker;    // 熔断器
     private final long heartbeatInterval = 30000L;           // 心跳间隔（毫秒）
     private final int failureThreshold = 5;
@@ -26,7 +26,6 @@ public class HeartbeatMonitor extends Monitor {
     private final AtomicInteger consecutiveFailures = new AtomicInteger(0); // 连续失败计数
 
     public HeartbeatMonitor() {
-        this.heartbeatClient = HttpClientRegistry.getInstance().getClient(HttpHeartbeatClient.class);
         this.circuitBreaker = new CircuitBreaker(failureThreshold, resetTimeoutMs);
     }
 
@@ -42,7 +41,9 @@ public class HeartbeatMonitor extends Monitor {
 
     @Override
     public void doRun() throws Exception {
-
+        if (this.heartbeatClient == null) {
+            this.heartbeatClient = HttpClientRegistry.getInstance().getClient(HttpHeartbeatClient.class);
+        }
         // 检查熔断器状态
         if (!circuitBreaker.allowRequest()) {
             handleCircuitBreakerOpen();

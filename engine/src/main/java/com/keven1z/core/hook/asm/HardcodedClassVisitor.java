@@ -1,8 +1,8 @@
 package com.keven1z.core.hook.asm;
 
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.pojo.ReportData;
-import com.keven1z.core.pojo.finding.HardcodedFindingData;
+import com.keven1z.core.model.server.ReportData;
+import com.keven1z.core.model.finding.HardcodedFindingData;
 import com.keven1z.core.utils.Base64Utils;
 import com.keven1z.core.utils.CommonUtils;
 import org.objectweb.asm.ClassVisitor;

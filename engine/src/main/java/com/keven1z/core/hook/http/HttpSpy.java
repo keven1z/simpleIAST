@@ -1,7 +1,7 @@
 package com.keven1z.core.hook.http;
 
-import com.keven1z.core.Config;
-import com.keven1z.core.model.graph.TaintGraph;
+import com.keven1z.core.model.Config;
+import com.keven1z.core.model.taint.TaintGraph;
 import com.keven1z.core.hook.http.body.HttpBodyOutputStream;
 import com.keven1z.core.hook.http.request.AbstractRequest;
 import com.keven1z.core.hook.http.request.CoyoteRequest;
@@ -10,7 +10,7 @@ import com.keven1z.core.hook.http.response.HttpServletResponse;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.taint.TaintSpy;
+import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.vulnerability.DetectorFactory;
 import org.apache.log4j.Logger;
 
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 
-import static com.keven1z.core.Config.MAX_DETECT_SIZE;
+import static com.keven1z.core.model.Config.MAX_DETECT_SIZE;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 import static com.keven1z.core.hook.HookThreadLocal.REQUEST_THREAD_LOCAL;
 

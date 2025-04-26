@@ -88,7 +88,7 @@
   ],
   "source": [
     {
-      "name": "getParameter",
+      "name": "http_string_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getParameter",
       "desc": "(Ljava/lang/String;)Ljava/lang/String;",
@@ -100,7 +100,7 @@
       "exit": 1
     },
     {
-      "name": "getInputStream",
+      "name": "http_body_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getInputStream",
       "desc": "()Ljavax/servlet/ServletInputStream;",
@@ -112,7 +112,7 @@
       "exit": 1
     },
     {
-      "name": "getParameterMap",
+      "name": "http_string_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getParameterMap",
       "desc": "()Ljava/util/Map;",
@@ -124,7 +124,7 @@
       "exit": 1
     },
     {
-      "name": "getParameterValues",
+      "name": "http_string_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getParameterValues",
       "desc": "(Ljava/lang/String;)[Ljava/lang/String;",
@@ -139,7 +139,7 @@
       "exit": 1
     },
     {
-      "name": "getReader",
+      "name": "http_body_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getReader",
       "desc": "()Ljava/io/BufferedReader;",
@@ -154,7 +154,7 @@
       "exit": 1
     },
     {
-      "name": "getQueryString",
+      "name": "http_string_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getQueryString",
       "desc": "()Ljava/lang/String;",
@@ -169,7 +169,7 @@
       "exit": 1
     },
     {
-      "name": "getPart",
+      "name": "http_multipart_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getPart",
       "desc": "(Ljava/lang/String;)Ljavax/servlet/http/Part;",
@@ -185,7 +185,7 @@
       "exit": 1
     },
     {
-      "name": "getParts",
+      "name": "http_multipart_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getParts",
       "desc": "()Ljava/util/Collection;",
@@ -201,7 +201,7 @@
       "exit": 1
     },
     {
-      "name": "getParameterNames",
+      "name": "http_string_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getParameterNames()",
       "desc": "Ljava/util/Enumeration;",
@@ -217,7 +217,7 @@
       "exit": 1
     },
     {
-      "name": "getHeader",
+      "name": "http_header_param",
       "className": "javax/servlet/http/HttpServletRequest",
       "method": "getHeader",
       "desc": "(Ljava/lang/String;)Ljava/lang/String;",
@@ -232,6 +232,7 @@
       "exit": 1
     },
     {
+      "name": "http_spring_param",
       "className": "org/springframework/web/method/support/HandlerMethodArgumentResolverComposite",
       "method": "resolveArgument",
       "desc": "(Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/bind/support/WebDataBinderFactory;)Ljava/lang/Object;",
@@ -1086,7 +1087,17 @@
       "state": 1,
       "from": "O",
       "to": "R",
-      "conditions": "P1,P2",
+      "enter": 0,
+      "exit": 1
+    },
+    {
+      "name": "StringEscapeUtils.unescapeJson",
+      "className": "org/apache/commons/lang3/StringEscapeUtils",
+      "method": "unescapeJson",
+      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+      "state": 1,
+      "from": "P1",
+      "to": "R",
       "enter": 0,
       "exit": 1
     }

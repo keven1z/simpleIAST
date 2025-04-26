@@ -3,8 +3,9 @@ package com.keven1z.core.utils;
 
 import com.keven1z.core.consts.CommonConst;
 import com.keven1z.core.consts.PolicyConst;
-import com.keven1z.core.model.graph.TaintGraph;
-import com.keven1z.core.model.graph.TaintNode;
+import com.keven1z.core.model.server.FlowObject;
+import com.keven1z.core.model.taint.TaintGraph;
+import com.keven1z.core.model.taint.PathNode;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.HookPolicy;
@@ -161,22 +162,21 @@ public class PolicyUtils {
     }
 
     private static HookPolicy createPolicy(String className, HookPolicy hookPolicy, String ancestor) {
-        HookPolicy childHookPolicy = new HookPolicy();
-        childHookPolicy.setConditions(hookPolicy.getConditions());
-        childHookPolicy.setClassName(className);
-        childHookPolicy.setMethod(hookPolicy.getMethod());
-        childHookPolicy.setDesc(hookPolicy.getDesc());
-        childHookPolicy.setEnter(hookPolicy.getEnter());
-        childHookPolicy.setFrom(hookPolicy.getFrom());
-        childHookPolicy.setName(hookPolicy.getName());
-        childHookPolicy.setExit(hookPolicy.getExit());
-        childHookPolicy.setType(hookPolicy.getType());
-        childHookPolicy.setState(CommonConst.ON);
-        childHookPolicy.setInter(false);
-        childHookPolicy.setHooked(true);
-        childHookPolicy.setOriginClassName(ancestor);
-        childHookPolicy.setTo(hookPolicy.getTo());
-        return childHookPolicy;
+        return new HookPolicy.Builder().conditions(hookPolicy.getConditions())
+                .className(className)
+                .method(hookPolicy.getMethod())
+                .desc(hookPolicy.getDesc())
+                .enter(hookPolicy.getEnter())
+                .exit(hookPolicy.getExit())
+                .from(hookPolicy.getFrom())
+                .to(hookPolicy.getTo())
+                .name(hookPolicy.getName())
+                .type(hookPolicy.getType())
+                .state(hookPolicy.getState())
+                .inter(false)
+                .isHooked(true)
+                .originClassName(ancestor)
+                .build();
     }
 
     /**
@@ -204,7 +204,11 @@ public class PolicyUtils {
      *
      */
     public static HookPolicy getHookedPolicyByBisection(String className, String method, String desc, List<HookPolicy> policies) {
-        HookPolicy target = new HookPolicy(className, method, desc);
+        HookPolicy target =HookPolicy.builder()
+                .className(className)
+                .method(method)
+                .desc(desc)
+                .build();
         Collections.sort(policies);
         // Perform binary search
         int index = Collections.binarySearch(policies, target);
@@ -226,19 +230,26 @@ public class PolicyUtils {
      * @param thisObject   hook类当前对象
      * @return 对应的对象List
      */
-    public static Map<String, Object> getFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
+    public static List<FlowObject> getFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
         if (position == null) {
             return null;
         }
-        Map<String, Object> map = new HashMap<>();
+        ArrayList<FlowObject> flowObjects = new ArrayList<>();
         String[] paths = position.split(PolicyConst.PATH_SPLIT_SEPARATOR);
         for (String path : paths) {
             Object pathObject = getPathObject(path, parameters, returnObject, thisObject);
             if (pathObject != null) {
-                map.put(path, pathObject);
+                flowObjects.add(new FlowObject(path, pathObject));
             }
         }
-        return map;
+        return flowObjects;
+    }
+    public static FlowObject getSourceAndSinkFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
+        List<FlowObject> fromPositionObjects = getFromPositionObject(position, parameters, returnObject, thisObject);
+        if (fromPositionObjects.isEmpty()) {
+            return null;
+        }
+        return fromPositionObjects.get(0);
     }
 
     public static Object getToPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
@@ -270,18 +281,18 @@ public class PolicyUtils {
     /**
      * 查找来源的节点,来源不仅仅是source阶段的节点
      */
-    public static TaintNode searchParentNode(Object fromObject, TaintGraph taintGraph) {
+    public static PathNode searchParentNode(Object fromObject, TaintGraph taintGraph) {
         int fromObjectHashCode = System.identityHashCode(fromObject);
-        if (!taintGraph.isTaint(fromObjectHashCode)) {
+        if (taintGraph.isTaint(fromObjectHashCode)) {
             return null;
         }
-        List<TaintNode> allNode = taintGraph.getAllNode();
+        List<PathNode> allNode = taintGraph.getAllNode();
         //倒序查询，符合代码执行的流程
         for (int i = allNode.size() - 1; i >= 0; i--) {
             /*
              * 是否为污点对象，eg: fromObject= "sql",传播方法为StringBuilder.toString,污点传出方向为返回值，返回值为sql，则判定为污点
              */
-            TaintNode node = allNode.get(i);
+            PathNode node = allNode.get(i);
             if (node.isToObject(fromObjectHashCode)) {
                 return node;
             }
@@ -292,21 +303,21 @@ public class PolicyUtils {
     /**
      * 查找来源的节点,来源不仅仅是source阶段的节点
      */
-    public static Set<TaintNode> searchParentNodes(Object fromObject, TaintGraph taintGraph) {
+    public static Set<PathNode> searchParentNodes(Object fromObject, TaintGraph taintGraph) {
         int fromObjectHashCode = System.identityHashCode(fromObject);
-        if (!taintGraph.isTaint(fromObjectHashCode)) {
+        if (taintGraph.isTaint(fromObjectHashCode)) {
             return null;
         }
-        List<TaintNode> allNode = taintGraph.getAllNode();
-        Set<TaintNode> parentNodes = new LinkedHashSet<>();
+        List<PathNode> allNode = taintGraph.getAllNode();
+        Set<PathNode> parentNodes = new LinkedHashSet<>();
         //倒序查询，符合代码执行的流程
         for (int i = allNode.size() - 1; i >= 0; i--) {
-            TaintNode taintNode = allNode.get(i);
+            PathNode PathNode = allNode.get(i);
             /*
              * 是否为污点对象，eg: fromObject= "sql",传播方法为StringBuilder.toString,污点传出方向为返回值，返回值为sql，则判定为污点
              */
-            if (taintNode.isToObject(fromObjectHashCode)) {
-                parentNodes.add(taintNode);
+            if (PathNode.isToObject(fromObjectHashCode)) {
+                parentNodes.add(PathNode);
             }
         }
         return parentNodes;

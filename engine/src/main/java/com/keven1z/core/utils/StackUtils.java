@@ -1,6 +1,6 @@
 package com.keven1z.core.utils;
 
-import com.keven1z.core.Config;
+import com.keven1z.core.model.Config;
 
 import java.util.Arrays;
 import java.util.LinkedList;

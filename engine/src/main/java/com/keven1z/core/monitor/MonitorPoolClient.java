@@ -2,8 +2,8 @@ package com.keven1z.core.monitor;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import static com.keven1z.core.Config.CORE_POOL_SIZE;
-import static com.keven1z.core.Config.MAXIMUM_POOL_SIZE;
+import static com.keven1z.core.model.Config.CORE_POOL_SIZE;
+import static com.keven1z.core.model.Config.MAXIMUM_POOL_SIZE;
 
 public class MonitorPoolClient {
 

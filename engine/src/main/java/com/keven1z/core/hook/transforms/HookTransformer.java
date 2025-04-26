@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.keven1z.core.Config.IS_DUMP_CLASS;
+import static com.keven1z.core.model.Config.IS_DUMP_CLASS;
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 
 
