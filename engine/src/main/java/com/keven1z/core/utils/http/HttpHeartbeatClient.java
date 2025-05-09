@@ -1,7 +1,7 @@
 package com.keven1z.core.utils.http;
 
 import com.keven1z.core.consts.Api;
-import com.keven1z.core.pojo.HeartbeatMessage;
+import com.keven1z.core.model.server.HeartbeatMessage;
 import com.keven1z.core.utils.JsonUtils;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;

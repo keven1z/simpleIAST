@@ -2,7 +2,7 @@ package com.keven1z.core.monitor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.keven1z.core.model.IASTContext;
-import com.keven1z.core.pojo.ReportData;
+import com.keven1z.core.model.server.ReportData;
 import com.keven1z.core.vulnerability.report.ReportBuilder;
 import com.keven1z.core.vulnerability.report.ReportPrinter;
 import com.keven1z.core.vulnerability.report.ReportSender;

@@ -1,6 +1,6 @@
 package com.keven1z.core.utils;
 
-import com.keven1z.core.Config;
+import com.keven1z.core.model.Config;
 import com.keven1z.core.EngineBoot;
 import com.keven1z.core.policy.HookPolicy;
 import com.keven1z.core.policy.HookPolicyContainer;
@@ -9,10 +9,7 @@ import com.keven1z.core.consts.PolicyType;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 资源文件加载工具类
@@ -25,87 +22,52 @@ public class FileUtils {
      * @return {@link HookPolicyContainer}
      */
     public static HookPolicyContainer load(ClassLoader classLoader) throws IOException {
-        InputStream inputStream = null;
-        try {
-            inputStream = classLoader.getResourceAsStream(Config.POLICY_FILE_PATH);
+        try (InputStream inputStream = classLoader.getResourceAsStream(Config.POLICY_FILE_PATH)) {
             String jsonFile = readJsonFile(inputStream);
             if (jsonFile == null) {
                 return null;
             }
 
             HookPolicyContainer hookPolicyContainer = JsonUtils.toObject(jsonFile, HookPolicyContainer.class);
-
             if (hookPolicyContainer == null) {
                 return null;
             }
 
-            List<HookPolicy> sources = hookPolicyContainer.getSource();
             List<HookPolicy> interfaceHookPolicy = hookPolicyContainer.getInterfacePolicy();
-            for (HookPolicy source : sources) {
-                if (source.getInter()) {
-                    interfaceHookPolicy.add(source);
-                }
-                source.setType(PolicyType.SOURCE);
-            }
-            List<HookPolicy> propagations = hookPolicyContainer.getPropagation();
-            for (HookPolicy propagation : propagations) {
-                if (propagation.getInter()) {
-                    interfaceHookPolicy.add(propagation);
-                }
-                propagation.setType(PolicyType.PROPAGATION);
-            }
-            List<HookPolicy> sinks = hookPolicyContainer.getSink();
-            for (HookPolicy sink : sinks) {
-                if (sink.getInter()) {
-                    interfaceHookPolicy.add(sink);
-                }
-                sink.setType(PolicyType.SINK);
-            }
-            List<HookPolicy> https = hookPolicyContainer.getHttp();
-            for (HookPolicy http : https) {
-                if (http.getInter()) {
-                    interfaceHookPolicy.add(http);
-                }
-                http.setType(PolicyType.HTTP);
-            }
-            List<HookPolicy> sanitizers = hookPolicyContainer.getSanitizers();
-            for (HookPolicy sanitizer : sanitizers) {
-                if (sanitizer.getInter()) {
-                    interfaceHookPolicy.add(sanitizer);
-                }
-                sanitizer.setType(PolicyType.SANITIZER);
-            }
-            List<HookPolicy> singles = hookPolicyContainer.getSingles();
-            for (HookPolicy single : singles) {
-                if (single.getInter()) {
-                    interfaceHookPolicy.add(single);
-                }
-                single.setType(PolicyType.SINGLE);
-            }
+
+            processPolicyList(hookPolicyContainer.getSource(), interfaceHookPolicy, PolicyType.SOURCE);
+            processPolicyList(hookPolicyContainer.getPropagation(), interfaceHookPolicy, PolicyType.PROPAGATION);
+            processPolicyList(hookPolicyContainer.getSink(), interfaceHookPolicy, PolicyType.SINK);
+            processPolicyList(hookPolicyContainer.getHttp(), interfaceHookPolicy, PolicyType.HTTP);
+            processPolicyList(hookPolicyContainer.getSanitizers(), interfaceHookPolicy, PolicyType.SANITIZER);
+            processPolicyList(hookPolicyContainer.getSingles(), interfaceHookPolicy, PolicyType.SINGLE);
 
             return hookPolicyContainer;
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
         }
     }
-
+    private static void processPolicyList(List<HookPolicy> policies, List<HookPolicy> interfacePolicies, PolicyType type) {
+        policies.forEach(policy -> {
+            if (policy.getInter()) {
+                interfacePolicies.add(policy);
+            }
+            policy.setType(type);
+        });
+    }
     /**
      * @return 加载黑名单文件
      */
-    public static List<String> loadBlackList(ClassLoader classLoader) throws IOException {
-        ArrayList<String> arrayList = new ArrayList<>();
+    public static Set<String> loadBlackList(ClassLoader classLoader) throws IOException {
+        Set<String> blackSet = new HashSet<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(classLoader.getResourceAsStream(Config.BLACK_LIST_FILE_PATH))))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.replace("\n", "");
                 if (!line.isEmpty()) {
-                    arrayList.add(line);
+                    blackSet.add(line);
                 }
             }
         }
-        return arrayList;
+        return blackSet;
     }
 
     public static String loadIASTProperties(ClassLoader classLoader, String key, String defaultValue){
@@ -181,5 +143,4 @@ public class FileUtils {
         }
         return baseDir;
     }
-
 }

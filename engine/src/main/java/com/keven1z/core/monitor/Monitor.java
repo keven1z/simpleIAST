@@ -1,6 +1,5 @@
 package com.keven1z.core.monitor;
 
-import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.IASTContext;
 import org.apache.log4j.Logger;
@@ -14,7 +13,6 @@ public abstract class Monitor extends Thread {
      * 是否为server服务的监控线程
      */
     public abstract boolean isForServer();
-
     private boolean state = true;
 
     @Override

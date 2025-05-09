@@ -1,6 +1,6 @@
 package com.keven1z.core.policy;
 
-import com.keven1z.core.Config;
+import com.keven1z.core.model.Config;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.utils.JsonUtils;
 import org.apache.log4j.Logger;

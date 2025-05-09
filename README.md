@@ -94,8 +94,9 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 - [x] 漏洞检测数量，覆盖[ant-application-security-testing-benchmark](https://github.com/alipay/ant-application-security-testing-benchmark)
 - [x] 服务端交互界面
 - [x] 支持多种中间件
-- [ ] sql注入漏洞误报修复
-- [ ] 心跳包重构
+- [x] sql注入漏洞误报修复
+- [x] 心跳包重构
+- [ ] hook自定义对象
 
 ## 8. 鸣谢
 > [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。

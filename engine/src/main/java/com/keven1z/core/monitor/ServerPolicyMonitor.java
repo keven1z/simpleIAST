@@ -9,9 +9,8 @@ import com.keven1z.core.utils.IASTHttpClient;
 
 
 public class ServerPolicyMonitor extends Monitor {
-    private final ServerPolicyManager serverPolicyManager;
+    private  ServerPolicyManager serverPolicyManager;
     public ServerPolicyMonitor() {
-        this.serverPolicyManager = ServerPolicyManager.getInstance();
     }
     @Override
     public String getThreadName() {
@@ -25,6 +24,9 @@ public class ServerPolicyMonitor extends Monitor {
 
     @Override
     public void doRun() throws Exception {
+        if (this.serverPolicyManager == null) {
+            this.serverPolicyManager = ServerPolicyManager.getInstance();
+        }
         PolicyUpdateResult policyUpdateResult = serverPolicyManager.checkUpdate();
         boolean isUpdated = policyUpdateResult.isUpdated();
         Thread.sleep(30 * 1000);

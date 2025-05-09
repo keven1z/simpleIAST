@@ -320,6 +320,7 @@ org/apache/catalina/util/ParameterMap
 org/apache/catalina/mapper/MappingData
 org/apache/catalina/core/ApplicationMapping
 javax/servlet/http/MappingMatch
+javax/servlet/http/HttpServletRequestWrapper
 org/apache/catalina/util/SessionConfig
 javax/security/
 org/apache/catalina/authenticator/jaspic/AuthConfigFactoryImpl

@@ -16,7 +16,7 @@
 
 package com.keven1z.core.hook.http.request;
 
-import com.keven1z.core.Config;
+import com.keven1z.core.model.Config;
 import com.keven1z.core.utils.ReflectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
