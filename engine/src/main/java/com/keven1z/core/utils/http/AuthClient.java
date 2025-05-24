@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.keven1z.core.consts.Api;
 import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.model.server.AgentDTO;
-import com.keven1z.core.model.server.AuthenticationDTO;
+import com.keven1z.core.model.server.AuthenticationDto;
 import com.keven1z.core.model.server.ResponseDTO;
 import com.keven1z.core.utils.JsonUtils;
 import org.apache.http.client.methods.HttpGet;
@@ -24,7 +24,7 @@ public class AuthClient extends BaseHttpClient {
         super(baseUrl);
     }
 
-    public AuthenticationDTO register(AgentDTO agentDto) throws RegistrationException {
+    public AuthenticationDto register(AgentDTO agentDto) throws RegistrationException {
         try {
             String payload = JsonUtils.toJsonString(agentDto);
             HttpPost request = buildPostRequest(Api.AGENT_REGISTER_URL, payload);
@@ -54,10 +54,10 @@ public class AuthClient extends BaseHttpClient {
         return request;
     }
 
-    private AuthenticationDTO parseAuthResponse(String json) throws RegistrationException {
+    private AuthenticationDto parseAuthResponse(String json) throws RegistrationException {
         try {
-            ResponseDTO<AuthenticationDTO> response = JsonUtils.parseObject(json,
-                    new TypeReference<ResponseDTO<AuthenticationDTO>>() {});
+            ResponseDTO<AuthenticationDto> response = JsonUtils.parseObject(json,
+                    new TypeReference<ResponseDTO<AuthenticationDto>>() {});
 
             // 处理失败响应
             if (!response.isFlag()) {
@@ -65,7 +65,7 @@ public class AuthClient extends BaseHttpClient {
                 LOGGER.warn(errorMsg);
                 throw new RegistrationException(errorMsg);
             }
-            AuthenticationDTO authData = response.getData();
+            AuthenticationDto authData = response.getData();
             // 校验响应数据类型
             if (authData == null || authData.getAgentId() == null || authData.getToken() == null) {
                 String errorMsg = "Incomplete authentication data. AgentId or Token is missing.";

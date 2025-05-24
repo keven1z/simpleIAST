@@ -3,6 +3,8 @@ package com.keven1z.core.model.taint;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.keven1z.core.consts.PolicyType;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public class TaintData {
     private final WeakReference<Object[]> parameters;
     private final List<String> stackList;
     private final List<FlowPath> flowPaths;
-
+    private PolicyType stage;
     protected TaintData(Builder<?> builder) {
         this.invokeId = INVOKE_ID.getAndIncrement();
         this.className = builder.className;
@@ -37,6 +39,7 @@ public class TaintData {
         this.parameters = builder.parameters;
         this.stackList = builder.stackList;
         this.flowPaths = builder.flowPaths;
+        this.stage = builder.stage;
     }
 
     public int getInvokeId() {
@@ -65,6 +68,11 @@ public class TaintData {
         }
         return thisObject.get();
     }
+
+    public PolicyType getStage() {
+        return stage;
+    }
+
     @JsonIgnore
     public Object getReturnObject() {
         if (returnObject == null) {
@@ -150,7 +158,8 @@ public class TaintData {
         private List<String> stackList;
         @JsonProperty("flowPaths")
         private List<FlowPath> flowPaths;
-
+        @JsonProperty("stage")
+        private PolicyType stage ;
         public Builder() {
         }
 
@@ -191,6 +200,10 @@ public class TaintData {
 
         public T stackList(List<String> stackList) {
             this.stackList = stackList;
+            return self();
+        }
+        public T stage(PolicyType stage) {
+            this.stage = stage;
             return self();
         }
 

@@ -7,7 +7,7 @@ import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.monitor.*;
 
-import com.keven1z.core.model.server.AuthenticationDTO;
+import com.keven1z.core.model.server.AuthenticationDto;
 import com.keven1z.core.policy.ServerPolicyManager;
 import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
@@ -92,7 +92,7 @@ public class EngineController {
     }
     private void performRegistration() throws RegistrationException {
         AuthClient authClient = HttpClientRegistry.getInstance().getClient(AuthClient.class);
-        AuthenticationDTO authenticationDTO = authClient.register(buildRegisterInformation());
+        AuthenticationDto authenticationDTO = authClient.register(buildRegisterInformation());
         if (authenticationDTO == null) {
             throw new RegistrationException("Failed to register agent");
         }

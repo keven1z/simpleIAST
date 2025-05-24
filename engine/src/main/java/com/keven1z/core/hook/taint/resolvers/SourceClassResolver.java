@@ -24,7 +24,15 @@ public class SourceClassResolver implements HandlerHookClassResolver {
     private static final String[] BLACK_SPRINGFRAMEWORK_RETURN_OBJECT = new String[]{"org.springframework.web", "SecurityContextHolderAwareRequestWrapper"};
 
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
+    public void resolve(Object returnObject,
+                        Object thisObject,
+                        Object[] parameters,
+                        String className,
+                        String method,
+                        String desc,
+                        String policyName,
+                        String from,
+                        String to) throws Exception{
         if (!isReturnObjectFiltered(returnObject)) {
             return;
         }
@@ -37,49 +45,45 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         if (handler == null) {
             return;
         }
-        try {
-            List<TaintData.FlowPath> flowPaths = handler.handle(sourceFromPositionObject, returnObject);
-            if (flowPaths.isEmpty()) {
+
+        List<TaintData.FlowPath> flowPaths;
+        flowPaths = handler.handle(sourceFromPositionObject, returnObject);
+        if (flowPaths.isEmpty()) {
+            return;
+        }
+        TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
+        //去除重复的污染源
+        for (TaintData.FlowPath flowPath : flowPaths) {
+            if (taintGraph.isTaint(flowPath.getHashcode())) {
                 return;
             }
-            TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-            //去除重复的污染源
-            for (TaintData.FlowPath flowPath : flowPaths) {
-                if (taintGraph.isTaint(flowPath.getHashcode())){
-                    return;
-                }
-            }
-
-            TaintSource taintSource = new TaintSource.Builder().className(className)
-                    .method(method)
-                    .desc(desc)
-                    .thisObject(thisObject)
-                    .returnObject(returnObject)
-                    .parameters(parameters)
-                    .stackList(StackUtils.getStackTraceArray(true, true))
-                    .flowPaths(flowPaths)
-                    .sourceType(SourceType.fromName(policyName))
-                    .build();
-            if (taintGraph == null) {
-                return;
-            }
-            taintGraph.addNode(taintSource, PolicyType.SOURCE);
-
-        } catch (Exception e) {
-
         }
+
+        TaintSource taintSource = new TaintSource.Builder().className(className)
+                .method(method)
+                .desc(desc)
+                .thisObject(thisObject)
+                .returnObject(returnObject)
+                .parameters(parameters)
+                .stackList(StackUtils.getStackTraceArray(true, true))
+                .flowPaths(flowPaths)
+                .sourceType(SourceType.fromName(policyName))
+                .stage(PolicyType.SOURCE)
+                .build();
+        if (taintGraph == null) {
+            return;
+        }
+        taintGraph.addNode(taintSource);
     }
 
-    /**
-     * 获取污染源的入参名，eg：id=1，入参名为id
-     */
-    private String getSourceFromName(FlowObject flowObject) {
-        if ("org.springframework.web.method.HandlerMethod$HandlerMethodParameter".equals(flowObject.getClass().getName())) {
-            return ReflectionUtils.invokeStringMethod(flowObject, "getParameterName", new Class[]{});
-        } else {
-            return flowObject.toString();
-        }
-    }
+
+//    private String getSourceFromName(FlowObject flowObject) {
+//        if ("org.springframework.web.method.HandlerMethod$HandlerMethodParameter".equals(flowObject.getClass().getName())) {
+//            return ReflectionUtils.invokeStringMethod(flowObject, "getParameterName", new Class[]{});
+//        } else {
+//            return flowObject.toString();
+//        }
+//    }
 //
 //    private void resolveBeanHook(String className, String method, String desc, Object returnObject, FlowObject sourceFromPositionObject) {
 //        TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
@@ -133,6 +137,4 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         }
         return true;
     }
-//
-
 }
