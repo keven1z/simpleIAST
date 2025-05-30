@@ -1,6 +1,6 @@
 <div align="center">
 
-#  simpleIAST  ![0.2.0 (shields.io)](https://img.shields.io/badge/0.2.0-brightgreen.svg)
+#  simpleIAST  ![0.3.0 (shields.io)](https://img.shields.io/badge/0.2.0-brightgreen.svg)
 
 </div>
 
