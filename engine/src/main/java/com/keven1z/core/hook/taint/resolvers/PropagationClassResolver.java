@@ -21,7 +21,15 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  */
 public class PropagationClassResolver implements HandlerHookClassResolver {
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
+    public void resolve(Object returnObject,
+                        Object thisObject,
+                        Object[] parameters,
+                        String className,
+                        String method,
+                        String desc,
+                        String policyName,
+                        String from,
+                        String to) throws Exception{
         List<FlowObject> fromPositionObjects = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
         if (fromPositionObjects.isEmpty()) {
             return;
@@ -48,10 +56,11 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
                             .returnObject(returnObject)
                             .thisObject(thisObject)
                             .parameters(parameters)
+                            .stage(PolicyType.PROPAGATION)
                             .addFlowPath(new TaintData.FlowPath(fromObject, toObject))
                             .build();
                 }
-                PathNode pathNode = taintGraph.addNode(taintData, PolicyType.PROPAGATION);
+                PathNode pathNode = taintGraph.addNode(taintData);
                 taintGraph.addEdge(parentNode, pathNode, flowObject.getPathFlag());
             }
         }

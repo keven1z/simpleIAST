@@ -36,7 +36,7 @@ public class TaintGraph {
     public List<PathNode> getSinkNodes() {
         ArrayList<PathNode> sinkNodes = new ArrayList<>(pathNodeList.size());
         for (PathNode node : pathNodeList) {
-            if (node.getPolicyType() == PolicyType.SINK) {
+            if (node.getTaintData().getStage() == PolicyType.SINK) {
                 sinkNodes.add(node);
             }
         }
@@ -49,8 +49,8 @@ public class TaintGraph {
     /**
      * 添加taint node
      */
-    public PathNode addNode(TaintData taintData,PolicyType policyType) {
-        PathNode node = new PathNode(taintData, policyType);
+    public PathNode addNode(TaintData taintData) {
+        PathNode node = new PathNode(taintData);
         addNode(node);
         List<TaintData.FlowPath> flowPaths = taintData.getFlowPaths();
         for (int i = 0; i < flowPaths.size(); i++) {
@@ -250,7 +250,7 @@ public class TaintGraph {
                 PathNode toNode = edge.getTo();
                 TaintData toTaintData = edge.getTo().getTaintData();
                 //如果污点的去向为SANITIZER并且没有包含在污点传播流程中
-                if (PolicyType.SANITIZER.equals(toNode.getPolicyType()) && !taintDataList.contains(toTaintData)) {
+                if (PolicyType.SANITIZER.equals(toNode.getTaintData().getStage()) && !taintDataList.contains(toTaintData)) {
                     queue.add(toTaintData);
                     sanitizerTaintDataList.add(toTaintData);
                 }

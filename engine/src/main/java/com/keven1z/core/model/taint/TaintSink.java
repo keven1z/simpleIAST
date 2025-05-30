@@ -1,5 +1,6 @@
 package com.keven1z.core.model.taint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.keven1z.core.consts.VulnerabilityType;
 @JsonDeserialize(builder = TaintSink.Builder.class)
@@ -13,6 +14,7 @@ public class TaintSink extends TaintData {
     }
 
     // 获取漏洞类型
+    @JsonIgnore
     public VulnerabilityType getVulnerabilityType() {
         return vulnerabilityType;
     }
@@ -25,6 +27,7 @@ public class TaintSink extends TaintData {
 
     // Builder 类，帮助构建 SinkInfo 对象
     public static class Builder extends TaintData.Builder<Builder> {
+        @JsonIgnore
         private VulnerabilityType vulnerabilityType;
 
         public Builder() {

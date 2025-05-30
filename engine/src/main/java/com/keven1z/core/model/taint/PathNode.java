@@ -1,7 +1,5 @@
 package com.keven1z.core.model.taint;
 
-import com.keven1z.core.consts.PolicyType;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +18,6 @@ public class PathNode {
      * @since 0.0.2
      */
     private final TaintData taintData;
-    private final PolicyType policyType;
     /**
      * 以此顶点为起点的边的集合，是一个列表，列表的每一项是一条边
      * <p>
@@ -33,10 +30,9 @@ public class PathNode {
      *
      * @param vertex 頂點
      */
-    public PathNode(TaintData vertex, PolicyType policyType) {
+    public PathNode(TaintData vertex) {
         this.taintData = vertex;
         this.taintEdgeSet = new HashSet<>();
-        this.policyType = policyType;
     }
 
     /**
@@ -118,9 +114,5 @@ public class PathNode {
     public void clear() {
         this.taintEdgeSet.clear();
 //        this.taintData.clear();
-    }
-
-    public PolicyType getPolicyType() {
-        return policyType;
     }
 }

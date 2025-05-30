@@ -37,9 +37,10 @@ public class SinkClassResolver implements HandlerHookClassResolver {
                 .parameters(parameters)
                 .thisObject(thisObject)
                 .addFlowPath(new TaintData.FlowPath(fromObject, null))
+                .stage(PolicyType.SINK)
                 .vulnerabilityType(VulnerabilityType.valueOf(policyName.toUpperCase()))
                 .build();
-        PathNode pathNode = taintGraph.addNode(taintData, PolicyType.SINK);
+        PathNode pathNode = taintGraph.addNode(taintData);
         taintGraph.addEdge(parentNode, pathNode, flowObject.getPathFlag());
     }
 }
