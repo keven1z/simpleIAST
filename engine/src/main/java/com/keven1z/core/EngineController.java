@@ -1,5 +1,6 @@
 package com.keven1z.core;
 
+import com.keven1z.core.error.ConfigLoadException;
 import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
@@ -8,14 +9,13 @@ import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.monitor.*;
 
 import com.keven1z.core.model.server.AuthenticationDto;
+import com.keven1z.core.policy.IastHookConfig;
+import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.policy.ServerPolicyManager;
 import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
-import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogConfig;
-import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.server.AgentDTO;
-import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.FileUtils;
 import com.keven1z.core.utils.http.*;
 import org.apache.log4j.Logger;
@@ -101,7 +101,7 @@ public class EngineController {
         EngineController.context.setToken(authenticationDTO.getToken());
     }
     private void loadAgentComponents() throws IOException {
-        loadHookPolicies();
+        loadHookConfigs();
         if (!context.isOfflineEnabled()) {
             ServerPolicyManager serverPolicyManager = ServerPolicyManager.getInstance();
             serverPolicyManager.loadInitialPolicy();
@@ -159,15 +159,21 @@ public class EngineController {
     }
 
     /**
-     * 加载策略
+     * 加载hook配置
      */
-    private void loadHookPolicies() throws IOException {
-        HookPolicyContainer hookPolicyContainer = FileUtils.load(this.getClass().getClassLoader());
-        if (hookPolicyContainer == null) {
-            LogTool.error(ErrorType.POLICY_ERROR, "policyContainer is null");
-            throw new RuntimeException("Policy load failed");
+    private void loadHookConfigs() throws IOException {
+//        HookPolicyContainer hookPolicyContainer = FileUtils.load(this.getClass().getClassLoader());
+//        if (hookPolicyContainer == null) {
+//            LogTool.error(ErrorType.POLICY_ERROR, "policyContainer is null");
+//            throw new RuntimeException("Policy load failed");
+//        }
+//        context.setPolicyContainer(hookPolicyContainer);
+        IastHookConfig iastHookConfig = FileUtils.loadHookConfig(this.getClass().getClassLoader());
+        if (iastHookConfig == null) {
+            throw new ConfigLoadException("Failed to load hook config");
         }
-        context.setPolicyContainer(hookPolicyContainer);
+        context.setHookConfig(iastHookConfig);
+        IastHookManager.getManager().loadConfig(iastHookConfig);
     }
 
     private void loadHookBlacklist() throws IOException {

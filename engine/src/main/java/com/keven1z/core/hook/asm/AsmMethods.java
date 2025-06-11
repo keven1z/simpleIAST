@@ -26,12 +26,12 @@ public interface AsmMethods {
     }
 
     /**
-     * asm method of {@link SimpleIASTSpyManager#$_taint(Object, Object, Object[], String, String, String, String, String, String, String)}
+     * asm method of {@link SimpleIASTSpyManager#$_taint(Object, Object, Object[], String, String, String, String)}
      */
     Method ASM_METHOD_HOOKSCHEDULER$_taint = getAsmMethod(
             SimpleIASTSpyManager.class,
             "$_taint",
-            Object.class, Object.class, Object[].class, String.class, String.class, String.class, String.class, String.class, String.class, String.class
+            Object.class, Object.class, Object[].class, String.class, String.class, String.class, String.class
     );
     /**
      * asm method of {@link SimpleIASTSpyManager#$_single(Object, Object, Object[], String, String, String, String, String, boolean)}

@@ -1,9 +1,8 @@
 package com.keven1z.core.hook.asm.adapter;
 
 
-import com.keven1z.core.consts.CommonConst;
 import com.keven1z.core.hook.asm.AsmMethods;
-import com.keven1z.core.policy.HookPolicy;
+import com.keven1z.core.policy.MethodHookConfig;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -12,7 +11,7 @@ import org.objectweb.asm.commons.AdviceAdapter;
 import java.lang.spy.SimpleIASTSpyManager;
 
 
-public class SingleAdviceAdapter extends HookAdviceAdapter {
+public class SingleAdviceAdapter extends IASTAdviceAdapter {
 
     /**
      * Creates a SingleAdviceAdapter {@link AdviceAdapter}.
@@ -24,24 +23,24 @@ public class SingleAdviceAdapter extends HookAdviceAdapter {
      * @param name      the method's name.
      * @param desc      the method's descriptor (see {@link Type Type}).
      */
-    public SingleAdviceAdapter(int api, MethodVisitor mv, int access, String className, String name, String desc, HookPolicy hookPolicy) {
-        super(api, mv, access, className, name, desc, hookPolicy);
+    public SingleAdviceAdapter(int api, MethodVisitor mv, int access, String className, String name, String desc, MethodHookConfig methodHookConfig) {
+        super(api, mv, access, className, name, desc, methodHookConfig);
     }
 
 
     @Override
     protected void onMethodEnter() {
-        if (hookPolicy.getEnter() != CommonConst.ON) {
+        if (!methodHookConfig.getHookPositions().isEntry()) {
             return;
         }
 
-        inject(-1, true);
+//        inject(-1, true);
 
     }
 
     @Override
     protected void onMethodExit(int opcode) {
-        if (hookPolicy.getExit() == CommonConst.OFF) {
+        if (!methodHookConfig.getHookPositions().isExit()) {
             return;
         }
         //如果有异常抛出，不做任何操作
@@ -49,7 +48,7 @@ public class SingleAdviceAdapter extends HookAdviceAdapter {
             return;
         }
 
-        inject(opcode, false);
+//        inject(opcode, false);
 
     }
     protected void inject(int opcode, boolean isEnter){
@@ -64,9 +63,9 @@ public class SingleAdviceAdapter extends HookAdviceAdapter {
         push(className);
         push(methodName);
         push(desc);
-        push(this.hookPolicy.getType().name());
-        push(this.hookPolicy.getName());
-        push(this.hookPolicy.isRequireHttp());
+//        push(this.hookPolicy.getType().name());
+//        push(this.hookPolicy.getName());
+//        push(this.hookPolicy.isRequireHttp());
         Type type = Type.getType(SimpleIASTSpyManager.class);
         invokeStatic(type, AsmMethods.ASM_METHOD_HOOKSCHEDULER$_single);
     }

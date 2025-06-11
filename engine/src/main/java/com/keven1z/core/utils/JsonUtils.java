@@ -3,9 +3,9 @@ package com.keven1z.core.utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -71,5 +71,22 @@ public class JsonUtils {
         if ("".equals(json)) {
             throw new RuntimeException("json is empty");
         }
+    }
+    /**
+     * 通用反序列化方法，支持泛型类型和整个对象的自定义反序列化器
+     *
+     * @param jsonString JSON 字符串
+     * @param targetClass 要注册反序列化器的类
+     * @param deserializer 自定义反序列化器
+     * @param <T>         返回的目标类型
+     * @return 反序列化后的对象
+     */
+    public static <T> T toObject(String jsonString, Class<T> targetClass, JsonDeserializer<? extends T> deserializer)
+            throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(targetClass,deserializer);
+        mapper.registerModule(module);
+        return mapper.readValue(jsonString, targetClass);
     }
 }

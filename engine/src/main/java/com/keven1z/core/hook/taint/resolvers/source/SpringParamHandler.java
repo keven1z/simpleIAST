@@ -2,19 +2,16 @@ package com.keven1z.core.hook.taint.resolvers.source;
 
 import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.PolicyConst;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 import com.keven1z.core.consts.SourceType;
-import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
-import com.keven1z.core.model.server.FlowObject;
 import com.keven1z.core.model.taint.TaintData;
 import com.keven1z.core.policy.HookPolicy;
+import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.utils.ClassUtils;
 import com.keven1z.core.utils.CommonUtils;
-import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.ReflectionUtils;
-
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Method;
@@ -31,10 +28,11 @@ public class SpringParamHandler implements SourceHandler{
     private static final String[] USER_PACKAGE_PREFIX = new String[]{"java", "javax", " org.spring".substring(1), " org.apache".substring(1), " io.undertow".substring(1)};
     private static final String CLASS_HANDLER_METHOD = "org.springframework.web.method.HandlerMethod$HandlerMethodParameter";
     @Override
-    public List<TaintData.FlowPath> handle(FlowObject fromObject, Object returnObject) throws Exception {
+    public List<TaintData.FlowPath> handle(Object thisObject,
+                                           Object[] parameters, Object returnObject) throws Exception {
         ArrayList<TaintData.FlowPath> flowPaths = new ArrayList<>();
         if (CommonUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
-            flowPaths.add(new TaintData.FlowPath(getSourceFromName(fromObject),returnObject));
+            flowPaths.add(new TaintData.FlowPath(getSourceFromName(thisObject),returnObject));
         }else {
             addBeanObjectPolicy(returnObject.getClass());
         }
@@ -69,9 +67,9 @@ public class SpringParamHandler implements SourceHandler{
                     .enter(OFF)
                     .exit(ON)
                     .name(SourceType.HTTP_BEAN_PARAM.getName())
-                    .type(PolicyType.SOURCE)
+                    .type(HookType.SOURCE)
                     .build();
-            TaintSpy.getInstance().getPolicyContainer().addPolicy(hookPolicy);
+//            TaintSpy.getInstance().getPolicyContainer().addPolicy(hookPolicy);
             toBeTransformedClass.add(taintClassName);
         }
         for (String taintClassName : toBeTransformedClass) {
@@ -97,8 +95,7 @@ public class SpringParamHandler implements SourceHandler{
                 if (CommonUtils.isStartsWithElementInArray(taintClassName, USER_PACKAGE_PREFIX)) {
                     continue;
                 }
-
-                if (!PolicyUtils.isExistInPolicy(taintClassName.replace(".", "/"), TaintSpy.getInstance().getPolicyContainer().getSource())) {
+                if(!IastHookManager.getManager().shouldHookClass(taintClassName.replace(".", "/"))){
                     toBeTransformedMethods.add(method);
                 }
             }
@@ -119,12 +116,11 @@ public class SpringParamHandler implements SourceHandler{
     /**
      * 获取spring污染源的入参名
      */
-    private String getSourceFromName(FlowObject flowObject) {
-        Object pathObject = flowObject.getPathObject();
-        if (CLASS_HANDLER_METHOD.equals(pathObject.getClass().getName())) {
-            return ReflectionUtils.invokeStringMethod(pathObject, "getParameterName", new Class[]{});
+    private String getSourceFromName(Object fromObject) {
+        if (CLASS_HANDLER_METHOD.equals(fromObject.getClass().getName())) {
+            return ReflectionUtils.invokeStringMethod(fromObject, "getParameterName", new Class[]{});
         } else {
-            return pathObject.toString();
+            return fromObject.toString();
         }
     }
 }

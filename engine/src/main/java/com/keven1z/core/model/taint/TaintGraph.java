@@ -1,6 +1,6 @@
 package com.keven1z.core.model.taint;
 
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -36,7 +36,7 @@ public class TaintGraph {
     public List<PathNode> getSinkNodes() {
         ArrayList<PathNode> sinkNodes = new ArrayList<>(pathNodeList.size());
         for (PathNode node : pathNodeList) {
-            if (node.getTaintData().getStage() == PolicyType.SINK) {
+            if (node.getTaintData().getStage() == HookType.SINK) {
                 sinkNodes.add(node);
             }
         }
@@ -250,7 +250,7 @@ public class TaintGraph {
                 PathNode toNode = edge.getTo();
                 TaintData toTaintData = edge.getTo().getTaintData();
                 //如果污点的去向为SANITIZER并且没有包含在污点传播流程中
-                if (PolicyType.SANITIZER.equals(toNode.getTaintData().getStage()) && !taintDataList.contains(toTaintData)) {
+                if (HookType.SANITIZER.equals(toNode.getTaintData().getStage()) && !taintDataList.contains(toTaintData)) {
                     queue.add(toTaintData);
                     sanitizerTaintDataList.add(toTaintData);
                 }

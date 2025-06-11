@@ -1,6 +1,7 @@
 package com.keven1z.core.hook.asm.adapter;
 
 import com.keven1z.core.hook.asm.AsmMethods;
+import com.keven1z.core.policy.MethodHookConfig;
 import org.objectweb.asm.MethodVisitor;
 import static com.keven1z.core.hook.asm.AsmMethods.ASM_TYPE_SPY;
 
@@ -8,12 +9,20 @@ public class HttpBodyReadAdviceAdapter extends IASTAdviceAdapter {
     private static final String READ_BODY_1 = "()I";
     private static final String READ_BODY_2 = "([B)I";
     private static final String READ_BODY_3 = "([BII)I";
-    private final String desc;
 
-    public HttpBodyReadAdviceAdapter(int api, MethodVisitor mv, int access, String name, String desc) {
-        super(api, mv, access, name, desc);
-        this.desc = desc;
+    /**
+     * Creates a HookAdviceAdapter
+     *
+     * @param api              the ASM API version implemented by this visitor.
+     * @param access           the method's access flags
+     * @param className        the class's name
+     * @param name             the method's name.
+     * @param desc             the method's descriptor
+     */
+    public HttpBodyReadAdviceAdapter(int api, MethodVisitor mv, int access, String className, String name, String desc, MethodHookConfig methodHookConfig) {
+        super(api, mv, access, className, name, desc, methodHookConfig);
     }
+
 
     @Override
     protected void onMethodExit(int opcode) {

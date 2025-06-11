@@ -1,6 +1,6 @@
 package com.keven1z.core.consts;
 
-public enum PolicyType {
+public enum HookType {
     NONE,
     HTTP,
     SOURCE,

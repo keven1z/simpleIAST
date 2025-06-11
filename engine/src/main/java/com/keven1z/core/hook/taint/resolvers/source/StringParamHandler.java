@@ -1,20 +1,21 @@
 package com.keven1z.core.hook.taint.resolvers.source;
 
-import com.keven1z.core.model.server.FlowObject;
 import com.keven1z.core.model.taint.TaintData;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
 public class StringParamHandler implements SourceHandler {
-    private static final String CLASS_OPTIONAL = "java.util.Optional";
-
     @Override
-    public List<TaintData.FlowPath> handle(FlowObject fromObject, Object returnObject) throws Exception {
-        return analyzeSource(fromObject, returnObject);
+    public List<TaintData.FlowPath> handle(Object thisObject,
+                                           Object[] parameters, Object returnObject) throws Exception {
+        return analyzeSource(thisObject, returnObject);
     }
 
-    public List<TaintData.FlowPath> analyzeSource(FlowObject fromObject, Object returnObject) {
+    public List<TaintData.FlowPath> analyzeSource(Object fromObject, Object returnObject) {
+        if (fromObject == null || returnObject == null) {
+            return Collections.emptyList();
+        }
         List<TaintData.FlowPath> flowPaths = new ArrayList<>();
         if (returnObject instanceof Iterator) {
             flowPaths.addAll(parseIteratorObject(fromObject, (Iterator<?>) returnObject));
@@ -30,17 +31,17 @@ public class StringParamHandler implements SourceHandler {
             } else {
                 flowPaths.addAll(parseIteratorObject(fromObject, ((Collection<?>) returnObject).iterator()));
             }
-        } else if (CLASS_OPTIONAL.equals(returnObject.getClass().getName())) {
+        } else if (returnObject instanceof Optional) {
             flowPaths.addAll(parseOptional(fromObject, returnObject));
         }
         else {
-            TaintData.FlowPath flowPath = new TaintData.FlowPath(fromObject.getPathObject().toString(), returnObject);
+            TaintData.FlowPath flowPath = new TaintData.FlowPath(fromObject, returnObject);
             flowPaths.add(flowPath);
         }
         return flowPaths;
     }
 
-    private Collection<? extends TaintData.FlowPath> parseArrayObject(FlowObject fromObject, Object toObject) {
+    private Collection<? extends TaintData.FlowPath> parseArrayObject(Object fromObject, Object toObject) {
         int length = Array.getLength(toObject);
         for (int i = 0; i < length; i++) {
             Object data = Array.get(toObject, i);
@@ -52,7 +53,7 @@ public class StringParamHandler implements SourceHandler {
         return new ArrayList<>();
     }
 
-    private List<TaintData.FlowPath> parseIteratorObject(FlowObject fromObject, Iterator<?> iterator) {
+    private List<TaintData.FlowPath> parseIteratorObject(Object fromObject, Iterator<?> iterator) {
         while (iterator.hasNext()) {
             Object data = iterator.next();
             if (data == null || data == "") {
@@ -63,7 +64,7 @@ public class StringParamHandler implements SourceHandler {
         return new ArrayList<>();
     }
 
-    private List<TaintData.FlowPath> parseMap(FlowObject fromObject, Map<?, ?> map) {
+    private List<TaintData.FlowPath> parseMap(Object fromObject, Map<?, ?> map) {
         for (Object value : map.values()) {
             if (value == null || value == "") {
                 continue;
@@ -74,7 +75,7 @@ public class StringParamHandler implements SourceHandler {
         return new ArrayList<>();
     }
 
-    private List<TaintData.FlowPath> parseMapEntry(FlowObject fromObject, Map.Entry<?, ?> entry) {
+    private List<TaintData.FlowPath> parseMapEntry(Object fromObject, Map.Entry<?, ?> entry) {
         Object value = entry.getValue();
         if (value == null || value == "") {
             return new ArrayList<>();
@@ -82,7 +83,7 @@ public class StringParamHandler implements SourceHandler {
         return analyzeSource(fromObject, value);
     }
 
-    private List<TaintData.FlowPath> parseList(FlowObject fromObject, List<?> list) {
+    private List<TaintData.FlowPath> parseList(Object fromObject, List<?> list) {
         for (Object data : list) {
             if (data == null || data == "") {
                 continue;
@@ -92,7 +93,7 @@ public class StringParamHandler implements SourceHandler {
         return new ArrayList<>();
     }
 
-    private List<TaintData.FlowPath> parseOptional(FlowObject fromObject, Object toObject) {
+    private List<TaintData.FlowPath> parseOptional(Object fromObject, Object toObject) {
         try {
             Object value = ((Optional<?>) toObject).orElse(null);
             if (value == null || value == "") {

@@ -1,13 +1,14 @@
 package com.keven1z.core.hook.taint.resolvers;
 
 import com.keven1z.core.consts.SourceType;
-import com.keven1z.core.model.server.FlowObject;
 import com.keven1z.core.model.taint.TaintData;
 import com.keven1z.core.model.taint.TaintSource;
 import com.keven1z.core.model.taint.TaintGraph;
 import com.keven1z.core.hook.taint.resolvers.source.SourceHandler;
 import com.keven1z.core.hook.taint.resolvers.source.SourceHandlerFactory;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
+import com.keven1z.core.policy.IastHookManager;
+import com.keven1z.core.policy.MethodHookConfig;
 import com.keven1z.core.utils.*;
 
 import java.util.*;
@@ -29,25 +30,28 @@ public class SourceClassResolver implements HandlerHookClassResolver {
                         Object[] parameters,
                         String className,
                         String method,
-                        String desc,
-                        String policyName,
-                        String from,
-                        String to) throws Exception{
+                        String desc) throws Exception{
         if (!isReturnObjectFiltered(returnObject)) {
             return;
         }
 
-        FlowObject sourceFromPositionObject = PolicyUtils.getSourceAndSinkFromPositionObject(from, parameters, returnObject, thisObject);
-        if (sourceFromPositionObject == null) {
+//        FlowObject sourceFromPositionObject = PolicyUtils.getSourceAndSinkFromPositionObject(from, parameters, returnObject, thisObject);
+//        if (sourceFromPositionObject == null) {
+//            return;
+//        }
+        MethodHookConfig methodHookConfig = IastHookManager.getManager().getHookMethod(className, method, desc);
+        if (methodHookConfig == null) {
             return;
         }
-        SourceHandler handler = SourceHandlerFactory.getHandler(SourceType.fromName(policyName));
+        SourceType sourceType = SourceType.fromName(methodHookConfig.getTaintTracking().getSourceType());
+        SourceHandler handler = SourceHandlerFactory.getHandler(sourceType);
         if (handler == null) {
             return;
         }
 
         List<TaintData.FlowPath> flowPaths;
-        flowPaths = handler.handle(sourceFromPositionObject, returnObject);
+        flowPaths = handler.handle(thisObject,
+                parameters,returnObject);
         if (flowPaths.isEmpty()) {
             return;
         }
@@ -67,8 +71,8 @@ public class SourceClassResolver implements HandlerHookClassResolver {
                 .parameters(parameters)
                 .stackList(StackUtils.getStackTraceArray(true, true))
                 .flowPaths(flowPaths)
-                .sourceType(SourceType.fromName(policyName))
-                .stage(PolicyType.SOURCE)
+                .sourceType(sourceType)
+                .stage(HookType.SOURCE)
                 .build();
         if (taintGraph == null) {
             return;

@@ -16,9 +16,9 @@ public class SimpleIASTSpyManager {
         SimpleIASTSpyManager.singleSpy = singleSpy;
     }
 
-    public static void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
+    public static void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type) {
         try {
-            taintSpy.$_taint(returnObject, thisObject, parameters, className, method, desc, type, policyName, from, to);
+            taintSpy.$_taint(returnObject, thisObject, parameters, className, method, desc, type);
         } catch (Throwable ignored) {
         }
     }

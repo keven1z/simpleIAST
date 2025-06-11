@@ -5,8 +5,10 @@ import com.keven1z.core.model.server.FlowObject;
 import com.keven1z.core.model.taint.TaintData;
 import com.keven1z.core.model.taint.TaintGraph;
 import com.keven1z.core.model.taint.PathNode;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 import com.keven1z.core.model.taint.TaintSink;
+import com.keven1z.core.policy.IastHookManager;
+import com.keven1z.core.policy.MethodHookConfig;
 import com.keven1z.core.utils.PolicyUtils;
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
@@ -18,7 +20,9 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  */
 public class SinkClassResolver implements HandlerHookClassResolver {
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
+    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc) {
+        MethodHookConfig methodHookConfig = IastHookManager.getManager().getHookMethod(className, method, desc);
+        String from = methodHookConfig.getTaintTracking().getTrackingDirection().getFrom();
         FlowObject flowObject = PolicyUtils.getSourceAndSinkFromPositionObject(from, parameters, returnObject, thisObject);
         if (flowObject == null) {
             return;
@@ -30,6 +34,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
         if (parentNode == null) {
             return;
         }
+        String vulnerabilityType = methodHookConfig.getTaintTracking().getVulnerabilityTypes().get(0);
         TaintData taintData = new TaintSink.Builder()
                 .className(className)
                 .method(method)
@@ -37,8 +42,8 @@ public class SinkClassResolver implements HandlerHookClassResolver {
                 .parameters(parameters)
                 .thisObject(thisObject)
                 .addFlowPath(new TaintData.FlowPath(fromObject, null))
-                .stage(PolicyType.SINK)
-                .vulnerabilityType(VulnerabilityType.valueOf(policyName.toUpperCase()))
+                .stage(HookType.SINK)
+                .vulnerabilityType(VulnerabilityType.valueOf(vulnerabilityType.toUpperCase()))
                 .build();
         PathNode pathNode = taintGraph.addNode(taintData);
         taintGraph.addEdge(parentNode, pathNode, flowObject.getPathFlag());

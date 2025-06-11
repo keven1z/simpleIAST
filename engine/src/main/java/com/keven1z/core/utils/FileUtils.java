@@ -4,7 +4,8 @@ import com.keven1z.core.model.Config;
 import com.keven1z.core.EngineBoot;
 import com.keven1z.core.policy.HookPolicy;
 import com.keven1z.core.policy.HookPolicyContainer;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
+import com.keven1z.core.policy.IastHookConfig;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -35,17 +36,26 @@ public class FileUtils {
 
             List<HookPolicy> interfaceHookPolicy = hookPolicyContainer.getInterfacePolicy();
 
-            processPolicyList(hookPolicyContainer.getSource(), interfaceHookPolicy, PolicyType.SOURCE);
-            processPolicyList(hookPolicyContainer.getPropagation(), interfaceHookPolicy, PolicyType.PROPAGATION);
-            processPolicyList(hookPolicyContainer.getSink(), interfaceHookPolicy, PolicyType.SINK);
-            processPolicyList(hookPolicyContainer.getHttp(), interfaceHookPolicy, PolicyType.HTTP);
-            processPolicyList(hookPolicyContainer.getSanitizers(), interfaceHookPolicy, PolicyType.SANITIZER);
-            processPolicyList(hookPolicyContainer.getSingles(), interfaceHookPolicy, PolicyType.SINGLE);
+            processPolicyList(hookPolicyContainer.getSource(), interfaceHookPolicy, HookType.SOURCE);
+            processPolicyList(hookPolicyContainer.getPropagation(), interfaceHookPolicy, HookType.PROPAGATION);
+            processPolicyList(hookPolicyContainer.getSink(), interfaceHookPolicy, HookType.SINK);
+            processPolicyList(hookPolicyContainer.getHttp(), interfaceHookPolicy, HookType.HTTP);
+            processPolicyList(hookPolicyContainer.getSanitizers(), interfaceHookPolicy, HookType.SANITIZER);
+            processPolicyList(hookPolicyContainer.getSingles(), interfaceHookPolicy, HookType.SINGLE);
 
             return hookPolicyContainer;
         }
     }
-    private static void processPolicyList(List<HookPolicy> policies, List<HookPolicy> interfacePolicies, PolicyType type) {
+    public static IastHookConfig loadHookConfig(ClassLoader classLoader) throws IOException {
+        try (InputStream inputStream = classLoader.getResourceAsStream(Config.POLICY_FILE_PATH)) {
+            String jsonFile = readJsonFile(inputStream);
+            if (jsonFile == null) {
+                return null;
+            }
+            return JsonUtils.toObject(jsonFile, IastHookConfig.class, new HookPolicyDeserializer());
+        }
+    }
+        private static void processPolicyList(List<HookPolicy> policies, List<HookPolicy> interfacePolicies, HookType type) {
         policies.forEach(policy -> {
             if (policy.getInter()) {
                 interfacePolicies.add(policy);

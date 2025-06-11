@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class SanitizerClassResolver implements HandlerHookClassResolver {
     @Override
-    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) {
+    public void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc) {
 //        List<FlowObject> fromPositionObjects = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
 //        if (fromPositionObjects.isEmpty()) {
 //            return;

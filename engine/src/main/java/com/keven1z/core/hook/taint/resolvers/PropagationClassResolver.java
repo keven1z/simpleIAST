@@ -4,8 +4,10 @@ import com.keven1z.core.model.server.FlowObject;
 import com.keven1z.core.model.taint.TaintData;
 import com.keven1z.core.model.taint.TaintGraph;
 import com.keven1z.core.model.taint.PathNode;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 import com.keven1z.core.model.taint.TaintPropagation;
+import com.keven1z.core.policy.IastHookManager;
+import com.keven1z.core.policy.MethodHookConfig;
 import com.keven1z.core.utils.PolicyUtils;
 
 import java.util.List;
@@ -26,10 +28,13 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
                         Object[] parameters,
                         String className,
                         String method,
-                        String desc,
-                        String policyName,
-                        String from,
-                        String to) throws Exception{
+                        String desc) throws Exception{
+        MethodHookConfig methodHookConfig = IastHookManager.getManager().getHookMethod(className, method, desc);
+        MethodHookConfig.TaintTracking taintTracking = methodHookConfig.getTaintTracking();
+        if (taintTracking == null) {
+            return;
+        }
+        String from = taintTracking.getTrackingDirection().getFrom();
         List<FlowObject> fromPositionObjects = PolicyUtils.getFromPositionObject(from, parameters, returnObject, thisObject);
         if (fromPositionObjects.isEmpty()) {
             return;
@@ -43,7 +48,7 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
             if (parentNodes == null || parentNodes.isEmpty()) {
                 continue;
             }
-            Object toObject = PolicyUtils.getToPositionObject(to, parameters, returnObject, thisObject);
+            Object toObject = PolicyUtils.getToPositionObject(taintTracking.getTrackingDirection().getTo(), parameters, returnObject, thisObject);
             if (toObject == null) {
                 return;
             }
@@ -56,7 +61,7 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
                             .returnObject(returnObject)
                             .thisObject(thisObject)
                             .parameters(parameters)
-                            .stage(PolicyType.PROPAGATION)
+                            .stage(HookType.PROPAGATION)
                             .addFlowPath(new TaintData.FlowPath(fromObject, toObject))
                             .build();
                 }

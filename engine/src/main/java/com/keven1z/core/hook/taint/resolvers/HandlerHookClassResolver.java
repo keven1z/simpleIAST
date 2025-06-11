@@ -7,5 +7,5 @@ package com.keven1z.core.hook.taint.resolvers;
  */
 public interface HandlerHookClassResolver {
 
-    void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String policyName, String from, String to) throws Exception;
+    void resolve(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc) throws Exception;
 }

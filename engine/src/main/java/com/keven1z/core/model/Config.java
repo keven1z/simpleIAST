@@ -68,7 +68,7 @@ public class Config {
     /**
      * 是否离线启动
      */
-    private final boolean isOfflineStart = false;
+    private final boolean isOfflineStart = true;
 
     /**
      * 是否记录详细日志

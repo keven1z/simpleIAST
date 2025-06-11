@@ -1,9 +1,6 @@
 package com.keven1z.core.consts;
 
 public class PolicyConst {
-
-
-
     /**
      * 污点传输通道
      */

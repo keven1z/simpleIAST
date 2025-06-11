@@ -8,6 +8,7 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.policy.HookPolicyContainer;
+import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.utils.*;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
@@ -95,6 +96,8 @@ public class HookTransformer implements ClassFileTransformer {
     }
 
     private byte[] doTransform(ClassLoader loader, String className, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IOException {
+        long start = System.currentTimeMillis();
+
         // 识别server类型
         identifyServerType(loader, className, protectionDomain);
 
@@ -106,10 +109,28 @@ public class HookTransformer implements ClassFileTransformer {
         }
         hardcodedCheckBeforeHook(classReader, className);
         logUserDefinedClasses(loader, protectionDomain, className);
+        /* 确定hook的className,若该类的接口是hook点,hookClassName和className不一致 */
+        String hookClassName = null;
+
         /* 判断是否需要hook */
-        if (!PolicyUtils.isHook(className, policy, classReader.getInterfaces(), classReader.getSuperName(), loader)) {
+        if (IastHookManager.getManager().shouldHookClass(className)) {
+            hookClassName = className;
+        } else {
+            // 判断是否需要hook祖先类
+            Set<String> ancestors = ClassUtils.getAncestors(classReader.getInterfaces(), classReader.getSuperName(), loader);
+            if (ancestors.isEmpty()) {
+                return classfileBuffer;
+            }
+            if (IastHookManager.getManager().shouldHookAncestors(className, ancestors)) {
+                hookClassName = IastHookManager.getManager().getMatchingAncestor(ancestors);
+            }
+        }
+        if (hookClassName == null) {
             return classfileBuffer;
         }
+//        if (!PolicyUtils.isHook(className, policy, classReader.getInterfaces(), classReader.getSuperName(), loader)) {
+//            return classfileBuffer;
+//        }
         /* transform class +1 */
         ++transformCount;
 
@@ -132,7 +153,7 @@ public class HookTransformer implements ClassFileTransformer {
 
         //通过自定义classVisitor进行类的改造
         classReader.accept(new IASTClassVisitor(classWriter,
-                        className,
+                        hookClassName,
                         this.nativePrefix),
                 ClassReader.EXPAND_FRAMES
         );
@@ -248,7 +269,7 @@ public class HookTransformer implements ClassFileTransformer {
                 if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
                     continue;
                 }
-                if (PolicyUtils.isHook(this.policy, clazz)) {
+                if (IastHookManager.getManager().shouldHookClass(CommonUtils.toInternalClassName(clazz.getName()))) {
                     classes.add(clazz);
                 }
             } catch (Exception e) {

@@ -3,7 +3,7 @@ package com.keven1z.core.model.taint;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class TaintData {
     private final WeakReference<Object[]> parameters;
     private final List<String> stackList;
     private final List<FlowPath> flowPaths;
-    private PolicyType stage;
+    private final HookType stage;
     protected TaintData(Builder<?> builder) {
         this.invokeId = INVOKE_ID.getAndIncrement();
         this.className = builder.className;
@@ -69,7 +69,7 @@ public class TaintData {
         return thisObject.get();
     }
 
-    public PolicyType getStage() {
+    public HookType getStage() {
         return stage;
     }
 
@@ -159,7 +159,7 @@ public class TaintData {
         @JsonProperty("flowPaths")
         private List<FlowPath> flowPaths;
         @JsonProperty("stage")
-        private PolicyType stage ;
+        private HookType stage ;
         public Builder() {
         }
 
@@ -202,7 +202,7 @@ public class TaintData {
             this.stackList = stackList;
             return self();
         }
-        public T stage(PolicyType stage) {
+        public T stage(HookType stage) {
             this.stage = stage;
             return self();
         }

@@ -1,19 +1,16 @@
 package com.keven1z.core.hook.taint;
 
-import com.keven1z.core.EngineController;
+import com.keven1z.core.consts.HookType;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 import java.lang.spy.SimpleIASTSpy;
 import static com.keven1z.core.model.Config.MAX_REPORT_QUEUE_SIZE;
-import static com.keven1z.core.consts.VulnerabilityType.WEAK_PASSWORD_IN_SQL;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
 public class TaintSpy implements SimpleIASTSpy {
-    private HookPolicyContainer hookPolicyContainer;
     private final TaintSpyHandler spyHandler = TaintSpyHandler.getInstance();
     private static final Logger logger = Logger.getLogger(TaintSpy.class);
 
@@ -22,10 +19,6 @@ public class TaintSpy implements SimpleIASTSpy {
 
     public static TaintSpy getInstance() {
         return Inner.taintSpy;
-    }
-
-    public HookPolicyContainer getPolicyContainer() {
-        return hookPolicyContainer;
     }
 
     private static class Inner {
@@ -42,12 +35,11 @@ public class TaintSpy implements SimpleIASTSpy {
      * @param method 被hook的方法名
      * @param desc 方法描述符
      * @param type taint类型
-     * @param policyName 污点策略名
      * @param from 污点来源
      * @param to 污点去向
      */
     @Override
-    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
+    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type) {
         if (enableHookLock.get()) {
             return;
         } else {
@@ -64,7 +56,7 @@ public class TaintSpy implements SimpleIASTSpy {
                 return;
             }
             //如果没有流量，不进行hook
-            if (REQUEST_THREAD_LOCAL.get() == null && !WEAK_PASSWORD_IN_SQL.name().equals(policyName)) {
+            if (REQUEST_THREAD_LOCAL.get() == null) {
                 return;
             }
             if (isRequestEnded.get()) {
@@ -80,10 +72,16 @@ public class TaintSpy implements SimpleIASTSpy {
                 return;
             }
 
-            if (hookPolicyContainer == null) {
-                hookPolicyContainer = EngineController.context.getPolicyContainer();
+            if (TAINT_GRAPH_THREAD_LOCAL.get() == null) {
+                return;
             }
-            spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type, policyName, from, to);
+            /*
+             * 如果污点图为空，并且不为污染源节点，则不处理
+             */
+            if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty() && !HookType.SOURCE.name().equals(type)) {
+                return;
+            }
+            spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type);
         } catch (Exception e) {
             LogTool.error(ErrorType.HOOK_ERROR, "Failed to taint", e);
         } finally {

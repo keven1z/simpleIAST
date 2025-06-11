@@ -303,7 +303,7 @@ public class HttpSpy implements SimpleIASTSpy {
     }
 
     @Override
-    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, String from, String to) {
+    public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type) {
 
     }
 

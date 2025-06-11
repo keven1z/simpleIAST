@@ -1,7 +1,7 @@
 package com.keven1z.core.policy;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
@@ -80,7 +80,7 @@ public class HookPolicy implements Serializable, Comparable<HookPolicy> {
     /**
      * 策略类型
      */
-    private PolicyType type;
+    private HookType type;
     private boolean inter;
     private String conditions;
     private Set<String> exclude = new HashSet<>();
@@ -94,8 +94,8 @@ public class HookPolicy implements Serializable, Comparable<HookPolicy> {
      */
     private  String originClassName;
 
-    public void setType(PolicyType policyType) {
-        this.type = policyType;
+    public void setType(HookType hookType) {
+        this.type = hookType;
     }
 
     public static class Builder {
@@ -120,7 +120,7 @@ public class HookPolicy implements Serializable, Comparable<HookPolicy> {
         @JsonProperty("isHooked")
         private boolean isHooked;
         @JsonProperty("type")
-        private PolicyType type;
+        private HookType type;
         @JsonProperty("inter")
         private boolean inter;
         @JsonProperty("conditions")
@@ -182,7 +182,7 @@ public class HookPolicy implements Serializable, Comparable<HookPolicy> {
             return this;
         }
 
-        public Builder type(PolicyType type) {
+        public Builder type(HookType type) {
             this.type = type;
             return this;
         }
@@ -265,7 +265,7 @@ public class HookPolicy implements Serializable, Comparable<HookPolicy> {
     }
 
 
-    public PolicyType getType() {
+    public HookType getType() {
         return type;
     }
 

@@ -2,6 +2,7 @@ package com.keven1z.core.model;
 
 import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.policy.HookPolicyContainer;
+import com.keven1z.core.policy.IastHookConfig;
 
 import java.lang.instrument.Instrumentation;
 import java.util.HashSet;
@@ -12,6 +13,8 @@ import java.util.Set;
  * Agent上下文对象
  */
 public class IASTContext {
+    private IastHookConfig iastHookConfig;
+
     private IASTContext() {
         userClasses = new HashSet<>();
     }
@@ -164,5 +167,8 @@ public class IASTContext {
 
     public void setAgentVersion(String agentVersion) {
         this.agentVersion = agentVersion;
+    }
+    public void setHookConfig(IastHookConfig iastHookConfig) {
+        this.iastHookConfig = iastHookConfig;
     }
 }

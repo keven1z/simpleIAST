@@ -1,6 +1,6 @@
 package com.keven1z.core.policy;
 
-import com.keven1z.core.consts.PolicyType;
+import com.keven1z.core.consts.HookType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,23 +62,23 @@ public class HookPolicyContainer {
     }
 
     public void addPolicy(HookPolicy hookPolicy) {
-        PolicyType policyType = hookPolicy.getType();
+        HookType hookType = hookPolicy.getType();
         //如果为接口，直接加入接口策略中
         if (hookPolicy.getInter()) {
             this.interfaceHookPolicy.add(hookPolicy);
         }
 
-        if (PolicyType.SOURCE.equals(policyType)) {
+        if (HookType.SOURCE.equals(hookType)) {
             this.source.add(hookPolicy);
-        } else if (PolicyType.PROPAGATION.equals(policyType)) {
+        } else if (HookType.PROPAGATION.equals(hookType)) {
             this.propagation.add(hookPolicy);
-        } else if (PolicyType.SINK.equals(policyType)) {
+        } else if (HookType.SINK.equals(hookType)) {
             this.sink.add(hookPolicy);
-        } else if (PolicyType.HTTP.equals(policyType)) {
+        } else if (HookType.HTTP.equals(hookType)) {
             this.http.add(hookPolicy);
-        } else if (PolicyType.SANITIZER.equals(policyType)) {
+        } else if (HookType.SANITIZER.equals(hookType)) {
             this.sanitizers.add(hookPolicy);
-        } else if (PolicyType.SINGLE.equals(policyType)) {
+        } else if (HookType.SINGLE.equals(hookType)) {
             this.singles.add(hookPolicy);
         }
     }

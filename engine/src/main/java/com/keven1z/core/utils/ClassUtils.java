@@ -15,22 +15,31 @@ import static org.objectweb.asm.Opcodes.*;
  * @since 2023/02/06
  */
 public class ClassUtils {
-    private static final String[] IGNORE_OBJECT_CLASS = new String[]{"java.lang.Object", "java.lang.Cloneable", "java.io.Serializable", "java.lang.Iterable"};
+    private static final String[] IGNORE_OBJECT_CLASS = new String[]{"java.lang.Object",
+    "java.lang.Cloneable",
+    "java.io.Closeable",
+    "java.io.Serializable",
+    "java.lang.Iterable",
+    "java.io.Flushable",
+    "java.lang.Appendable",
+    "java.lang.Enum",
+    "java.lang.Comparable",
+    "java.rmi.Remote",
+    "javax.servlet.SingleThreadModel",
+    "java.lang.FunctionalInterface"};
     private static final String INTEGER_CLASS = "java.lang.Integer";
     private static final String IAST_FAMILY_CLASS_RES_PREFIX = "com/keven1z/";
+    private static final int RECURSION_LIMIT = 3; // 设置递归限制次数
 
     public static Set<String> buildAncestors(String[] interfaces, String superClass) {
         Set<String> ancestors = new HashSet<>();
         if (superClass != null) {
-            superClass = superClass.replace("/", ".");
-
-            if (!CommonUtils.isInList(superClass, Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (!CommonUtils.isInList(CommonUtils.toJavaClassName(superClass), Arrays.asList(IGNORE_OBJECT_CLASS))) {
                 ancestors.add(superClass);
             }
         }
         for (String inter : interfaces) {
-            inter = inter.replace("/", ".");
-            if (!CommonUtils.isInList(inter, Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (!CommonUtils.isInList(CommonUtils.toJavaClassName(inter), Arrays.asList(IGNORE_OBJECT_CLASS))) {
                 ancestors.add(inter);
             }
         }
@@ -47,10 +56,12 @@ public class ClassUtils {
         }
         return allInterfaces;
     }
+    public static Set<String> getAncestors(String[] interfaces, String superClass, ClassLoader loader) throws IOException {
+        Set<String> ancestors = ClassUtils.buildAncestors(interfaces, superClass);
+        return ClassUtils.getAncestors(ancestors, loader, 0);
+    }
 
-    private static final int RECURSION_LIMIT = 3; // 设置递归限制次数
-
-    public static Set<String> getAllInterfaces(Set<String> ancestors, ClassLoader classLoader, int recursionCount) throws IOException {
+    public static Set<String> getAncestors(Set<String> ancestors, ClassLoader classLoader, int recursionCount) throws IOException {
         Set<String> set = new HashSet<>(5);
         if (recursionCount >= RECURSION_LIMIT) {
             return set;
@@ -62,7 +73,7 @@ public class ClassUtils {
         for (String ancestor : ancestors) {
             InputStream stream = null;
             BufferedInputStream bufferedInput = null;
-            ancestor = ancestor.replace(".", "/");
+            ancestor = CommonUtils.toInternalClassName(ancestor);
             try {
                 stream = classLoader.getResourceAsStream(ancestor + ".class");
                 if (stream == null) {
@@ -72,15 +83,14 @@ public class ClassUtils {
                 ClassReader classReader = new ClassReader(bufferedInput);
                 String superName = classReader.getSuperName();
                 if (superName != null) {
-                    if (!CommonUtils.isInList(superName, ignoreList)) {
-                        set.add(superName.replace(".", "/"));
+                    if (!CommonUtils.isInList(CommonUtils.toJavaClassName(superName), ignoreList)) {
+                        set.add(superName);
                     }
                 }
 
                 String[] interfaces = classReader.getInterfaces();
                 for (String interfaceName : interfaces) {
-                    if (!CommonUtils.isInList(interfaceName, ignoreList)) {
-                        interfaceName = interfaceName.replace(".", "/");
+                    if (!CommonUtils.isInList(CommonUtils.toJavaClassName(interfaceName), ignoreList)) {
                         if (set.size() <= 5) {
                             set.add(interfaceName);
                         }
@@ -97,7 +107,7 @@ public class ClassUtils {
 
         }
         if (!set.isEmpty()) {
-            set.addAll(getAllInterfaces(set, classLoader, recursionCount + 1));
+            set.addAll(getAncestors(set, classLoader, recursionCount + 1));
         }
         set.addAll(ancestors);
         return set;

@@ -1,1985 +1,3367 @@
 {
-  "http": [
-    {
-      "name": "http_circle",
-      "className": "javax/servlet/Filter",
-      "method": "doFilter",
-      "desc": "(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V",
-      "state": 1,
-      "enter": 1,
-      "exit": 1,
-      "exclude": [
-        "org/springframework/security/web/header/HeaderWriterFilter",
-        "org/springframework/security/web/csrf/CsrfFilter",
-        "org/springframework/security/web/authentication/preauth/x509/X509AuthenticationFilter",
-        "org/springframework/security/web/authentication/UsernamePasswordAuthenticationFilter",
-        "org/springframework/security/web/authentication/www/BasicAuthenticationFilter",
-        ""
-      ],
-      "inter": true
-    },
-    {
-      "name": "http_circle",
-      "className": "javax/servlet/Servlet",
-      "method": "service",
-      "desc": "(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V",
-      "state": 1,
-      "enter": 1,
-      "exit": 1,
-      "exclude": [
-        "org/springframework/security/web/firewall/FirewalledRequest",
-        "javax/servlet/http/HttpServletRequestWrapper"
-      ],
-      "inter": true
-    },
-    {
-      "name": "http_body",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getReader",
-      "desc": "()Ljava/io/BufferedReader;",
-      "state": 1,
-      "enter": 1,
-      "inter": true
-    },
-    {
-      "name": "http_body",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getInputStream",
-      "desc": "()Ljavax/servlet/ServletInputStream;",
-      "state": 1,
-      "enter": 1,
-      "inter": true
-    },
-    {
-      "name": "http_body",
-      "className": "org/apache/catalina/connector/Request",
-      "method": "getStream",
-      "desc": "()Ljava/io/InputStream;",
-      "state": 1,
-      "exit": 1
-    },
-    {
-      "name": "http_body_read",
-      "className": "java/io/InputStream",
-      "method": "read",
-      "desc": "([BII)I",
-      "state": 1,
-      "enter": 1,
-      "inter": true
-    },
-    {
-      "name": "http_body_read",
-      "className": "java/io/InputStream",
-      "method": "read",
-      "desc": "([B)I",
-      "state": 1,
-      "enter": 1,
-      "inter": true
-    },
-    {
-      "name": "http_body_read",
-      "className": "java/io/InputStream",
-      "method": "read",
-      "desc": "()I",
-      "state": 1,
-      "enter": 1,
-      "inter": true
-    }
-  ],
-  "source": [
-    {
-      "name": "http_string_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getParameter",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "inter": true,
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_body_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getInputStream",
-      "desc": "()Ljavax/servlet/ServletInputStream;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "inter": true,
-      "exit": 1
-    },
-    {
-      "name": "http_string_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getParameterMap",
-      "desc": "()Ljava/util/Map;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "inter": true,
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_string_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getParameterValues",
-      "desc": "(Ljava/lang/String;)[Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_body_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getReader",
-      "desc": "()Ljava/io/BufferedReader;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_string_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getQueryString",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_multipart_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getPart",
-      "desc": "(Ljava/lang/String;)Ljavax/servlet/http/Part;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper",
-        "org/apache/catalina/connector/RequestFacade"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_multipart_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getParts",
-      "desc": "()Ljava/util/Collection;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper",
-        "org/apache/catalina/connector/RequestFacade"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_string_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getParameterNames()",
-      "desc": "Ljava/util/Enumeration;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper",
-        "org/apache/catalina/connector/RequestFacade"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_header_param",
-      "className": "javax/servlet/http/HttpServletRequest",
-      "method": "getHeader",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "inter": true,
-      "exclude": [
-        "org/springframework/security/web/savedrequest/SavedRequestAwareWrapper"
-      ],
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "http_spring_param",
-      "className": "org/springframework/web/method/support/HandlerMethodArgumentResolverComposite",
-      "method": "resolveArgument",
-      "desc": "(Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/bind/support/WebDataBinderFactory;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    }
-  ],
-  "propagation": [
-    {
-      "name": "StringJoiner add",
-      "className": "java/util/StringJoiner",
-      "method": "add",
-      "desc": "(Ljava/lang/CharSequence;)Ljava/util/StringJoiner;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "StringJoiner toString",
-      "className": "java/util/StringJoiner",
-      "method": "toString",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "append",
-      "desc": "(Ljava/lang/AbstractStringBuilder;)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "O,P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "append",
-      "desc": "(Ljava/lang/String;)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "O,P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "getChars",
-      "desc": "(II[CI)V",
-      "state": 1,
-      "from": "O",
-      "to": "P3",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "insert",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "insert",
-      "desc": "(ILjava/lang/CharSequence;)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "insert",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "insert",
-      "desc": "(ILjava/lang/CharSequence;II)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "insert",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "insert",
-      "desc": "(ILjava/lang/String;)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "insert",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "insert",
-      "desc": "(I[CII)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "insert",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "insert",
-      "desc": "(I[C)Ljava/lang/AbstractStringBuilder;",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "java/lang/StringBuilder",
-      "method": "toString",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "java/lang/StringBuffer",
-      "method": "toString",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "concat",
-      "className": "java/lang/String",
-      "method": "concat",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "O,P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "toUpperCase",
-      "className": "java/lang/String",
-      "method": "toUpperCase",
-      "desc": "(Ljava/util/Locale;)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "toLowerCase",
-      "className": "java/lang/String",
-      "method": "toLowerCase",
-      "desc": "(Ljava/util/Locale;)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String toCharArray",
-      "className": "java/lang/String",
-      "method": "toCharArray",
-      "desc": "()[C",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "trim",
-      "className": "java/lang/String",
-      "method": "trim",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "getBytes",
-      "className": "java/lang/String",
-      "method": "getBytes",
-      "desc": "()[B",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "getBytes",
-      "className": "java/lang/String",
-      "method": "getBytes",
-      "desc": "(Ljava/lang/String;)[B",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "getBytes",
-      "className": "java/lang/String",
-      "method": "getBytes",
-      "desc": "(Ljava/nio/charset/Charset;)[B",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([BIII)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([C)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([CII)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([BIILjava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([BIILjava/nio/charset/Charset;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "(Ljava/lang/StringBuffer;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "(Ljava/lang/StringBuilder;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "String.<init>",
-      "className": "java/lang/String",
-      "method": "<init>",
-      "desc": "([BB)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "string append-jdk11",
-      "className": "java/lang/StringConcatHelper",
-      "method": "prepend",
-      "desc": "(I[BBLjava/lang/String;)I",
-      "state": 1,
-      "from": "P4",
-      "to": "P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "string append-jdk11",
-      "className": "java/lang/StringConcatHelper",
-      "method": "prepend",
-      "desc": "(J[BLjava/lang/String;)J",
-      "state": 1,
-      "from": "P3",
-      "to": "P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "string newString-jdk11",
-      "className": "java/lang/StringConcatHelper",
-      "method": "newString",
-      "desc": "([BIB)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "getChars",
-      "className": "java/lang/String",
-      "method": "getChars",
-      "desc": "(II[CI)V",
-      "state": 1,
-      "from": "O",
-      "to": "P3",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "CharBuffer.wrap",
-      "className": "java/nio/CharBuffer",
-      "method": "wrap",
-      "desc": "([CII)Ljava/nio/CharBuffer;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "CharsetEncoder",
-      "className": "java/nio/charset/CharsetEncoder",
-      "method": "encode",
-      "desc": "(Ljava/nio/CharBuffer;Ljava/nio/ByteBuffer;Z)Ljava/nio/charset/CoderResult;",
-      "state": 1,
-      "from": "P1",
-      "to": "P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "byteBuffer.array",
-      "className": "java/nio/ByteBuffer",
-      "method": "array",
-      "desc": "()[B",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "byteBuffer.wrap",
-      "className": "java/nio/ByteBuffer",
-      "method": "wrap",
-      "desc": "([BII)Ljava/nio/ByteBuffer;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Request.Get",
-      "className": "org/apache/http/client/fluent/Request",
-      "method": "Get",
-      "desc": "(Ljava/lang/String;)Lorg/apache/http/client/fluent/Request;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "HttpGet.<init>",
-      "className": "org/apache/http/client/methods/HttpGet",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "HttpPost.<init>",
-      "className": "org/apache/http/client/methods/HttpPost",
-      "method": "<init>",
-      "desc": "(Ljava/net/URI;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "HttpPost.<init>",
-      "className": "org/apache/http/client/methods/HttpPost",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "url init1",
-      "className": "java/net/URL",
-      "method": "<init>",
-      "desc": "(Ljava/net/URL;Ljava/lang/String;Ljava/net/URLStreamHandler;)V",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "java/net/URL",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;Ljava/lang/String;ILjava/net/URLStreamHandler;)V",
-      "state": 1,
-      "from": "P2",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "ProcessBuilder.<init>",
-      "className": "java/lang/ProcessBuilder",
-      "method": "<init>",
-      "desc": "(Ljava/util/List;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "ProcessBuilder.<init>",
-      "className": "java/lang/ProcessBuilder",
-      "method": "<init>",
-      "desc": "([Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "ObjectInputStream",
-      "className": "java/io/ObjectInputStream",
-      "method": "<init>",
-      "desc": "(Ljava/io/InputStream;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "ByteArrayInputStream",
-      "className": "java/io/ByteArrayInputStream",
-      "method": "<init>",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "ByteArrayInputStream",
-      "className": "java/io/ByteArrayInputStream",
-      "method": "<init>",
-      "desc": "([B)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "InputStreamReader",
-      "className": "java/io/InputStreamReader",
-      "method": "<init>",
-      "desc": "(Ljava/io/InputStream;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Base64$Decoder",
-      "className": "java/util/Base64$Decoder",
-      "method": "decode",
-      "desc": "([B)[B",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "StringReader",
-      "className": "java/io/StringReader",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "className": "org/springframework/web/multipart/MultipartFile",
-      "method": "getBytes",
-      "desc": "()[B",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1,
-      "inter": true
-    },
-    {
-      "className": "org/springframework/web/multipart/MultipartFile",
-      "method": "getInputStream",
-      "desc": "()Ljava/io/InputStream;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1,
-      "inter": true
-    },
-    {
-      "name": "InputSource",
-      "className": "org/xml/sax/InputSource",
-      "method": "<init>",
-      "desc": "(Ljava/io/Reader;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "InputSource",
-      "className": "org/xml/sax/InputSource",
-      "method": "<init>",
-      "desc": "(Ljava/io/InputStream;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "URI.<init>",
-      "className": "java/net/URI",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Paths.get",
-      "className": "java/nio/file/Paths",
-      "method": "get",
-      "desc": "(Ljava/net/URI;)Ljava/nio/file/Paths;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Paths.get",
-      "className": "java/nio/file/Paths",
-      "method": "get",
-      "desc": "(Ljava/lang/String;[Ljava/lang/String;)Ljava/nio/file/Path;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "StreamSource.setInputStream",
-      "className": "javax/xml/transform/stream/StreamSource",
-      "method": "setInputStream",
-      "desc": "(Ljava/io/InputStream;)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "HierarchicalStreamDriver.createReader",
-      "className": "com/thoughtworks/xstream/io/HierarchicalStreamDriver",
-      "method": "createReader",
-      "desc": "(Ljava/io/Reader;)Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "HierarchicalStreamDriver.createReader",
-      "className": "com/thoughtworks/xstream/io/HierarchicalStreamDriver",
-      "method": "createReader",
-      "desc": "(Ljava/io/InputStream;)Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Input.<init>",
-      "className": "com/esotericsoftware/kryo/io/Input",
-      "method": "<init>",
-      "desc": "([B)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Input.<init>",
-      "className": "com/esotericsoftware/kryo/io/Input",
-      "method": "<init>",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Input.<init>",
-      "className": "com/esotericsoftware/kryo/io/Input",
-      "method": "<init>",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "Input.<init>",
-      "className": "com/esotericsoftware/kryo/io/Input",
-      "method": "<init>",
-      "desc": "(Ljava/io/InputStream;I)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "getSubmittedFileName",
-      "className": "javax/servlet/http/Part",
-      "method": "getSubmittedFileName",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "inter": true,
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "BufferedReader.<init>",
-      "className": "java/io/BufferedReader",
-      "method": "<init>",
-      "desc": "(Ljava/io/Reader;I)V",
-      "state": 1,
-      "from": "P1",
-      "to": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "readLine",
-      "className": "java/io/BufferedReader",
-      "method": "readLine",
-      "desc": "(Z)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "arraycopy",
-      "className": "java/lang/System",
-      "method": "arraycopy",
-      "desc": "(Ljava/lang/Object;ILjava/lang/Object;II)V",
-      "state": 1,
-      "from": "P1",
-      "to": "P3",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "intern",
-      "className": "java/lang/String",
-      "method": "intern",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/String",
-      "method": "subSequence",
-      "desc": "(II)Ljava/lang/CharSequence;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(I)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "substring",
-      "className": "java/lang/String",
-      "method": "substring",
-      "desc": "(II)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "sub",
-      "className": "java/lang/AbstractStringBuilder",
-      "method": "subSequence",
-      "desc": "(II)Ljava/lang/CharSequence;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "StringEscapeUtils.unescapeJson",
-      "className": "org/apache/commons/lang3/StringEscapeUtils",
-      "method": "unescapeJson",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    }
-  ],
-  "sink": [
-    {
-      "name": "sql_injection",
-      "className": "java/sql/Statement",
-      "method": "executeQuery",
-      "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "com/alibaba/druid/pool/DruidPooledCallableStatement",
-        "com/alibaba/druid/pool/DruidPooledPreparedStatement",
-        "java/sql/CallableStatement",
-        "java/sql/PreparedStatement",
-        "com/mysql/cj/jdbc/ClientPreparedStatement",
-        "com/mysql/cj/jdbc/ServerPreparedStatement"
-      ],
-      "inter": true
-    },
-    {
-      "name": "sql_injection",
-      "className": "java/sql/Statement",
-      "method": "executeUpdate",
-      "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "com/alibaba/druid/pool/DruidPooledCallableStatement",
-        "com/alibaba/druid/pool/DruidPooledPreparedStatement",
-        "java/sql/CallableStatement",
-        "java/sql/PreparedStatement",
-        "com/mysql/cj/jdbc/ClientPreparedStatement",
-        "com/mysql/cj/jdbc/ServerPreparedStatement"
-      ],
-      "inter": true
-    },
-    {
-      "name": "sql_injection",
-      "className": "java/sql/Statement",
-      "method": "executeLargeUpdate",
-      "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "com/alibaba/druid/pool/DruidPooledCallableStatement",
-        "com/alibaba/druid/pool/DruidPooledPreparedStatement",
-        "java/sql/CallableStatement",
-        "java/sql/PreparedStatement",
-        "com/mysql/cj/jdbc/ClientPreparedStatement",
-        "com/mysql/cj/jdbc/ServerPreparedStatement"
-      ],
-      "inter": true
-    },
-    {
-      "name": "sql_injection",
-      "className": "java/sql/Statement",
-      "method": "execute",
-      "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "com/alibaba/druid/pool/DruidPooledCallableStatement",
-        "com/alibaba/druid/pool/DruidPooledPreparedStatement",
-        "java/sql/CallableStatement",
-        "java/sql/PreparedStatement",
-        "com/mysql/cj/jdbc/ClientPreparedStatement",
-        "com/mysql/cj/jdbc/ServerPreparedStatement"
-      ],
-      "inter": true
-    },
-    {
-      "name": "sql_injection",
-      "className": "java/sql/Connection",
-      "method": "prepareStatement",
-      "desc": "(Ljava/lang/String;II)Ljava/sql/PreparedStatement;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "org/springframework/jdbc/datasource/ConnectionProxy",
-        "com/microsoft/sqlserver/jdbc/SQLServerConnection43",
-        "com/microsoft/sqlserver/jdbc/SQLServerConnection",
-        "com/mysql/cj/jdbc/JdbcConnection"
-      ],
-      "inter": true
-    },
-    {
-      "name": "sql_injection",
-      "className": "java/sql/Connection",
-      "method": "prepareStatement",
-      "desc": "(Ljava/lang/String;IIZ)Ljava/sql/PreparedStatement;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "org/springframework/jdbc/datasource/ConnectionProxy",
-        "com/microsoft/sqlserver/jdbc/SQLServerConnection43",
-        "com/microsoft/sqlserver/jdbc/SQLServerConnection",
-        "com/mysql/cj/jdbc/JdbcConnection"
-      ],
-      "inter": true
-    },
-    {
-      "name": "ssrf",
-      "className": "java/net/URL",
-      "method": "openConnection",
-      "desc": "()Ljava/net/URLConnection;",
-      "state": 1,
-      "from": "O",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ssrf",
-      "className": "java/net/URL",
-      "method": "openConnection",
-      "desc": "(Ljava/net/Proxy;)Ljava/net/URLConnection;",
-      "state": 1,
-      "from": "O",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ssrf",
-      "className": "com/squareup/okhttp/HttpUrl",
-      "method": "parse",
-      "desc": "(Ljava/lang/String;)Lcom/squareup/okhttp/HttpUrl;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ssrf",
-      "className": "okhttp3/HttpUrl",
-      "method": "parse",
-      "desc": "(Ljava/lang/String;)Lokhttp3/HttpUrl;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ssrf",
-      "className": "weblogic/uddi/client/service/UDDIService",
-      "method": "setURL",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ssrf",
-      "className": "org/apache/http/client/fluent/Request",
-      "method": "execute",
-      "desc": "()Lorg/apache/http/client/fluent/Response;",
-      "state": 1,
-      "from": "O",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "ssrf",
-      "className": "org/apache/http/impl/client/CloseableHttpClient",
-      "method": "doExecute",
-      "desc": "(Lorg/apache/http/HttpHost;Lorg/apache/http/HttpRequest;Lorg/apache/http/protocol/HttpContext;)Lorg/apache/http/client/methods/CloseableHttpResponse;",
-      "state": 1,
-      "from": "P2",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "cmd_injection",
-      "className": "java/lang/ProcessBuilder",
-      "method": "start",
-      "desc": "()Ljava/lang/Process;",
-      "state": 1,
-      "from": "O",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "cmd_injection",
-      "className": "java/lang/Runtime",
-      "method": "exec",
-      "desc": "(Ljava/lang/String;[Ljava/lang/String;Ljava/io/File;)Ljava/lang/Process;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "deserialization",
-      "className": "java/io/ObjectInputStream",
-      "method": "readObject",
-      "desc": "()Ljava/lang/Object;",
-      "state": 1,
-      "from": "O",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "url_redirect",
-      "className": "javax/servlet/http/HttpServletResponse",
-      "method": "sendRedirect",
-      "desc": "(Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "url_redirect",
-      "className": "javax/servlet/http/HttpServletResponse",
-      "method": "setHeader",
-      "desc": "(Ljava/lang/String;Ljava/lang/String;)V",
-      "state": 1,
-      "from": "P2",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/io/Reader;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/io/InputStream;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/fasterxml/jackson/databind/ObjectMapper",
-      "method": "readValue",
-      "desc": "(Ljava/io/DataInput;Ljava/lang/Class;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/sun/org/apache/xerces/internal/jaxp/validation/XMLSchemaFactory",
-      "method": "newSchema",
-      "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/validation/Schema;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/validation/Validator",
-      "method": "validate",
-      "desc": "(Ljavax/xml/transform/Source;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "org/xml/sax/XMLReader",
-      "method": "parse",
-      "desc": "(Lorg/xml/sax/InputSource;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/validation/SchemaFactory",
-      "method": "newSchema",
-      "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/validation/Schema;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "com/sun/org/apache/xalan/internal/xsltc/trax/TransformerImpl",
-      "method": "transform",
-      "desc": "(Ljavax/xml/transform/Source;Ljavax/xml/transform/Result;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/stream/XMLInputFactory",
-      "method": "createXMLStreamReader",
-      "desc": "(Ljava/io/InputStream;)Ljavax/xml/stream/XMLStreamReader;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "org/codehaus/stax2/XMLInputFactory2"
-      ],
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/stream/XMLInputFactory",
-      "method": "createXMLStreamReader",
-      "desc": "(Ljava/io/Reader;)Ljavax/xml/stream/XMLStreamReader;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "org/codehaus/stax2/XMLInputFactory2"
-      ],
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "org/jdom2/input/SAXBuilder",
-      "method": "build",
-      "desc": "(Ljava/io/InputStream;)Lorg/jdom2/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "org/jdom2/input/SAXBuilder",
-      "method": "build",
-      "desc": "(Ljava/io/InputStream;Ljava/lang/String;)Lorg/jdom2/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "org/jdom2/input/SAXBuilder",
-      "method": "build",
-      "desc": "(Lorg/xml/sax/InputSource;)Lorg/jdom2/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/DocumentBuilder",
-      "method": "parse",
-      "desc": "(Ljava/io/InputStream;)Lorg/w3c/dom/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/DocumentBuilder",
-      "method": "parse",
-      "desc": "(Ljava/io/InputStream;Ljava/lang/String;)Lorg/w3c/dom/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/DocumentBuilder",
-      "method": "parse",
-      "desc": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/DocumentBuilder",
-      "method": "parse",
-      "desc": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/DocumentBuilder",
-      "method": "parse",
-      "desc": "(Ljava/io/File;)Lorg/w3c/dom/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/DocumentBuilder",
-      "method": "parse",
-      "desc": "(Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/SAXParser",
-      "method": "parse",
-      "desc": "(Lorg/xml/sax/InputSource;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "javax/xml/parsers/SAXParser",
-      "method": "parse",
-      "desc": "(Lorg/xml/sax/InputSource;Lorg/xml/sax/HandlerBase;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "xxe",
-      "className": "com/sun/org/apache/xalan/internal/xsltc/trax/TransformerFactoryImpl",
-      "method": "newTransformerHandler",
-      "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/transform/sax/TransformerHandler;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "xss",
-      "className": "javax/servlet/ServletOutputStream",
-      "method": "write",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "exclude": [
-        "org/springframework/security/web/util/OnCommittedResponseWrapper$SaveContextServletOutputStream"
-      ],
-      "inter": true
-    },
-    {
-      "name": "xss",
-      "className": "java/io/Writer",
-      "method": "write",
-      "desc": "(Ljava/lang/String;II)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "file_upload",
-      "className": "java/io/OutputStream",
-      "method": "write",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "file_upload",
-      "className": "java/nio/channels/Channels$1",
-      "method": "write",
-      "desc": "([BII)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "spring_expression_injection",
-      "className": "org/springframework/expression/ExpressionParser",
-      "method": "parseExpression",
-      "desc": "(Ljava/lang/String;)Lorg/springframework/expression/Expression;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "spring_expression_injection",
-      "className": "javax/el/ExpressionFactory",
-      "method": "createValueExpression",
-      "desc": "(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;)Ljavax/el/ValueExpression;",
-      "state": 1,
-      "from": "P3",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "spring_expression_injection",
-      "className": "javax/el/ExpressionFactory",
-      "method": "createMethodExpression",
-      "desc": "(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;[Ljava/lang/Class;)Ljavax/el/MethodExpression;",
-      "state": 1,
-      "from": "P3",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "spring_expression_injection",
-      "className": "org/apache/ibatis/ognl/Ognl",
-      "method": "parseExpression",
-      "desc": "(Ljava/lang/String;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "spring_expression_injection",
-      "className": "org/thymeleaf/standard/expression/StandardExpressionParser",
-      "method": "parseExpression",
-      "desc": "(Lorg/thymeleaf/context/IExpressionContext;Ljava/lang/String;Z)Lorg/thymeleaf/standard/expression/IStandardExpression;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "XPath_injection",
-      "className": "javax/xml/xpath/XPath",
-      "method": "compile",
-      "desc": "(Ljava/lang/String;)Ljavax/xml/xpath/XPathExpression;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "XPath_injection",
-      "className": "org/apache/xpath/XPath",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;Ljavax/xml/transform/SourceLocator;Lorg/apache/xml/utils/PrefixResolver;ILjavax/xml/transform/ErrorListener;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "XPath_injection",
-      "className": "org/apache/xpath/XPath",
-      "method": "<init>",
-      "desc": "(Ljava/lang/String;Ljavax/xml/transform/SourceLocator;Lorg/apache/xml/utils/PrefixResolver;ILjavax/xml/transform/ErrorListener;Lorg/apache/xpath/compiler/FunctionTable;)V",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    },
-    {
-      "name": "XPath_injection",
-      "className": "javax/xml/xpath/XPath",
-      "method": "evaluate",
-      "desc": "(Ljava/lang/String;Ljava/lang/Object;Ljavax/xml/namespace/QName;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "XPath_injection",
-      "className": "javax/xml/xpath/XPath",
-      "method": "evaluate",
-      "desc": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "XPath_injection",
-      "className": "javax/xml/xpath/XPath",
-      "method": "evaluate",
-      "desc": "(Ljava/lang/String;Lorg/xml/sax/InputSource;Ljavax/xml/namespace/QName;)Ljava/lang/Object;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "XPath_injection",
-      "className": "javax/xml/xpath/XPath",
-      "method": "evaluate",
-      "desc": "(Ljava/lang/String;Lorg/xml/sax/InputSource;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    },
-    {
-      "name": "fastjson",
-      "className": "com/alibaba/fastjson/JSON",
-      "method": "parseObject",
-      "desc": "(Ljava/lang/String;)Lcom/alibaba/fastjson/JSONObject;",
-      "state": 1,
-      "from": "P1",
-      "enter": 1,
-      "exit": 0
-    }
-  ],
-  "sanitizers": [
-    {
-      "name": "pattern",
-      "className": "java/util/regex/Pattern",
-      "method": "matcher",
-      "desc": "(Ljava/lang/CharSequence;)Ljava/util/regex/Matcher;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "conditions": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "pattern",
-      "className": "java/util/regex/Matcher",
-      "method": "matches",
-      "desc": "()Z",
-      "state": 0,
-      "from": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "replace",
-      "className": "java/util/regex/Matcher",
-      "method": "replaceAll",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "escape",
-      "className": "org/apache/commons/text/StringEscapeUtils",
-      "method": "escapeHtml3",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "escape",
-      "className": "org/apache/commons/text/StringEscapeUtils",
-      "method": "escapeHtml4",
-      "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "escape",
-      "className": "org/springframework/web/util/HtmlUtils",
-      "method": "htmlEscape",
-      "desc": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "replace",
-      "className": "java/lang/String",
-      "method": "replace",
-      "desc": "(CC)Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "conditions": "P1,P2",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "compare",
-      "className": "java/lang/String",
-      "method": "startsWith",
-      "desc": "(Ljava/lang/String;)Z",
-      "state": 1,
-      "from": "O",
-      "conditions": "P1",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "compare",
-      "className": "java/lang/String",
-      "method": "contains",
-      "desc": "(Ljava/lang/String;)Z",
-      "state": 1,
-      "from": "O",
-      "conditions": "P1",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "compare",
-      "className": "java/lang/String",
-      "method": "equals",
-      "desc": "(Ljava/lang/Object;)Z",
-      "state": 1,
-      "from": "P1",
-      "conditions": "O",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "compare",
-      "className": "java/lang/String",
-      "method": "endsWith",
-      "desc": "(Ljava/lang/String;)Z",
-      "state": 1,
-      "from": "O",
-      "conditions": "P1",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "parse",
-      "className": "java/lang/Integer",
-      "method": "parseInt",
-      "desc": "(Ljava/lang/String;I)I",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "parse",
-      "className": "java/lang/Integer",
-      "method": "parseInt",
-      "desc": "(Ljava/lang/CharSequence;III)I",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "replace",
-      "className": "org/apache/commons/lang/StringUtils",
-      "method": "replace",
-      "desc": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "conditions": "P2,P3",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "replace",
-      "className": "org/springframework/util/StringUtils",
-      "method": "replace",
-      "desc": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1",
-      "to": "R",
-      "conditions": "P2,P3",
-      "enter": 0,
-      "exit": 1
-    },
-
-    {
-      "name": "replace",
-      "className": "java/lang/String",
-      "method": "replaceAll",
-      "desc": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
-      "state": 1,
-      "from": "P1,P2",
-      "to": "R",
-      "enter": 0,
-      "exit": 1
-    },
-    {
-      "name": "feature",
-      "className": "org/springframework/web/multipart/MultipartFile",
-      "method": "getOriginalFilename",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1,
-      "inter": true
-    },
-    {
-      "name": "feature",
-      "className": "org/springframework/web/multipart/MultipartFile",
-      "method": "getContentType",
-      "desc": "()Ljava/lang/String;",
-      "state": 1,
-      "from": "O",
-      "to": "R",
-      "enter": 0,
-      "exit": 1,
-      "inter": true
-    }
-  ],
-  "singles": [
-    {
-      "name": "weak_password_in_sql",
-      "className": "java/sql/Driver",
-      "method": "connect",
-      "desc": "(Ljava/lang/String;Ljava/util/Properties;)Ljava/sql/Connection;",
-      "state": 1,
-      "requireHttp": false,
-      "enter": 1,
-      "exit": 0,
-      "inter": true
-    }
-  ]
+  "iast_hook_config": {
+    "version": "0.3.1",
+    "hooks": [
+      {
+        "class": {
+          "name": "javax/servlet/Filter",
+          "is_interface": true,
+          "exclude_classes": [
+            "org/springframework/security/web/header/HeaderWriterFilter",
+            "org/springframework/security/web/csrf/CsrfFilter",
+            "org/springframework/security/web/authentication/preauth/x509/X509AuthenticationFilter",
+            "org/springframework/security/web/authentication/UsernamePasswordAuthenticationFilter",
+            "org/springframework/security/web/authentication/www/BasicAuthenticationFilter"
+          ]
+        },
+        "methods": [
+          {
+            "name": "doFilter",
+            "desc": "(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_enter"
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/servlet/Servlet",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "service",
+            "desc": "(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_enter"
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/catalina/connector/Request",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "getStream",
+            "desc": "()Ljava/io/InputStream;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_body"
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/InputStream",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "read",
+            "desc": "([BII)I",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_body_read"
+            }
+          },
+          {
+            "name": "read",
+            "desc": "([B)I",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_body_read"
+            }
+          },
+          {
+            "name": "read",
+            "desc": "()I",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_body_read"
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/servlet/http/HttpServletRequest",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "getParameter",
+            "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              },
+              "cleaning_effect": {
+                "XSS": "full"
+              }
+            }
+          },
+          {
+            "name": "getInputStream",
+            "desc": "()Ljavax/servlet/ServletInputStream;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_body",
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getParameterMap",
+            "desc": "()Ljava/util/Map;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getParameterValues",
+            "desc": "(Ljava/lang/String;)[Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getReader",
+            "desc": "()Ljava/io/BufferedReader;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "http": true,
+              "http_stage": "http_body",
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getQueryString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getPart",
+            "desc": "(Ljava/lang/String;)Ljavax/servlet/http/Part;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getParts",
+            "desc": "()Ljava/util/Collection;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getParameterNames()",
+            "desc": "Ljava/util/Enumeration;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          },
+          {
+            "name": "getHeader1",
+            "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+            "state": false,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "cleaning_effect": {}
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/springframework/web/method/support/HandlerMethodArgumentResolverComposite",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "resolveArgument",
+            "desc": "(Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/bind/support/WebDataBinderFactory;)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": true,
+              "propagator": false,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "source_type": "http_spring_param"
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/StringJoiner",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/CharSequence;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
+            }
+          },
+          {
+            "name": "add",
+            "desc": "(Ljava/lang/CharSequence;)Ljava/lang/StringJoiner;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
+            }
+          },
+          {
+            "name": "toString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/AbstractStringBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "append",
+            "desc": "(Ljava/lang/AbstractStringBuilder;)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O,P1",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "append",
+            "desc": "(Ljava/lang/String;)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O,P1",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "getChars",
+            "desc": "(II[CI)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "P3"
+              }
+            }
+          },
+          {
+            "name": "insert",
+            "desc": "(ILjava/lang/CharSequence;)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "insert",
+            "desc": "(ILjava/lang/CharSequence;II)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "insert",
+            "desc": "(ILjava/lang/CharSequence;II)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "insert",
+            "desc": "(I[CII)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "insert",
+            "desc": "(I[C)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/String",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "toString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "concat",
+            "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O,P1",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "toUpperCase",
+            "desc": "(Ljava/util/Locale;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "toLowerCase",
+            "desc": "(Ljava/util/Locale;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "toCharArray",
+            "desc": "()[C",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "trim",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "getBytes",
+            "desc": "()[B",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "getBytes",
+            "desc": "(Ljava/lang/String;)[B",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "getBytes",
+            "desc": "(Ljava/nio/charset/Charset;)[B",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([BII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([BIII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([C)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([CII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([BIILjava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([BIILjava/nio/charset/Charset;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/StringBuffer;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/StringBuilder;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([BB)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "getChars",
+            "desc": "(II[CI)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "P3"
+              }
+            }
+          },
+          {
+            "name": "intern",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "subSequence",
+            "desc": "(II)Ljava/lang/CharSequence;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              },
+              "conditions": "P1,P2"
+            }
+          },
+          {
+            "name": "substring",
+            "desc": "(II)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              },
+              "conditions": "P1,P2"
+            }
+          },
+          {
+            "name": "substring",
+            "desc": "(I)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              },
+              "conditions": "P1,P2"
+            }
+          },
+          {
+            "name": "substring",
+            "desc": "(II)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/StringBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "toString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/StringBuffer",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "toString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/StringConcatHelper",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "prepend",
+            "desc": "(I[BBLjava/lang/String;)I",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P4",
+                "to": "P2"
+              }
+            }
+          },
+          {
+            "name": "prepend",
+            "desc": "(J[BLjava/lang/String;)J",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P3",
+                "to": "P2"
+              }
+            }
+          },
+          {
+            "name": "newString",
+            "desc": "([BIB)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/nio/CharBuffer",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "wrap",
+            "desc": "([CII)Ljava/nio/CharBuffer;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/nio/charset/CharsetEncoder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "encode",
+            "desc": "(Ljava/nio/CharBuffer;Ljava/nio/ByteBuffer;Z)Ljava/nio/charset/CoderResult;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "P2"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/nio/ByteBuffer",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "array",
+            "desc": "()[B",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "wrap",
+            "desc": "([BII)Ljava/nio/ByteBuffer;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/http/client/fluent/Request",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "Get",
+            "desc": "(Ljava/lang/String;)Lorg/apache/http/client/fluent/Request;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/http/client/methods/HttpGet",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/http/client/methods/HttpPost",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/net/URI;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/net/URL",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/net/URL;Ljava/lang/String;Ljava/net/URLStreamHandler;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/String;Ljava/lang/String;ILjava/net/URLStreamHandler;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P2",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/ProcessBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/util/List;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/ObjectInputStream",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/io/InputStream;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/ByteArrayInputStream",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "([BII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([B)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/InputStreamReader",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/io/InputStream;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/util/Base64$Decoder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "decode",
+            "desc": "([B)[B",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/StringReader",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/springframework/web/multipart/MultipartFile",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "getBytes",
+            "desc": "()[B",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "getInputStream",
+            "desc": "()Ljava/io/InputStream;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/xml/sax/InputSource",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/io/Reader;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/io/InputStream;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/net/URI",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/nio/file/Paths",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "get",
+            "desc": "(Ljava/net/URI;)Ljava/nio/file/Paths;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "get",
+            "desc": "(Ljava/lang/String;[Ljava/lang/String;)Ljava/nio/file/Path;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/xml/transform/stream/StreamSource",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "setInputStream",
+            "desc": "(Ljava/io/InputStream;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/thoughtworks/xstream/io/HierarchicalStreamDriver",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "createReader",
+            "desc": "(Ljava/io/Reader;)Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "createReader",
+            "desc": "(Ljava/io/InputStream;)Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/esotericsoftware/kryo/io/Input",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "([B)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "([BII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "<init>",
+            "desc": "(Ljava/io/InputStream;I)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/servlet/http/Part",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "getSubmittedFileName",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/BufferedReader",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "<init>",
+            "desc": "(Ljava/io/Reader;I)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          },
+          {
+            "name": "readLine",
+            "desc": "(Z)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/System",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "arraycopy",
+            "desc": "(Ljava/lang/Object;ILjava/lang/Object;II)V",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "P3"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/AbstractStringBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "substring",
+            "desc": "(II)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              },
+              "conditions": "P1,P2"
+            }
+          },
+          {
+            "name": "subSequence",
+            "desc": "(II)Ljava/lang/CharSequence;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/commons/lang3/StringEscapeUtils",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "unescapeJson",
+            "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/sql/Statement",
+          "is_interface": true,
+          "exclude_classes": [
+            "com/alibaba/druid/pool/DruidPooledCallableStatement",
+            "com/alibaba/druid/pool/DruidPooledPreparedStatement",
+            "java/sql/CallableStatement",
+            "java/sql/PreparedStatement",
+            "com/mysql/cj/jdbc/ClientPreparedStatement",
+            "com/mysql/cj/jdbc/ServerPreparedStatement"
+          ]
+        },
+        "methods": [
+          {
+            "name": "executeQuery",
+            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "executeUpdate",
+            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "executeLargeUpdate",
+            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "execute",
+            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/Runtime",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "exec",
+            "desc": "(Ljava/lang/String;[Ljava/lang/String;Ljava/io/File;)Ljava/lang/Process;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "cmd_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/sql/Connection",
+          "is_interface": true,
+          "exclude_classes": ["org/springframework/jdbc/datasource/ConnectionProxy",
+            "com/microsoft/sqlserver/jdbc/SQLServerConnection43",
+            "com/microsoft/sqlserver/jdbc/SQLServerConnection",
+            "com/mysql/cj/jdbc/JdbcConnection"]
+        },
+        "methods": [
+          {
+            "name": "prepareStatement",
+            "desc": "(Ljava/lang/String;II)Ljava/sql/PreparedStatement;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "prepareStatement",
+            "desc": "(Ljava/lang/String;IIZ)Ljava/sql/PreparedStatement;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/net/URL",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "openConnection",
+            "desc": "()Ljava/net/URLConnection;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "O"
+              }
+            }
+          },
+          {
+            "name": "openConnection",
+            "desc": "(Ljava/net/Proxy;)Ljava/net/URLConnection;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/squareup/okhttp/HttpUrl",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parse",
+            "desc": "(Ljava/lang/String;)Lcom/squareup/okhttp/HttpUrl;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "okhttp3/HttpUrl",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parse",
+            "desc": "(Ljava/lang/String;)Lokhttp3/HttpUrl;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "weblogic/uddi/client/service/UDDIService",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "setURL",
+            "desc": "(Ljava/lang/String;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/http/client/fluent/Request",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "execute",
+            "desc": "()Lorg/apache/http/client/fluent/Response;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/http/impl/client/CloseableHttpClient",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "doExecute",
+            "desc": "(Lorg/apache/http/HttpHost;Lorg/apache/http/HttpRequest;Lorg/apache/http/protocol/HttpContext;)Lorg/apache/http/client/methods/CloseableHttpResponse;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "ssrf"
+              ],
+              "tracking_direction": {
+                "from": "P2"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/lang/ProcessBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "start",
+            "desc": "()Ljava/lang/Process;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "cmd_injection"
+              ],
+              "tracking_direction": {
+                "from": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/ObjectInputStream",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "readObject",
+            "desc": "()Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "deserialization"
+              ],
+              "tracking_direction": {
+                "from": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/servlet/http/HttpServletResponse",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "sendRedirect",
+            "desc": "(Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "url_redirect"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "setHeader",
+            "desc": "(Ljava/lang/String;Ljava/lang/String;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "url_redirect"
+              ],
+              "tracking_direction": {
+                "from": "P2"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/fasterxml/jackson/databind/ObjectMapper",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "readValue",
+            "desc": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "readValue",
+            "desc": "(Ljava/io/Reader;Ljava/lang/Class;)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "readValue",
+            "desc": "(Ljava/io/InputStream;Ljava/lang/Class;)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "readValue",
+            "desc": "(Ljava/io/DataInput;Ljava/lang/Class;)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/sun/org/apache/xerces/internal/jaxp/validation/XMLSchemaFactory",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "newSchema",
+            "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/validation/Schema;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/xml/validation/Validator",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "validate",
+            "desc": "(Ljavax/xml/transform/Source;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/xml/sax/XMLReader",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "parse",
+            "desc": "(Lorg/xml/sax/InputSource;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/xml/validation/SchemaFactory",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "newSchema",
+            "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/validation/Schema;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/sun/org/apache/xalan/internal/xsltc/trax/TransformerImpl",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "transform",
+            "desc": "(Ljavax/xml/transform/Source;Ljavax/xml/transform/Result;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/xml/stream/XMLInputFactory",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "createXMLStreamReader",
+            "desc": "(Ljava/io/InputStream;)Ljavax/xml/stream/XMLStreamReader;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              },
+              "exclude": [
+                "org/codehaus/stax2/XMLInputFactory2"
+              ]
+            }
+          },
+          {
+            "name": "createXMLStreamReader",
+            "desc": "(Ljava/io/Reader;)Ljavax/xml/stream/XMLStreamReader;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              },
+              "exclude": [
+                "org/codehaus/stax2/XMLInputFactory2"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/jdom2/input/SAXBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "build",
+            "desc": "(Ljava/io/InputStream;)Lorg/jdom2/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "build",
+            "desc": "(Ljava/io/InputStream;Ljava/lang/String;)Lorg/jdom2/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "build",
+            "desc": "(Lorg/xml/sax/InputSource;)Lorg/jdom2/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/xml/parsers/DocumentBuilder",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parse",
+            "desc": "(Ljava/io/InputStream;)Lorg/w3c/dom/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "parse",
+            "desc": "(Ljava/io/InputStream;Ljava/lang/String;)Lorg/w3c/dom/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "parse",
+            "desc": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "parse",
+            "desc": "(Ljava/io/File;)Lorg/w3c/dom/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "parse",
+            "desc": "(Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/xml/parsers/SAXParser",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parse",
+            "desc": "(Lorg/xml/sax/InputSource;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "parse",
+            "desc": "(Lorg/xml/sax/InputSource;Lorg/xml/sax/HandlerBase;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/sun/org/apache/xalan/internal/xsltc/trax/TransformerFactoryImpl",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "newTransformerHandler",
+            "desc": "(Ljavax/xml/transform/Source;)Ljavax/xml/transform/sax/TransformerHandler;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xxe"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/servlet/ServletOutputStream",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "write",
+            "desc": "([BII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xss"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              },
+              "exclude": [
+                "org/springframework/security/web/util/OnCommittedResponseWrapper$SaveContextServletOutputStream"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/Writer",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "write",
+            "desc": "(Ljava/lang/String;II)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "xss"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/OutputStream",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "write",
+            "desc": "([BII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "file_upload"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/nio/channels/Channels$1",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "write",
+            "desc": "([BII)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "file_upload"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/springframework/expression/ExpressionParser",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "parseExpression",
+            "desc": "(Ljava/lang/String;)Lorg/springframework/expression/Expression;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "spring_expression_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "javax/el/ExpressionFactory",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "createValueExpression",
+            "desc": "(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;)Ljavax/el/ValueExpression;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "spring_expression_injection"
+              ],
+              "tracking_direction": {
+                "from": "P3"
+              }
+            }
+          },
+          {
+            "name": "createMethodExpression",
+            "desc": "(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;[Ljava/lang/Class;)Ljavax/el/MethodExpression;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "spring_expression_injection"
+              ],
+              "tracking_direction": {
+                "from": "P3"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/apache/ibatis/ognl/Ognl",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parseExpression",
+            "desc": "(Ljava/lang/String;)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "spring_expression_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/thymeleaf/standard/expression/StandardExpressionParser",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parseExpression",
+            "desc": "(Lorg/thymeleaf/context/IExpressionContext;Ljava/lang/String;Z)Lorg/thymeleaf/standard/expression/IStandardExpression;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "spring_expression_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
 }

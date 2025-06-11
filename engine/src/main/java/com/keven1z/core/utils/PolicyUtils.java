@@ -45,9 +45,8 @@ public class PolicyUtils {
     }
 
     public static Set<String> getAllInterfaces(String[] interfaces, String superClass, ClassLoader loader) throws IOException {
-
         Set<String> ancestors = ClassUtils.buildAncestors(interfaces, superClass);
-        return ClassUtils.getAllInterfaces(ancestors, loader, 0);
+        return ClassUtils.getAncestors(ancestors, loader, 0);
     }
 
     public static boolean isHook(HookPolicyContainer hookPolicyContainer, Class<?> clazz) {
