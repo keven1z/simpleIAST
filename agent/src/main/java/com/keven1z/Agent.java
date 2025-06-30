@@ -42,7 +42,6 @@ public class Agent {
         }
         catch (Exception e) {
             System.err.println("[SimpleIAST] Failed to initialize agent, will continue without simpleIAST.");
-            e.printStackTrace();
             release();
         }
     }

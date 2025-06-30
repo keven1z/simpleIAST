@@ -5,6 +5,5 @@ agent/dependency-reduced-pom.xml
 *.lst
 */target/*
 /.idea/
-*.jar
 /agent/target/*
 /engine/target/*
