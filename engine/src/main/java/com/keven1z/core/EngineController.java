@@ -3,18 +3,18 @@ package com.keven1z.core;
 import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
+import com.keven1z.core.model.ApplicationModel;
+import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.monitor.*;
 
-import com.keven1z.core.pojo.AuthenticationDTO;
+import com.keven1z.core.model.server.AuthenticationDto;
 import com.keven1z.core.policy.ServerPolicyManager;
-import com.keven1z.core.taint.TaintSpy;
+import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.hook.transforms.HookTransformer;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogConfig;
 import com.keven1z.core.log.LogTool;
-import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.model.IASTContext;
-import com.keven1z.core.pojo.AgentDTO;
+import com.keven1z.core.model.server.AgentDTO;
 import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.utils.FileUtils;
 import com.keven1z.core.utils.http.*;
@@ -23,10 +23,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.spy.SimpleIASTSpyManager;
 import java.lang.instrument.Instrumentation;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.keven1z.core.consts.CommonConst.*;
@@ -95,7 +92,7 @@ public class EngineController {
     }
     private void performRegistration() throws RegistrationException {
         AuthClient authClient = HttpClientRegistry.getInstance().getClient(AuthClient.class);
-        AuthenticationDTO authenticationDTO = authClient.register(buildRegisterInformation());
+        AuthenticationDto authenticationDTO = authClient.register(buildRegisterInformation());
         if (authenticationDTO == null) {
             throw new RegistrationException("Failed to register agent");
         }
@@ -174,8 +171,8 @@ public class EngineController {
     }
 
     private void loadHookBlacklist() throws IOException {
-        List<String> blackList = FileUtils.loadBlackList(this.getClass().getClassLoader());
-        context.setBlackList(blackList);
+        Set<String> blackSet = FileUtils.loadBlackList(this.getClass().getClassLoader());
+        context.setBlackList(blackSet);
     }
 
     private static AgentDTO buildRegisterInformation() {

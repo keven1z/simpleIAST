@@ -11,9 +11,5 @@ public class PolicyConst {
     public static final  String R = "R"; //通过返回值
     public static final  String O = "O"; //通过当前对象
     public static final  String PATH_SPLIT_SEPARATOR = ",";
-    /**
-     * 污染源为bean对象
-     */
-    public static final  String SOURCE_BEAN = "bean";
 
 }

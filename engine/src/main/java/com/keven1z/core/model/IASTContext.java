@@ -1,12 +1,10 @@
 package com.keven1z.core.model;
 
-import com.keven1z.core.Config;
-import com.keven1z.core.taint.TaintSpy;
+import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.policy.HookPolicyContainer;
 
 import java.lang.instrument.Instrumentation;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -32,7 +30,7 @@ public class IASTContext {
     private HookPolicyContainer hookPolicyContainer;
 
     private Instrumentation instrumentation;
-    private List<String> blackList;
+    private Set<String> blackList;
     /**
      * 与服务端通信的认证token
      */
@@ -96,7 +94,7 @@ public class IASTContext {
         userClasses.clear();
     }
 
-    public void setBlackList(List<String> blackList) {
+    public void setBlackList(Set<String> blackList) {
         this.blackList = blackList;
     }
 
@@ -148,7 +146,7 @@ public class IASTContext {
         this.token = token;
     }
 
-    public List<String> getBlackList() {
+    public Set<String> getBlackList() {
         return blackList;
     }
 

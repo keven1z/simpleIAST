@@ -1,10 +1,10 @@
 package com.keven1z.core.hook;
 
-import com.keven1z.core.model.graph.TaintGraph;
+import com.keven1z.core.model.taint.TaintGraph;
 import com.keven1z.core.hook.http.HttpContext;
-import com.keven1z.core.pojo.finding.FindingReportBo;
-import com.keven1z.core.pojo.ReportData;
-import com.keven1z.core.pojo.finding.SingleFindingData;
+import com.keven1z.core.model.finding.FindingReportBo;
+import com.keven1z.core.model.server.ReportData;
+import com.keven1z.core.model.finding.SingleFindingData;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.keven1z.core.Config.MAX_REPORT_QUEUE_SIZE;
+import static com.keven1z.core.model.Config.MAX_REPORT_QUEUE_SIZE;
 
 public class HookThreadLocal {
     /**

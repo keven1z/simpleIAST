@@ -11,9 +11,9 @@ import com.keven1z.core.error.RegistrationException;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.pojo.AgentDTO;
-import com.keven1z.core.pojo.AuthenticationDTO;
-import com.keven1z.core.pojo.ResponseDTO;
+import com.keven1z.core.model.server.AgentDTO;
+import com.keven1z.core.model.server.AuthenticationDto;
+import com.keven1z.core.model.server.ResponseDTO;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -166,7 +166,7 @@ public class IASTHttpClient {
                 throw new RegistrationException(errorMsg);
             }
             // 校验响应数据类型
-            AuthenticationDTO authData = JsonUtils.parseObject(responseDTO.getData(), AuthenticationDTO.class);
+            AuthenticationDto authData = JsonUtils.parseObject(responseDTO.getData(), AuthenticationDto.class);
             if (authData == null || authData.getAgentId() == null || authData.getToken() == null) {
                 String errorMsg = "Incomplete authentication data. AgentId or Token is missing.";
                 logger.error(errorMsg);

@@ -17,7 +17,7 @@
 package com.keven1z.core.log;
 
 
-import com.keven1z.core.Config;
+import com.keven1z.core.model.Config;
 import org.apache.log4j.*;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.helpers.OnlyOnceErrorHandler;

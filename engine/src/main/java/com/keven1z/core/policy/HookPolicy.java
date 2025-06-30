@@ -1,6 +1,8 @@
 package com.keven1z.core.policy;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.keven1z.core.consts.PolicyType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -11,15 +13,31 @@ import java.util.Set;
  * @author keven1z
  * @since 2023/02/22
  */
-public class HookPolicy implements Serializable,Comparable<HookPolicy> {
-    public HookPolicy(String className, String method, String desc) {
-        this.className = className;
-        this.method = method;
-        this.desc = desc;
+@JsonDeserialize(builder = HookPolicy.Builder.class)
+public class HookPolicy implements Serializable, Comparable<HookPolicy> {
+
+    public static Builder builder() {
+        return new Builder();
     }
-
-    public HookPolicy() {
-
+    public HookPolicy(){
+    }
+    private HookPolicy(Builder builder) {
+        this.name = builder.name;
+        this.className = builder.className;
+        this.method = builder.method;
+        this.desc = builder.desc;
+        this.enter = builder.enter;
+        this.exit = builder.exit;
+        this.state = builder.state;
+        this.from = builder.from;
+        this.to = builder.to;
+        this.isHooked = builder.isHooked;
+        this.type = builder.type;
+        this.inter = builder.inter;
+        this.conditions = builder.conditions;
+        this.exclude = builder.exclude;
+        this.requireHttp = builder.requireHttp;
+        this.originClassName = builder.originClassName;
     }
 
     /**
@@ -74,39 +92,154 @@ public class HookPolicy implements Serializable,Comparable<HookPolicy> {
     /**
      * 某些类通过其接口hook类被添加为hook点，originClassName为其接口类名
      */
-    private String originClassName;
+    private  String originClassName;
+
+    public void setType(PolicyType policyType) {
+        this.type = policyType;
+    }
+
+    public static class Builder {
+        @JsonProperty("name")
+        private String name;
+        @JsonProperty("className")
+        private String className;
+        @JsonProperty("method")
+        private String method;
+        @JsonProperty("desc")
+        private String desc;
+        @JsonProperty("enter")
+        private int enter;
+        @JsonProperty("exit")
+        private int exit;
+        @JsonProperty("state")
+        private int state;
+        @JsonProperty("from")
+        private String from;
+        @JsonProperty("to")
+        private String to;
+        @JsonProperty("isHooked")
+        private boolean isHooked;
+        @JsonProperty("type")
+        private PolicyType type;
+        @JsonProperty("inter")
+        private boolean inter;
+        @JsonProperty("conditions")
+        private String conditions;
+        @JsonProperty("exclude")
+        private Set<String> exclude = new HashSet<>();
+        @JsonProperty("requireHttp")
+        private boolean requireHttp = true;
+        @JsonProperty("originClassName")
+        private String originClassName;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder className(String className) {
+            this.className = className;
+            return this;
+        }
+
+        public Builder method(String method) {
+            this.method = method;
+            return this;
+        }
+
+        public Builder desc(String desc) {
+            this.desc = desc;
+            return this;
+        }
+
+        public Builder enter(int enter) {
+            this.enter = enter;
+            return this;
+        }
+
+        public Builder exit(int exit) {
+            this.exit = exit;
+            return this;
+        }
+
+        public Builder state(int state) {
+            this.state = state;
+            return this;
+        }
+
+        public Builder from(String from) {
+            this.from = from;
+            return this;
+        }
+
+        public Builder to(String to) {
+            this.to = to;
+            return this;
+        }
+
+        public Builder isHooked(boolean isHooked) {
+            this.isHooked = isHooked;
+            return this;
+        }
+
+        public Builder type(PolicyType type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder inter(boolean inter) {
+            this.inter = inter;
+            return this;
+        }
+
+        public Builder conditions(String conditions) {
+            this.conditions = conditions;
+            return this;
+        }
+
+        public Builder exclude(Set<String> exclude) {
+            this.exclude = exclude;
+            return this;
+        }
+
+        public Builder requireHttp(boolean requireHttp) {
+            this.requireHttp = requireHttp;
+            return this;
+        }
+
+        public Builder originClassName(String originClassName) {
+            this.originClassName = originClassName;
+            return this;
+        }
+
+        public HookPolicy build() {
+            return new HookPolicy(this);
+        }
+    }
+
+    public void setHooked(boolean hooked) {
+        isHooked = hooked;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getClassName() {
         return className;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
-    }
 
     public String getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
 
     public String getDesc() {
         return desc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 
     public int getEnter() {
         return enter;
@@ -116,41 +249,21 @@ public class HookPolicy implements Serializable,Comparable<HookPolicy> {
         return exit;
     }
 
-    public void setEnter(int enter) {
-        this.enter = enter;
-    }
-
-    public void setExit(int exit) {
-        this.exit = exit;
-    }
 
     public int getState() {
         return state;
     }
 
-    public void setState(int state) {
-        this.state = state;
-    }
 
     public String getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
 
     public String getTo() {
         return to;
     }
 
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public void setType(PolicyType type) {
-        this.type = type;
-    }
 
     public PolicyType getType() {
         return type;
@@ -160,25 +273,16 @@ public class HookPolicy implements Serializable,Comparable<HookPolicy> {
         return inter;
     }
 
-    public void setInter(boolean inter) {
-        this.inter = inter;
-    }
 
     public boolean isHooked() {
         return isHooked;
     }
 
-    public void setHooked(boolean hooked) {
-        isHooked = hooked;
-    }
 
     public String getConditions() {
         return conditions;
     }
 
-    public void setConditions(String conditions) {
-        this.conditions = conditions;
-    }
 
     @Override
     public String toString() {
@@ -192,25 +296,14 @@ public class HookPolicy implements Serializable,Comparable<HookPolicy> {
         return originClassName;
     }
 
-    public void setOriginClassName(String originClassName) {
-        this.originClassName = originClassName;
-    }
-
     public Set<String> getExclude() {
         return exclude;
-    }
-
-    public void setExclude(Set<String> exclude) {
-        this.exclude = exclude;
     }
 
     public boolean isRequireHttp() {
         return requireHttp;
     }
 
-    public void setRequireHttp(boolean requireHttp) {
-        this.requireHttp = requireHttp;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -219,6 +312,7 @@ public class HookPolicy implements Serializable,Comparable<HookPolicy> {
         HookPolicy hookPolicy = (HookPolicy) o;
         return className.equals(hookPolicy.className) && method.equals(hookPolicy.method) && desc.equals(hookPolicy.desc);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(className, method, desc);
@@ -230,7 +324,6 @@ public class HookPolicy implements Serializable,Comparable<HookPolicy> {
         if (classNameComparison != 0) {
             return classNameComparison;
         }
-
         int methodComparison = this.method.compareTo(other.method);
         if (methodComparison != 0) {
             return methodComparison;

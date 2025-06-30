@@ -6,13 +6,14 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.IASTContext;
-import com.keven1z.core.model.graph.TaintData;
-import com.keven1z.core.model.graph.TaintGraph;
-import com.keven1z.core.model.graph.TaintNode;
-import com.keven1z.core.pojo.finding.FindingData;
-import com.keven1z.core.pojo.finding.FindingReportBo;
-import com.keven1z.core.pojo.ReportData;
-import com.keven1z.core.pojo.finding.TaintFindingData;
+import com.keven1z.core.model.taint.TaintData;
+import com.keven1z.core.model.taint.TaintGraph;
+import com.keven1z.core.model.taint.PathNode;
+import com.keven1z.core.model.finding.FindingData;
+import com.keven1z.core.model.finding.FindingReportBo;
+import com.keven1z.core.model.server.ReportData;
+import com.keven1z.core.model.finding.TaintFindingData;
+import com.keven1z.core.model.taint.TaintSink;
 import com.keven1z.core.utils.CommonUtils;
 import com.keven1z.core.vulnerability.DetectContext;
 import com.keven1z.core.vulnerability.Detector;
@@ -67,7 +68,7 @@ public class TrafficReadingReportMonitor extends Monitor {
             }
             return findingDataList;
         }
-        List<TaintNode> taintFindings = taintGraph.getSinkNodes();
+        List<PathNode> taintFindings = taintGraph.getSinkNodes();
         if (taintFindings.isEmpty()) {
             if (LogTool.isDebugEnabled()) {
                 logger.warn("Not found sink node in taintGraph");
@@ -75,11 +76,12 @@ public class TrafficReadingReportMonitor extends Monitor {
             return findingDataList;
         }
         Set<String> processedSinkClass = new HashSet<>();
-        for (TaintNode sinkNode : taintFindings) {
+        for (PathNode sinkNode : taintFindings) {
             if (isDuplicateSink(sinkNode, processedSinkClass)) {
                 continue;
             }
-            VulnerabilityType vulnerabilityType = sinkNode.getTaintData().getVulnType();
+            TaintSink taintData = (TaintSink) sinkNode.getTaintData();
+            VulnerabilityType vulnerabilityType = taintData.getVulnerabilityType();
             Detector detector = detectorFactory.getDetector(vulnerabilityType);
             if (detector == null) {
                 LogTool.warn(ErrorType.DETECT_VULNERABILITY_ERROR, "Failed to get detector for SinkNode vulnType,vulnType is " + vulnerabilityType);
@@ -109,7 +111,7 @@ public class TrafficReadingReportMonitor extends Monitor {
         return findingDataList;
     }
 
-    private boolean isDuplicateSink(TaintNode sinkNode, Set<String> processedSinkClass) {
+    private boolean isDuplicateSink(PathNode sinkNode, Set<String> processedSinkClass) {
         if (processedSinkClass.isEmpty()) {
             return false;
         }
