@@ -34,6 +34,14 @@ public interface AsmMethods {
             Object.class, Object.class, Object[].class, String.class, String.class, String.class, String.class
     );
     /**
+     * asm method of {@link SimpleIASTSpyManager#$_arrayTaint(Object, int, Object, String, String, String)}
+     */
+    Method ASM_METHOD_HOOKSCHEDULER$_arrayTaint = getAsmMethod(
+            SimpleIASTSpyManager.class,
+            "$_arrayTaint",
+            Object.class, int.class, Object.class, String.class, String.class, String.class
+    );
+    /**
      * asm method of {@link SimpleIASTSpyManager#$_single(Object, Object, Object[], String, String, String, String, String, boolean)}
      */
     Method ASM_METHOD_HOOKSCHEDULER$_single = getAsmMethod(

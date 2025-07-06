@@ -10,8 +10,10 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.objectweb.asm.commons.Method;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static com.keven1z.core.utils.CommonUtils.toInternalClassName;
 import static org.objectweb.asm.Opcodes.*;
 
@@ -37,13 +39,15 @@ public class IASTClassVisitor extends ClassVisitor {
     private final static String HTTP_BODY_READ = "http_body_read";
     private final String nativePrefix;
     private List<ProxyMethod> proxyNativeAsmMethods;
+    private final boolean isUserClass;
 
     public IASTClassVisitor(ClassVisitor classVisitor,
                             String className,
-                            String nativePrefix) {
+                            String nativePrefix, boolean isUserClass) {
         super(Opcodes.ASM9, classVisitor);
         this.className = className;
         this.nativePrefix = nativePrefix;
+        this.isUserClass = isUserClass;
     }
 
     @Override
@@ -54,7 +58,12 @@ public class IASTClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        if (!IastHookManager.getManager().shouldHookMethod(this.className, name, descriptor)){
+        /* 如果是用户代码,仅进行方法中数组操作的hook */
+        if (isUserClass) {
+            MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+            return new ArrayAdviceAdapter(this.api, methodVisitor, access, this.className, name, descriptor);
+        }
+        if (!IastHookManager.getManager().shouldHookMethod(this.className, name, descriptor)) {
             return super.visitMethod(access, name, descriptor, signature, exceptions);
         }
         if (!isNative(access)) {
@@ -67,10 +76,10 @@ public class IASTClassVisitor extends ClassVisitor {
     /**
      * 重写普通方法
      *
-     * @param access 方法的访问权限修饰符
-     * @param name   方法名
+     * @param access     方法的访问权限修饰符
+     * @param name       方法名
      * @param descriptor 方法描述符
-     * @param signature 方法的泛型签名
+     * @param signature  方法的泛型签名
      * @param exceptions 方法抛出的异常类型数组
      * @return 改写后的方法访问器
      */
@@ -87,7 +96,7 @@ public class IASTClassVisitor extends ClassVisitor {
             isVisitMethod = true;   //标记已经访问过方法
             methodVisitor = visitTaintMethod(access, name, descriptor, methodVisitor, methodHookConfig);
         }
-        if (taintTracking.isHttp()){
+        if (taintTracking.isHttp()) {
             isVisitMethod = true;
             methodVisitor = visitHTTPMethod(access, name, descriptor, methodVisitor, methodHookConfig);
         }
@@ -117,10 +126,10 @@ public class IASTClassVisitor extends ClassVisitor {
     /**
      * 重写原生方法，将原生方法的实现替换为代理方法
      *
-     * @param access 方法的访问权限修饰符
-     * @param name 方法名
+     * @param access     方法的访问权限修饰符
+     * @param name       方法名
      * @param descriptor 方法描述符
-     * @param signature 方法的泛型签名
+     * @param signature  方法的泛型签名
      * @param exceptions 方法抛出的异常类型数组
      * @return 改写后的方法访问器
      */
@@ -133,13 +142,13 @@ public class IASTClassVisitor extends ClassVisitor {
         //去掉native
         int newAccess = access & ~ACC_NATIVE;
         final MethodVisitor mv = super.visitMethod(newAccess, name, descriptor, signature, exceptions);
-        return new IASTAdviceAdapter(api, new JSRInlinerAdapter(mv, newAccess, name,
+        return new TaintAdviceAdapter(api, new JSRInlinerAdapter(mv, newAccess, name,
                 descriptor, signature, exceptions), newAccess, className, name, descriptor, methodHookConfig) {
             @Override
             public void visitEnd() {
                 if (!name.startsWith(nativePrefix)) {
                     if (this.methodHookConfig.getHookPositions().isEntry()) {
-//                        inject(-1, true);
+                        injectTaintHook(-1, true);
                     }
                     final String proxyMethodName = nativePrefix + name;
                     final ProxyMethod proxyMethod = new ProxyMethod(access, proxyMethodName, desc);
@@ -157,7 +166,7 @@ public class IASTClassVisitor extends ClassVisitor {
 
                     proxyNativeAsmMethods.add(proxyMethod);
                     if (this.methodHookConfig.getHookPositions().isExit()) {
-//                        inject(getReturnType().getOpcode(IRETURN), false);
+                        injectTaintHook(getReturnType().getOpcode(IRETURN), false);
                     }
                     returnValue();
                 }
@@ -169,21 +178,21 @@ public class IASTClassVisitor extends ClassVisitor {
     /**
      * 访问HTTP方法并返回MethodVisitor对象
      *
-     * @param access 方法的访问修饰符
-     * @param name 方法名
-     * @param descriptor 方法的描述符
+     * @param access            方法的访问修饰符
+     * @param name              方法名
+     * @param descriptor        方法的描述符
      * @param jsrInlinerAdapter 方法的MethodVisitor适配器
-     * @param methodHookConfig hook点配置
+     * @param methodHookConfig  hook点配置
      * @return 返回适配后的MethodVisitor对象，如果策略不是HTTP_CIRCLE、HTTP_BODY或HTTP_BODY_READ则直接返回传入的jsrInlinerAdapter
      */
     public MethodVisitor visitHTTPMethod(int access, String name, String descriptor, MethodVisitor jsrInlinerAdapter, MethodHookConfig methodHookConfig) {
         String httpStage = methodHookConfig.getTaintTracking().getHttpStage();
         if (HTTP_ENTER.equals(httpStage)) {
-            return new HttpAdviceAdapter(api, jsrInlinerAdapter, access,this.className, name, descriptor, methodHookConfig);
+            return new HttpAdviceAdapter(api, jsrInlinerAdapter, access, this.className, name, descriptor, methodHookConfig);
         } else if (HTTP_BODY.equals(httpStage)) {
-            return new HttpBodyAdviceAdapter(api, jsrInlinerAdapter, access, this.className,name, descriptor,methodHookConfig);
+            return new HttpBodyAdviceAdapter(api, jsrInlinerAdapter, access, this.className, name, descriptor, methodHookConfig);
         } else if (HTTP_BODY_READ.equals(httpStage)) {
-            return new HttpBodyReadAdviceAdapter(api, jsrInlinerAdapter, access,this.className, name, descriptor,methodHookConfig);
+            return new HttpBodyReadAdviceAdapter(api, jsrInlinerAdapter, access, this.className, name, descriptor, methodHookConfig);
         }
         return jsrInlinerAdapter;
     }

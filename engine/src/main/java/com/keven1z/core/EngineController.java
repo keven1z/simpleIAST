@@ -196,7 +196,7 @@ public class EngineController {
      */
     private void initTransformer() {
         Instrumentation instrumentation = context.getInstrumentation();
-        HookTransformer hookTransformer = new HookTransformer(context.getPolicy(), instrumentation);
+        HookTransformer hookTransformer = new HookTransformer(instrumentation);
         if (instrumentation.isNativeMethodPrefixSupported()) {
             instrumentation.setNativeMethodPrefix(hookTransformer, hookTransformer.getNativePrefix());
         }

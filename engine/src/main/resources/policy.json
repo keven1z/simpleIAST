@@ -3361,6 +3361,56 @@
             }
           }
         ]
+      },
+      {
+        "class": {
+          "name": "java/lang/Integer",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parseInt",
+            "desc": "(Ljava/lang/CharSequence;III)I",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "cleaning_effect": {
+                "*": "full"
+              },
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "parseInt",
+            "desc": "(Ljava/lang/String;I)I",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              },
+              "cleaning_effect": {
+                "*": "full"
+              }
+            }
+          }
+        ]
       }
     ]
   }

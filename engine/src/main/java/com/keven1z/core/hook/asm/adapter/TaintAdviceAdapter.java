@@ -12,7 +12,6 @@ import org.objectweb.asm.commons.AdviceAdapter;
 import static com.keven1z.core.hook.asm.AsmMethods.ASM_TYPE_SPY;
 
 public class TaintAdviceAdapter extends IASTAdviceAdapter {
-    private static final String HOOK_ARRAY_CLASS_NAME = "java/lang/String";
     /**
      * Creates a TaintAdviceAdapter {@link AdviceAdapter}.
      *
@@ -76,12 +75,5 @@ public class TaintAdviceAdapter extends IASTAdviceAdapter {
         push(hookType);
         invokeStatic(ASM_TYPE_SPY, AsmMethods.ASM_METHOD_HOOKSCHEDULER$_taint);
     }
-// hook array
-//    @Override
-//    public void visitTypeInsn(int opcode, String type) {
-//        if (HOOK_ARRAY_CLASS_NAME.equals(type) && opcode == Opcodes.ANEWARRAY) {
-//            System.out.println(type);
-//        }
-//        super.visitTypeInsn(opcode, type);
-//    }
+
 }

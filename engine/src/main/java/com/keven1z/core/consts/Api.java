@@ -1,6 +1,9 @@
 package com.keven1z.core.consts;
 
 
+/**
+ * 服务端交互url
+ */
 public class Api {
     private Api() {
     }

@@ -7,24 +7,22 @@ import com.keven1z.core.hook.server.detectors.*;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
-import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.utils.*;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
+import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import static com.keven1z.core.model.Config.IS_DUMP_CLASS;
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 
@@ -33,7 +31,6 @@ import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
  * 自定义Transformer，用于修改被hook的class
  */
 public class HookTransformer implements ClassFileTransformer {
-    private final HookPolicyContainer policy;
     private final Instrumentation instrumentation;
     /**
      * transform class计数
@@ -51,9 +48,7 @@ public class HookTransformer implements ClassFileTransformer {
      */
     public static final String SANDBOX_SPECIAL_PREFIX = "$$SIMPLE$$";
 
-    public HookTransformer(HookPolicyContainer hookPolicyContainer,
-                           Instrumentation instrumentation) {
-        this.policy = hookPolicyContainer;
+    public HookTransformer(Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
         this.instrumentation.addTransformer(this, true);
         this.hasTransformedClasses = new HashSet<>();
@@ -96,8 +91,6 @@ public class HookTransformer implements ClassFileTransformer {
     }
 
     private byte[] doTransform(ClassLoader loader, String className, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IOException {
-        long start = System.currentTimeMillis();
-
         // 识别server类型
         identifyServerType(loader, className, protectionDomain);
 
@@ -108,12 +101,15 @@ public class HookTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
         hardcodedCheckBeforeHook(classReader, className);
-        logUserDefinedClasses(loader, protectionDomain, className);
         /* 确定hook的className,若该类的接口是hook点,hookClassName和className不一致 */
         String hookClassName = null;
-
-        /* 判断是否需要hook */
-        if (IastHookManager.getManager().shouldHookClass(className)) {
+        boolean isUserClass = false;
+        /*  如果为用户类,统一hook 用户类的array操作方法*/
+        if (isUserDefinedClass(loader, protectionDomain)) {
+            hookClassName = className;
+            logUserDefinedClass(className);
+            isUserClass = true;
+        } else if (IastHookManager.getManager().shouldHookClass(className)) {
             hookClassName = className;
         } else {
             // 判断是否需要hook祖先类
@@ -128,9 +124,6 @@ public class HookTransformer implements ClassFileTransformer {
         if (hookClassName == null) {
             return classfileBuffer;
         }
-//        if (!PolicyUtils.isHook(className, policy, classReader.getInterfaces(), classReader.getSuperName(), loader)) {
-//            return classfileBuffer;
-//        }
         /* transform class +1 */
         ++transformCount;
 
@@ -154,7 +147,8 @@ public class HookTransformer implements ClassFileTransformer {
         //通过自定义classVisitor进行类的改造
         classReader.accept(new IASTClassVisitor(classWriter,
                         hookClassName,
-                        this.nativePrefix),
+                        this.nativePrefix
+                        , isUserClass),
                 ClassReader.EXPAND_FRAMES
         );
         // 记录已转换的类名
@@ -329,25 +323,43 @@ public class HookTransformer implements ClassFileTransformer {
         classReader.accept(classVisitor, ClassReader.SKIP_CODE);
     }
 
+    private static final String[] USER_CLASS_LOCATIONS = {
+            "BOOT-INF/classes",
+            "WEB-INF/classes",
+            "target/classes",
+            "APP-INF/classes"
+    };
+
     /**
-     * 记录用户代码类
+     * 检测用户定义的类
      */
-    private void logUserDefinedClasses(ClassLoader loader, ProtectionDomain protectionDomain, String className) {
+    private boolean isUserDefinedClass(ClassLoader loader, ProtectionDomain protectionDomain) {
         if (loader == null || protectionDomain == null) {
-            return;
+            return false;
         }
         String loaderName = loader.getClass().getName();
         if (loaderName.startsWith("jdk.internal.") ||  // JDK 内部加载器
                 loaderName.equals("sun.misc.Launcher$ExtClassLoader") || // 扩展类加载器
                 loaderName.startsWith("org.apache.")) { // 某些容器级加载器（如 Tomcat 的共享库加载器）)
-            return;
+            return false;
         }
-        String codeLocation = protectionDomain.getCodeSource().getLocation().toString();
-        if (codeLocation.contains("BOOT-INF/classes")
-                || codeLocation.contains("WEB-INF/classes")
-                || codeLocation.contains("target/classes")
-                || codeLocation.contains("APP-INF/classes")) {
-            EngineController.context.addUserClass(className);
+        CodeSource codeSource = protectionDomain.getCodeSource();
+        if (codeSource == null || codeSource.getLocation() == null) {
+            return false;
         }
+        String codeLocation = codeSource.getLocation().toString();
+        for (String location : USER_CLASS_LOCATIONS) {
+            if (codeLocation.contains(location)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 记录用户定义的类
+     */
+    private void logUserDefinedClass(String className) {
+        EngineController.context.addUserClass(className);
     }
 }

@@ -83,6 +83,11 @@ public class SingleSpy implements SimpleIASTSpy {
     }
 
     @Override
+    public void $_arrayTaint(Object arrayObject, int index, Object arrayValue, String className, String method, String desc) {
+
+    }
+
+    @Override
     public void $_requestStarted(Object requestObject, Object responseObject) {
 
     }

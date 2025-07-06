@@ -6,7 +6,9 @@ import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
+
 import java.lang.spy.SimpleIASTSpy;
+
 import static com.keven1z.core.model.Config.MAX_REPORT_QUEUE_SIZE;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
@@ -29,14 +31,12 @@ public class TaintSpy implements SimpleIASTSpy {
      * 对方法返回值、当前对象、方法参数进行taint标记
      *
      * @param returnObject 被污染的对象，即方法的返回值
-     * @param thisObject 当前对象
-     * @param parameters 方法参数
-     * @param className 被hook的类名
-     * @param method 被hook的方法名
-     * @param desc 方法描述符
-     * @param type taint类型
-     * @param from 污点来源
-     * @param to 污点去向
+     * @param thisObject   当前对象
+     * @param parameters   方法参数
+     * @param className    被hook的类名
+     * @param method       被hook的方法名
+     * @param desc         方法描述符
+     * @param type         taint类型
      */
     @Override
     public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type) {
@@ -66,7 +66,7 @@ public class TaintSpy implements SimpleIASTSpy {
              * 如果上报线程满了，不进行hook
              */
             if (REPORT_QUEUE.size() >= MAX_REPORT_QUEUE_SIZE) {
-                if (LogTool.isDebugEnabled()){
+                if (LogTool.isDebugEnabled()) {
                     logger.warn("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
                 }
                 return;
@@ -84,6 +84,20 @@ public class TaintSpy implements SimpleIASTSpy {
             spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type);
         } catch (Exception e) {
             LogTool.error(ErrorType.HOOK_ERROR, "Failed to taint", e);
+        } finally {
+            enableHookLock.set(false);
+        }
+    }
+
+    @Override
+    public void $_arrayTaint(Object arrayObject, int index, Object arrayValue, String className, String method, String desc) {
+        if (enableHookLock.get()) {
+            return;
+        } else {
+            enableHookLock.set(true);
+        }
+        try {
+            System.out.println(arrayObject);
         } finally {
             enableHookLock.set(false);
         }

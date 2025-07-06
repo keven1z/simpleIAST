@@ -7,3 +7,4 @@ agent/dependency-reduced-pom.xml
 /.idea/
 /agent/target/*
 /engine/target/*
+*.log
