@@ -7,5 +7,8 @@ public enum HookType {
     PROPAGATION,
     SINK,
     SANITIZER,
-    SINGLE
+    SINGLE;
+    public static boolean isSource(String type) {
+        return HookType.valueOf(type.toUpperCase()) == SOURCE;
+    }
 }

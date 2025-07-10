@@ -4,11 +4,18 @@ import com.keven1z.core.consts.HookType;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
+import com.keven1z.core.model.taint.PathNode;
+import com.keven1z.core.model.taint.TaintData;
+import com.keven1z.core.model.taint.TaintGraph;
+import com.keven1z.core.model.taint.TaintPropagation;
+import com.keven1z.core.utils.PolicyUtils;
 import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 
 import java.lang.spy.SimpleIASTSpy;
+import java.util.Set;
 
+import static com.keven1z.core.consts.PolicyConst.O;
 import static com.keven1z.core.model.Config.MAX_REPORT_QUEUE_SIZE;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
@@ -46,39 +53,14 @@ public class TaintSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
-            /*
-             * 判断agent是否开启，若关闭不进行hook
-             */
-            if (!ApplicationModel.isRunning()) {
-                return;
-            }
-            if (TransformerProtector.instance.isInProtecting()) {
-                return;
-            }
-            //如果没有流量，不进行hook
-            if (REQUEST_THREAD_LOCAL.get() == null) {
-                return;
-            }
-            if (isRequestEnded.get()) {
-                return;
-            }
-            /*
-             * 如果上报线程满了，不进行hook
-             */
-            if (REPORT_QUEUE.size() >= MAX_REPORT_QUEUE_SIZE) {
-                if (LogTool.isDebugEnabled()) {
-                    logger.warn("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
-                }
+            if (shouldProceedWithTaintTracking()){
                 return;
             }
 
-            if (TAINT_GRAPH_THREAD_LOCAL.get() == null) {
-                return;
-            }
             /*
              * 如果污点图为空，并且不为污染源节点，则不处理
              */
-            if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty() && !HookType.SOURCE.name().equals(type)) {
+            if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty() && !HookType.isSource(type)) {
                 return;
             }
             spyHandler.doHandle(returnObject, thisObject, parameters, className, method, desc, type);
@@ -97,12 +79,82 @@ public class TaintSpy implements SimpleIASTSpy {
             enableHookLock.set(true);
         }
         try {
-            System.out.println(arrayObject);
+            if (shouldProceedWithTaintTracking()){
+                return;
+            }
+            if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty()){
+                return;
+            }
+            if (arrayObject == null || arrayValue == null){
+                return;
+            }
+            TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
+            Set<PathNode> parentNodes = PolicyUtils.searchParentNodes(arrayValue, taintGraph);
+            if (parentNodes == null || parentNodes.isEmpty()) {
+                return;
+            }
+            TaintPropagation taintData = new TaintPropagation.Builder()
+                    .className(className)
+                    .method(method)
+                    .desc(desc)
+                    .returnObject(arrayObject)
+                    .thisObject(arrayObject)
+                    .stage(HookType.PROPAGATION)
+                    .addFlowPath(new TaintData.FlowPath(arrayValue, arrayObject))
+                    .build();
+            for (PathNode parentNode : parentNodes) {
+                PathNode pathNode = taintGraph.addNode(taintData);
+                taintGraph.addEdge(parentNode, pathNode, O);
+            }
+
         } finally {
             enableHookLock.set(false);
         }
     }
 
+
+    /**
+     * 判断是否应该继续进行污点追踪
+     *
+     * @return 如果满足继续污点追踪的条件，则返回true；否则返回false
+     */
+    private boolean shouldProceedWithTaintTracking(){
+        /*
+         * 判断agent是否开启，若关闭不进行hook
+         */
+        /*
+         * 判断agent是否开启，若关闭不进行hook
+         */
+        if (!ApplicationModel.isRunning()) {
+            return true;
+        }
+        if (TransformerProtector.instance.isInProtecting()) {
+            return true;
+        }
+        //如果没有流量，不进行hook
+        if (REQUEST_THREAD_LOCAL.get() == null) {
+            return true;
+        }
+        if (isRequestEnded.get()) {
+            return true;
+        }
+        /*
+         * 如果上报线程满了，不进行hook
+         */
+        if (REPORT_QUEUE.size() >= MAX_REPORT_QUEUE_SIZE) {
+            if (LogTool.isDebugEnabled()) {
+                logger.warn("上报队列已满,目前队列大小：" + REPORT_QUEUE.size());
+            }
+            return true;
+        }
+
+        if (TAINT_GRAPH_THREAD_LOCAL.get() == null) {
+            logger.warn("Taint graph is null, skip taint tracking");
+            return true;
+        }
+
+        return false;
+    }
     @Override
     public void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
 
