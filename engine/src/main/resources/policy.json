@@ -155,15 +155,13 @@
               "source": true,
               "propagator": false,
               "sink": false,
+              "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
               ],
               "tracking_direction": {
                 "from": "P1",
                 "to": "R"
-              },
-              "cleaning_effect": {
-                "XSS": "full"
               }
             }
           },
@@ -180,11 +178,11 @@
               "propagator": false,
               "sink": false,
               "http": true,
+              "source_type": "http_body_param",
               "http_stage": "http_body",
               "vulnerability_types": [
                 "*"
-              ],
-              "cleaning_effect": {}
+              ]
             }
           },
           {
@@ -199,10 +197,10 @@
               "source": true,
               "propagator": false,
               "sink": false,
+              "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
-              ],
-              "cleaning_effect": {}
+              ]
             }
           },
           {
@@ -217,10 +215,10 @@
               "source": true,
               "propagator": false,
               "sink": false,
+              "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
-              ],
-              "cleaning_effect": {}
+              ]
             }
           },
           {
@@ -236,11 +234,11 @@
               "propagator": false,
               "sink": false,
               "http": true,
+              "source_type": "http_body_param",
               "http_stage": "http_body",
               "vulnerability_types": [
                 "*"
-              ],
-              "cleaning_effect": {}
+              ]
             }
           },
           {
@@ -255,10 +253,10 @@
               "source": true,
               "propagator": false,
               "sink": false,
+              "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
-              ],
-              "cleaning_effect": {}
+              ]
             }
           },
           {
@@ -273,10 +271,10 @@
               "source": true,
               "propagator": false,
               "sink": false,
+              "source_type": "http_multipart_param",
               "vulnerability_types": [
                 "*"
-              ],
-              "cleaning_effect": {}
+              ]
             }
           },
           {
@@ -294,7 +292,7 @@
               "vulnerability_types": [
                 "*"
               ],
-              "cleaning_effect": {}
+              "source_type": "http_multipart_param"
             }
           },
           {
@@ -312,11 +310,11 @@
               "vulnerability_types": [
                 "*"
               ],
-              "cleaning_effect": {}
+              "source_type": "http_string_param"
             }
           },
           {
-            "name": "getHeader1",
+            "name": "getHeader",
             "desc": "(Ljava/lang/String;)Ljava/lang/String;",
             "state": false,
             "hook_positions": {
@@ -330,7 +328,7 @@
               "vulnerability_types": [
                 "*"
               ],
-              "cleaning_effect": {}
+              "source_type": "http_header_param"
             }
           }
         ]
@@ -357,6 +355,134 @@
                 "*"
               ],
               "source_type": "http_spring_param"
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/springframework/util/FileCopyUtils",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "copy",
+            "desc": "(Ljava/io/InputStream;Ljava/io/OutputStream;)I",
+            "state": true,
+            "comment": "for file upload, propagate taint from input stream to output stream.",
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "P2"
+              }
+            }
+          },
+          {
+            "name": "add",
+            "desc": "(Ljava/lang/CharSequence;)Ljava/lang/StringJoiner;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
+            }
+          },
+          {
+            "name": "toString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/io/ByteArrayOutputStream",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "toByteArray",
+            "desc": "()[B",
+            "state": true,
+            "comment": "for file upload, propagate taint from output stream to bytes.",
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "add",
+            "desc": "(Ljava/lang/CharSequence;)Ljava/lang/StringJoiner;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
+            }
+          },
+          {
+            "name": "toString",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "vulnerability_types": [
+                "*"
+              ]
             }
           }
         ]
@@ -1040,7 +1166,7 @@
           {
             "name": "subSequence",
             "desc": "(II)Ljava/lang/CharSequence;",
-            "state": true,
+            "state": false,
             "hook_positions": {
               "entry": false,
               "exit": true
@@ -1059,7 +1185,7 @@
           {
             "name": "substring",
             "desc": "(II)Ljava/lang/String;",
-            "state": true,
+            "state": false,
             "hook_positions": {
               "entry": false,
               "exit": true
@@ -1953,8 +2079,8 @@
         },
         "methods": [
           {
-            "name": "getSubmittedFileName",
-            "desc": "()Ljava/lang/String;",
+            "name": "getInputStream",
+            "desc": "()Ljava/io/InputStream;",
             "state": true,
             "hook_positions": {
               "entry": false,
@@ -3204,34 +3330,6 @@
       },
       {
         "class": {
-          "name": "java/nio/channels/Channels$1",
-          "is_interface": false
-        },
-        "methods": [
-          {
-            "name": "write",
-            "desc": "([BII)V",
-            "state": true,
-            "hook_positions": {
-              "entry": true,
-              "exit": false
-            },
-            "taint_tracking": {
-              "source": false,
-              "propagator": false,
-              "sink": true,
-              "vulnerability_types": [
-                "file_upload"
-              ],
-              "tracking_direction": {
-                "from": "P1"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "class": {
           "name": "org/springframework/expression/ExpressionParser",
           "is_interface": true
         },
@@ -3354,6 +3452,34 @@
               "sink": true,
               "vulnerability_types": [
                 "spring_expression_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "com/alibaba/fastjson/JSON",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "parse",
+            "desc": "(Ljava/lang/String;I)Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "fastjson"
               ],
               "tracking_direction": {
                 "from": "P1"

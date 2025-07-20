@@ -1,4 +1,4 @@
-package com.keven1z.core.error;
+package com.keven1z.core.error.taint;
 
 public class DetectorNotFoundException extends TaintException {
     public DetectorNotFoundException(String message) {

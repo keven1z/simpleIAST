@@ -228,7 +228,8 @@ public class HookTransformer implements ClassFileTransformer {
     /**
      * 查找已加载到内存中hook点
      */
-    public List<Class<?>> findForReTransform() {
+    public List<Class<?>>
+    findForReTransform() {
         final List<Class<?>> classes = new ArrayList<>();
 
         Class<?>[] loadedClasses = this.instrumentation.getAllLoadedClasses();

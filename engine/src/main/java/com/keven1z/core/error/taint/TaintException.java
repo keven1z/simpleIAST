@@ -1,4 +1,4 @@
-package com.keven1z.core.error;
+package com.keven1z.core.error.taint;
 
 public class TaintException extends Exception{
     TaintException(String message){

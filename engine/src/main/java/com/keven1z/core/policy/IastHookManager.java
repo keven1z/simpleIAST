@@ -18,6 +18,11 @@ public class IastHookManager {
     private static class InstanceHolder {
         public static final IastHookManager INSTANCE = new IastHookManager();
     }
+    /**
+     * 加载配置信息
+     *
+     * @param config 配置信息对象
+     */
     public void loadConfig(IastHookConfig config) {
 
         for (ClassHookConfig classConfig : config.getHooks()) {
@@ -26,10 +31,13 @@ public class IastHookManager {
 
             // 构建方法缓存
             for (MethodHookConfig methodConfig : classConfig.getMethods()) {
-                String methodKey = getMethodKey(className,
-                        methodConfig.getName(),
-                        methodConfig.getDesc());
-                methodCache.put(methodKey, methodConfig);
+                // 仅对启用的方法进行hook处理
+                if (methodConfig.isState()){
+                    String methodKey = getMethodKey(className,
+                            methodConfig.getName(),
+                            methodConfig.getDesc());
+                    methodCache.put(methodKey, methodConfig);
+                }
             }
         }
     }
@@ -57,10 +65,22 @@ public class IastHookManager {
         return methodCache.get(methodKey);
     }
 
+    /**
+     * 判断是否需要对指定类进行Hook操作
+     *
+     * @param className 需要判断的类名
+     * @return 如果需要对指定类进行Hook操作，则返回true；否则返回false
+     */
     public boolean shouldHookClass(String className) {
         ClassHookConfig classConfig = hookRegistry.get(className);
         return classConfig != null;
     }
+    /**
+     * 根据类名获取对应的类hook配置
+     *
+     * @param className 需要获取类钩子配置的类名
+     * @return 对应类名的类hook配置，如果不存在则返回null
+     */
     public ClassHookConfig getClassHook(String className) {
         return hookRegistry.get(className);
     }
@@ -77,16 +97,16 @@ public class IastHookManager {
         for (String ancestor : ancestors) {
             if (shouldHookClass(ancestor)) {
                 ClassHookConfig classHook = getClassHook(ancestor);
-                if (classHook.getExcludeClasses().contains(className)){
-                    return false;
-                }
-                return true;
+                return !classHook.getExcludeClasses().contains(className);
             }
         }
         return false;
     }
     /**
      * 获取最后一个匹配的 Hook 祖先类名
+     *
+     * @param ancestors 祖先类集合
+     * @return 最后一个匹配的 Hook 祖先类名，如果没有找到则返回 null
      */
     public String getMatchingAncestor(Set<String> ancestors) {
         if (ancestors == null || ancestors.isEmpty()) {
@@ -102,12 +122,19 @@ public class IastHookManager {
 
     /**
      * 生成方法的唯一标识键
-     * @param className 类的全限定名(内部格式，如 java/lang/String)
-     * @param methodName 方法名
-     * @param descriptor 方法描述符(ASM格式)
+     * @param className 类的全限定名(内部格式，如 java/lang/String)，不能为null
+     * @param methodName 方法名，不能为null
+     * @param descriptor 方法描述符(ASM格式，如 (I)V)，不能为null
      * @return 格式为 "className#methodNameDescriptor" 的唯一键
      */
     private String getMethodKey(String className, String methodName, String descriptor) {
-        return className + "#" + methodName + descriptor;
-    }
+        if (className == null || methodName == null || descriptor == null) {
+            return null;
+        }
+        return new StringBuilder(className.length() + methodName.length() + descriptor.length() + 1)
+                .append(className)
+                .append('#')
+                .append(methodName)
+                .append(descriptor)
+                .toString();    }
 }

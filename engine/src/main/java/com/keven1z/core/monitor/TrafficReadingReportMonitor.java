@@ -58,6 +58,12 @@ public class TrafficReadingReportMonitor extends Monitor {
         }
     }
 
+    /**
+     * 检查给定的{@link FindingReportBo}，返回检测到的漏洞数据列表。
+     *
+     * @param findingReportBo 要检查的{@link FindingReportBo}对象
+     * @return 检测到的漏洞数据列表
+     */
     private List<FindingData> check(FindingReportBo findingReportBo) {
         TaintGraph taintGraph = findingReportBo.getTaintGraph();
         List<FindingData> findingDataList = new ArrayList<>();
@@ -111,11 +117,28 @@ public class TrafficReadingReportMonitor extends Monitor {
         return findingDataList;
     }
 
+    /**
+     * 判断给定的sink节点是否为重复sink节点
+     *
+     * @param sinkNode 待判断的sink节点
+     * @param processedSinkClass 已处理的sink类集合
+     * @return 如果sink节点是重复节点，则返回true；否则返回false
+     */
     private boolean isDuplicateSink(PathNode sinkNode, Set<String> processedSinkClass) {
         if (processedSinkClass.isEmpty()) {
             return false;
         }
+        // 如果sink点是同一个类，则认为是重复的
+        String className = sinkNode.getTaintData().getClassName();
+        if (processedSinkClass.contains(className)) {
+            return true;
+        }
+        // 如果sink点所在的调用栈中包含已处理的类，则认为是重复的
         List<String> stackList = sinkNode.getTaintData().getStackList();
+        if (stackList == null || stackList.isEmpty()) {
+            LogTool.warn(ErrorType.DETECT_VULNERABILITY_ERROR, "Failed to get stackList from SinkNode");
+            return false;
+        }
         for (String stack : stackList) {
             for (String processSinkClass : processedSinkClass) {
                 if (stack.contains(CommonUtils.toJavaClassName(processSinkClass))) {

@@ -1,4 +1,4 @@
-package com.keven1z.core.error;
+package com.keven1z.core.error.http;
 
 public class HttpException extends Exception {
     public HttpException(String message) {

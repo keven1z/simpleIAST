@@ -3,7 +3,7 @@ package com.keven1z.core.utils.http;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.keven1z.core.consts.Api;
-import com.keven1z.core.error.RegistrationException;
+import com.keven1z.core.error.http.RegistrationException;
 import com.keven1z.core.model.server.AgentDTO;
 import com.keven1z.core.model.server.AuthenticationDto;
 import com.keven1z.core.model.server.ResponseDTO;

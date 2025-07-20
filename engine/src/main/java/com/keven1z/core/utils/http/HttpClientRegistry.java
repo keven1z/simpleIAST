@@ -20,7 +20,8 @@ import java.util.function.Supplier;
  * </p>
  *
  * @author keven1z
- * @since 2024/4/10
+ * @Date 2024/4/10
+ * @since 0.3.0
  */
 public final class HttpClientRegistry implements Closeable {
     private static final Logger LOGGER = Logger.getLogger(HttpClientRegistry.class);

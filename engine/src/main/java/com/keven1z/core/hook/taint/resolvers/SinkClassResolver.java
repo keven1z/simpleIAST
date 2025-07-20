@@ -10,6 +10,8 @@ import com.keven1z.core.model.taint.TaintSink;
 import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.policy.MethodHookConfig;
 import com.keven1z.core.utils.PolicyUtils;
+import com.keven1z.core.utils.StackUtils;
+
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
 
 /**
@@ -43,6 +45,7 @@ public class SinkClassResolver implements HandlerHookClassResolver {
                 .thisObject(thisObject)
                 .addFlowPath(new TaintData.FlowPath(fromObject, null))
                 .stage(HookType.SINK)
+                .stackList(StackUtils.getParamStackTraceArray())
                 .vulnerabilityType(VulnerabilityType.valueOf(vulnerabilityType.toUpperCase()))
                 .build();
         PathNode pathNode = taintGraph.addNode(taintData);

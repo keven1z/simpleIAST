@@ -93,8 +93,8 @@ public class HandlerHookClassResolverInitializer {
         } else if (thisObject instanceof URL) {
             URL url = (URL) thisObject;
             String protocol = url.getProtocol();
-            return "jar".equals(protocol) || "file".equals(protocol) || "jrt".equals(protocol);
-
+            String path = url.getPath();
+            return "jar".equals(protocol) || "jrt".equals(protocol) || path.endsWith(".class");
         } else if (returnValue instanceof StringBuilder) {
             StringBuilder returnString = (StringBuilder) returnValue;
             return returnString.toString().startsWith("jar") || returnString.toString().startsWith("file");

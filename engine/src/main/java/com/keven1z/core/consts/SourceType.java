@@ -75,6 +75,9 @@ public enum SourceType {
      * @throws IllegalArgumentException 如果找不到对应的枚举值
      */
     public static SourceType fromName(String name) {
+        if (name == null) {
+            throw  new IllegalArgumentException("Source name cannot be null");
+        }
         SourceType result = nameToEnum.get(name);
         if (result == null) {
             throw new IllegalArgumentException("No enum constant " + SourceType.class.getName() + "." + name);

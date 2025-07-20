@@ -3,7 +3,7 @@ package com.keven1z.core.utils.http;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.keven1z.core.consts.Api;
-import com.keven1z.core.error.PolicyException;
+import com.keven1z.core.error.http.PolicyException;
 import com.keven1z.core.model.server.ResponseDTO;
 import com.keven1z.core.policy.ServerPolicy;
 import com.keven1z.core.utils.JsonUtils;

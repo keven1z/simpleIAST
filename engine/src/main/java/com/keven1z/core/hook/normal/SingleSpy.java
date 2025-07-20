@@ -2,7 +2,7 @@ package com.keven1z.core.hook.normal;
 
 
 import com.keven1z.core.consts.VulnerabilityType;
-import com.keven1z.core.error.DetectorNotFoundException;
+import com.keven1z.core.error.taint.DetectorNotFoundException;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.server.ReportData;
 import com.keven1z.core.model.finding.SingleFindingData;

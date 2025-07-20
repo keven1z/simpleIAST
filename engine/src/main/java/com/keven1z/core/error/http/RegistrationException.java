@@ -1,6 +1,6 @@
-package com.keven1z.core.error;
+package com.keven1z.core.error.http;
 
-public class RegistrationException extends HttpException{
+public class RegistrationException extends HttpException {
     public RegistrationException(String message) {
         super(message);
     }

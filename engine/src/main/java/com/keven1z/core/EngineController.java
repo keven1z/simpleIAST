@@ -1,7 +1,7 @@
 package com.keven1z.core;
 
 import com.keven1z.core.error.ConfigLoadException;
-import com.keven1z.core.error.RegistrationException;
+import com.keven1z.core.error.http.RegistrationException;
 import com.keven1z.core.hook.http.HttpSpy;
 import com.keven1z.core.hook.normal.SingleSpy;
 import com.keven1z.core.model.ApplicationModel;
@@ -161,19 +161,20 @@ public class EngineController {
     /**
      * 加载hook配置
      */
-    private void loadHookConfigs() throws IOException {
-//        HookPolicyContainer hookPolicyContainer = FileUtils.load(this.getClass().getClassLoader());
-//        if (hookPolicyContainer == null) {
-//            LogTool.error(ErrorType.POLICY_ERROR, "policyContainer is null");
-//            throw new RuntimeException("Policy load failed");
-//        }
-//        context.setPolicyContainer(hookPolicyContainer);
-        IastHookConfig iastHookConfig = FileUtils.loadHookConfig(this.getClass().getClassLoader());
-        if (iastHookConfig == null) {
-            throw new ConfigLoadException("Failed to load hook config");
+    private void loadHookConfigs() throws ConfigLoadException {
+        try {
+            IastHookConfig iastHookConfig = FileUtils.loadHookConfig(this.getClass().getClassLoader());
+            if (iastHookConfig == null) {
+                throw new ConfigLoadException("Hook config file could be null");
+            }
+            context.setHookConfig(iastHookConfig);
+            IastHookManager.getManager().loadConfig(iastHookConfig);
         }
-        context.setHookConfig(iastHookConfig);
-        IastHookManager.getManager().loadConfig(iastHookConfig);
+        catch (IOException e) {
+            System.err.println("[SimpleIAST] Failed to load hook config,cause:" + e.getMessage());
+            throw new ConfigLoadException("Failed to load hook config,cause:" + e.getMessage());
+        }
+
     }
 
     private void loadHookBlacklist() throws IOException {

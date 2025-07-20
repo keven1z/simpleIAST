@@ -14,7 +14,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
  *   3. 线程安全实现
  *   </p>
  * @author keven1z
- * @since 2025/4/8
+ * @Date 2025/4/8
  */
 public class HttpClientFactory {
     private static final PoolingHttpClientConnectionManager sharedPool = new PoolingHttpClientConnectionManager();

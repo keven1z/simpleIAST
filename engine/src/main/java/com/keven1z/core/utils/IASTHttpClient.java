@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.keven1z.core.EngineController;
 import com.keven1z.core.consts.Api;
-import com.keven1z.core.error.RegistrationException;
+import com.keven1z.core.error.http.RegistrationException;
 import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;

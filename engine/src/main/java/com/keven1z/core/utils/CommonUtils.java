@@ -99,7 +99,10 @@ public class CommonUtils {
         }
         return true;
     }
-
+    private static final String URL_REGEX = "^((https?|ftp)://([^/\\s]+?)(:\\d{1,5})?|file:/{1,3})" +  // 协议部分
+            "([^\\s?#]*)" +  // 路径部分
+            "(\\?[^#]*)?" +   // 查询参数
+            "(#.*)?$";        // 锚点
     /**
      * 判断是否为URL
      *
@@ -108,42 +111,27 @@ public class CommonUtils {
     public static boolean isURL(String str) {
         //转换为小写
         str = str.toLowerCase();
-        String regex = "^((https|http|ftp|rtsp|mms)?://)"  //https、http、ftp、rtsp、mms
-                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@
-                + "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 例如：199.194.52.184
-                + "|" // 允许IP和DOMAIN（域名）
-                + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
-                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
-                + "[a-z]{2,6})" // first level domain- .com or .museum
-                + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
-                + "((/?)|" // a slash isn't required if there is no file name
-                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
-        return str.matches(regex);
+        return str.matches(URL_REGEX);
     }
 
     /**
-     * 判断元素是否在集合中
+     * 判断元素是否不在集合中
      *
      * @param element 要检查的元素
      * @param list    要检查的字符串集合
      * @return 如果元素在集合中，则返回true；否则返回false
      */
-    public static boolean isInList(String element, List<String> list) {
-        if (element == null || list == null || list.isEmpty()) {
-            return false;
+    public static boolean absentFromCollection(String element, List<String> list) {
+        if (element == null || list == null) {
+            return true;
         }
-        for (String l : list) {
-            if (element.equals(l)) {
-                return true;
-            }
-        }
-        return false;
+        return !list.contains(element);
     }
 
     /**
      * 解析URL查询字符串为键值对映射
      *
-     * @param url 需要解析的URL字符串（应包含合法的查询参数）
+     * @param query 需要解析的URL字符串（应包含合法的查询参数）
      * @return 参数键值对映射，遵循以下规则：
      *         - 使用UTF-8字符集进行URL解码
      *         - 当存在重复参数名时，保留第一个出现的参数值（遵循RFC 3986不强制唯一键的规范）

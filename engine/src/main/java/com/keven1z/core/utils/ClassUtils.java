@@ -34,12 +34,12 @@ public class ClassUtils {
     public static Set<String> buildAncestors(String[] interfaces, String superClass) {
         Set<String> ancestors = new HashSet<>();
         if (superClass != null) {
-            if (!CommonUtils.isInList(CommonUtils.toJavaClassName(superClass), Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(superClass), Arrays.asList(IGNORE_OBJECT_CLASS))) {
                 ancestors.add(superClass);
             }
         }
         for (String inter : interfaces) {
-            if (!CommonUtils.isInList(CommonUtils.toJavaClassName(inter), Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(inter), Arrays.asList(IGNORE_OBJECT_CLASS))) {
                 ancestors.add(inter);
             }
         }
@@ -83,14 +83,14 @@ public class ClassUtils {
                 ClassReader classReader = new ClassReader(bufferedInput);
                 String superName = classReader.getSuperName();
                 if (superName != null) {
-                    if (!CommonUtils.isInList(CommonUtils.toJavaClassName(superName), ignoreList)) {
+                    if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(superName), ignoreList)) {
                         set.add(superName);
                     }
                 }
 
                 String[] interfaces = classReader.getInterfaces();
                 for (String interfaceName : interfaces) {
-                    if (!CommonUtils.isInList(CommonUtils.toJavaClassName(interfaceName), ignoreList)) {
+                    if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(interfaceName), ignoreList)) {
                         if (set.size() <= 5) {
                             set.add(interfaceName);
                         }

@@ -39,7 +39,7 @@ public class Config {
     /**
      * 是否dump hook的class
      */
-    public static final boolean IS_DUMP_CLASS = true;
+    public static final boolean IS_DUMP_CLASS = false;
     /**
      * 最大上报队列大小
      */

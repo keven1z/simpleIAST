@@ -113,14 +113,43 @@ public class TaintData {
 
         // 构造函数
         public FlowPath(Object fromObject, Object toObject) {
-            this.fromObject = fromObject.toString();
+            this.fromObject = truncateWithEllipsis(fromObject.toString());
             if (toObject != null) {
                 this.hashcode = System.identityHashCode(toObject); // 使用值的身份哈希码
-                this.toObject = toObject.toString();
+                this.toObject = truncateWithEllipsis(toObject.toString());
             } else {
                 this.hashcode = -1;
                 this.toObject = null;
             }
+        }
+        /**
+         * 限制字符串长度，超出则中间用 ... 省略
+         *
+         * @param input 原始字符串
+         * @return 格式化后的字符串
+         */
+        public static String truncateWithEllipsis(String input) {
+            int maxLength = 128;
+            if (input == null) {
+                return "";
+            }
+
+            if (input.length() <= maxLength) {
+                return input;
+            }
+
+            // 预留中间的 "..."
+            int ellipsisLength = 3;
+
+            // 前后保留的字符数
+            int remain = maxLength - ellipsisLength;
+            int prefixLength = remain / 2;
+            int suffixLength = remain - prefixLength;
+
+            String prefix = input.substring(0, prefixLength);
+            String suffix = input.substring(input.length() - suffixLength);
+
+            return prefix + "..." + suffix;
         }
 
         // 获取来源对象
