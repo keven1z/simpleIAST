@@ -423,7 +423,6 @@ org/joda/
 io/prometheus/
 com/fasterxml/classmate/
 org/apache/rocketmq/
-java/util/HashMap$KeyIterator
 com/fasterxml/jackson/databind/deser/
 com/fasterxml/jackson/databind/introspect/
 com/fasterxml/jackson/databind/introspect/
@@ -575,13 +574,10 @@ org/apache/catalina/ContainerEvent
 java/util/TreeMap$KeySpliterator
 java/util/concurrent/CountDownLatch
 java/util/concurrent/CountDownLatch$Sync
-java/util/concurrent/LinkedBlockingDeque$
 java/util/concurrent/Semaphore
-java/util/concurrent/ConcurrentHashMap$
 java/util/concurrent/AbstractExecutorService
 java/util/concurrent/Executors
 java/util/concurrent/FutureTask
-java/util/concurrent/ConcurrentLinkedDeque$
 javax/naming/InitialContext
 java/util/Stack
 jdk/xml/internal/JdkXmlUtils
@@ -910,16 +906,8 @@ org/apache/logging/
 org/jboss/logging/
 org/bson/
 java/util/concurrent/locks/ReentrantReadWriteLock
-java/util/concurrent/locks/ReentrantReadWriteLock$NonfairSync
-java/util/concurrent/locks/ReentrantReadWriteLock$Sync
-java/util/concurrent/locks/ReentrantReadWriteLock$Sync$ThreadLocalHoldCounter
-java/util/concurrent/locks/ReentrantReadWriteLock$ReadLock
-java/util/concurrent/locks/ReentrantReadWriteLock$WriteLock
 org/apache/catalina/webresources/TomcatJarInputStream
 com/netflix/
-java/util/concurrent/CopyOnWriteArraySet
-java/util/concurrent/ConcurrentLinkedDeque
-java/util/concurrent/ConcurrentLinkedDeque$Node
 java/util/AbstractMap$SimpleImmutableEntry
 java/lang/StringLatin1$CharsSpliterator
 cn/hutool/
@@ -1048,7 +1036,6 @@ com/fasterxml/jackson/databind/module/
 com/fasterxml/jackson/datatype/jsr310/
 java/util/concurrent/ScheduledThreadPoolExecutor
 java/sql/Time
-java/util/concurrent/ArrayBlockingQueue
 java/util/RegularEnumSet$EnumSetIterator
 com/fasterxml/jackson/databind/JsonSerializer
 com/fasterxml/jackson/databind/JsonDeserializer
@@ -1139,8 +1126,6 @@ jdk/net/LinuxSocketOptions
 jdk/net/ExtendedSocketOptions$1
 java/util/HashMap$KeySpliterator
 java/util/concurrent/atomic/AtomicReferenceFieldUpdater
-java/util/concurrent/atomic/AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl
-java/util/concurrent/atomic/AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl$1
 org/springframework/beans/factory/support/BeanDefinitionResource
 org/springframework/web/method/HandlerMethod
 org/springframework/context/support/DefaultMessageSourceResolvable

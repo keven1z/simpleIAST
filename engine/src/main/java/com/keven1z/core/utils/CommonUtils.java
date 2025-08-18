@@ -2,6 +2,7 @@ package com.keven1z.core.utils;
 
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -52,12 +53,36 @@ public class CommonUtils {
     }
 
     /**
+     * 通用空对象判断方法
+     * @param obj 要判断的对象
+     * @return 如果对象为null、空字符串、空集合、空Map则返回true
+     */
+    public static boolean isEmpty(Object obj) {
+        if (obj == null) {
+            return true;
+        }
+        if (obj instanceof CharSequence) {
+            return ((CharSequence) obj).length() == 0;
+        }
+        if (obj instanceof Collection) {
+            return ((Collection<?>) obj).isEmpty();
+        }
+        if (obj instanceof Map) {
+            return ((Map<?, ?>) obj).isEmpty();
+        }
+        if (obj.getClass().isArray()) {
+            return Array.getLength(obj) == 0;
+        }
+        return false;
+    }
+
+    /**
      * java'TomcatV7 classname to internal'TomcatV7 classname
      *
      * @return internal'TomcatV7 classname
      */
     public static String toInternalClassName(String javaClassName) {
-        if (org.apache.commons.lang3.StringUtils.isEmpty(javaClassName)) {
+        if (isEmpty(javaClassName)) {
             return javaClassName;
         }
         return javaClassName.replace('.', '/');

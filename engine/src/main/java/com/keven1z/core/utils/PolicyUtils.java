@@ -10,8 +10,6 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.HookPolicy;
 import com.keven1z.core.policy.HookPolicyContainer;
-
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,34 +18,7 @@ import static com.keven1z.core.consts.CommonConst.OFF;
 public class PolicyUtils {
     private final static ConcurrentHashMap<String, Boolean> superClassCache = new ConcurrentHashMap<>(1024);
 
-    /**
-     * 判断是否是hook点或者是hook接口的实现类
-     *
-     * @param className       待判断的类名
-     * @param hookPolicyContainer 策略集
-     * @param interfaces      待判断类的单一接口
-     * @param loader          classloader
-     * @return 是否是hook点或者是hook接口的实现类
-     */
-    public static boolean isHook(String className, HookPolicyContainer hookPolicyContainer, String[] interfaces, String superClass, ClassLoader loader) throws IOException {
-        if (PolicyUtils.isHookedByClassName(className, hookPolicyContainer, true)) {
-            return true;
-        }
-        if (superClassCache.containsKey(className)) {
-            return superClassCache.get(className);
-        }
 
-        Set<String> allInterfaces = getAllInterfaces(interfaces, superClass, loader);
-        boolean isHooked = PolicyUtils.isHookedByAncestors(className, allInterfaces, hookPolicyContainer);
-        superClassCache.put(className, isHooked);
-        return isHooked;
-
-    }
-
-    public static Set<String> getAllInterfaces(String[] interfaces, String superClass, ClassLoader loader) throws IOException {
-        Set<String> ancestors = ClassUtils.buildAncestors(interfaces, superClass);
-        return ClassUtils.getAncestors(ancestors, loader, 0);
-    }
 
     public static boolean isHook(HookPolicyContainer hookPolicyContainer, Class<?> clazz) {
         String className = clazz.getName();
@@ -305,7 +276,7 @@ public class PolicyUtils {
     public static Set<PathNode> searchParentNodes(Object fromObject, TaintGraph taintGraph) {
         int fromObjectHashCode = System.identityHashCode(fromObject);
         if (taintGraph.isTaint(fromObjectHashCode)) {
-            return null;
+            return Collections.emptySet();
         }
         List<PathNode> allNode = taintGraph.getAllNode();
         Set<PathNode> parentNodes = new LinkedHashSet<>();

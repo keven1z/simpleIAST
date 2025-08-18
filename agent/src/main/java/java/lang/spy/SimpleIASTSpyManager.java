@@ -28,6 +28,12 @@ public class SimpleIASTSpyManager {
         } catch (Throwable ignored) {
         }
     }
+    public static void $_userBeanTaint(Object returnObject, Object[] parameters, Object thisObject, String className, String method, String desc) {
+        try {
+            taintSpy.$_userBeanTaint(returnObject, parameters, thisObject, className, method, desc);
+        } catch (Throwable ignored) {
+        }
+    }
 
     public static void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
         try {

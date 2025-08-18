@@ -50,18 +50,33 @@ public class ClassUtils {
         Set<String> allInterfaces = new HashSet<>();
         Class<?>[] interfaces = clazz.getInterfaces();
         for (Class<?> inter : interfaces) {
-            String name = inter.getName().replace(".", "/");
+            String name = CommonUtils.toInternalClassName(inter.getName());
             allInterfaces.add(name);
             allInterfaces.addAll(getAllInterfaces(inter));
         }
         return allInterfaces;
+    }
+    /**
+     * 获取给定接口和父类的祖先类集合。
+     *
+     * @param interfaces 接口数组，可以为空。
+     * @param superClass 父类名称，可以为null。
+     * @param loader 类加载器，用于加载类。
+     * @return 祖先类集合。
+     */
+    public static Set<String> getAncestors(Class<?>[] interfaces, Class<?> superClass, ClassLoader loader) throws IOException {
+        String[] interfaceArray = Arrays.stream(interfaces)
+                .map(Class::getName)
+                .toArray(String[]::new);
+        Set<String> ancestors = ClassUtils.buildAncestors(interfaceArray, superClass.getName());
+        return ClassUtils.getAncestors(ancestors, loader, 0);
     }
     public static Set<String> getAncestors(String[] interfaces, String superClass, ClassLoader loader) throws IOException {
         Set<String> ancestors = ClassUtils.buildAncestors(interfaces, superClass);
         return ClassUtils.getAncestors(ancestors, loader, 0);
     }
 
-    public static Set<String> getAncestors(Set<String> ancestors, ClassLoader classLoader, int recursionCount) throws IOException {
+    private static Set<String> getAncestors(Set<String> ancestors, ClassLoader classLoader, int recursionCount) throws IOException {
         Set<String> set = new HashSet<>(5);
         if (recursionCount >= RECURSION_LIMIT) {
             return set;

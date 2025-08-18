@@ -2100,6 +2100,102 @@
       },
       {
         "class": {
+          "name": "java/util/Queue",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "peek",
+            "desc": "()Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "add",
+            "desc": "(Ljava/lang/Object;)Z",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "O"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/util/Set",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "iterator",
+            "desc": "()Ljava/util/Iterator;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "java/util/Iterator",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "next",
+            "desc": "()Ljava/lang/Object;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
           "name": "java/io/BufferedReader",
           "is_interface": false
         },

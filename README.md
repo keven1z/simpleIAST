@@ -1,6 +1,6 @@
 <div align="center">
 
-#  simpleIAST  ![0.3.0 (shields.io)](https://img.shields.io/badge/0.3.0-brightgreen.svg)
+#  simpleIAST  ![0.4.0.dev (shields.io)](https://img.shields.io/badge/0.4.0.dev-brightgreen.svg)
 
 </div>
 
@@ -9,6 +9,26 @@
 simpleIAST是一种交互式应用程序安全测试工具。
 </p>
 
+<!-- TOC -->
+[目录](#simpleiast-)
+  * [1. 快速开始](#1-快速开始)
+    * [clone项目](#clone项目)
+    * [docker运行](#docker运行)
+    * [访问](#访问)
+  * [2. Agent启动](#2-agent启动)
+    * [跟随应用启动运行](#跟随应用启动运行)
+    * [应用启动完成attach方式运行](#应用启动完成attach方式运行)
+  * [3. 兼容](#3-兼容)
+    * [支持中间件](#支持中间件)
+    * [支持JDK](#支持jdk)
+  * [4. 支持漏洞](#4-支持漏洞)
+  * [5.benchmark](#5benchmark)
+  * [6. 漏洞详情展示](#6-漏洞详情展示)
+  * [7. 使用文档](#7-使用文档)
+  * [8. 计划](#8-计划)
+  * [9. 鸣谢](#9-鸣谢)
+  * [10. License](#10-license)
+<!-- TOC -->
 
 ## 1. 快速开始
 
@@ -79,31 +99,34 @@ java -jar iast-engine.jar -m uninstall -p [pid]
 |  12  |       硬编码漏洞       |  中危  |
 |  13  |  Fastjson反序列化漏洞  |  严重  |
 
-## 5. 漏洞详情展示
+## 5.benchmark
+benchmark测试说明以及simpleIAST测试结果见文档:[benchmark](./benchmark/README.md)
+
+## 6. 漏洞详情展示
 ![detail.png](img/detail.png)
 
-## 6. 使用文档
+## 7. 使用文档
 * [快速开始](https://github.com/keven1z/simpleIAST/wiki/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
 * [项目](https://github.com/keven1z/simpleIAST/wiki/项目)
 * [应用](https://github.com/keven1z/simpleIAST/wiki/%E5%BA%94%E7%94%A8)
 * [漏洞](https://github.com/keven1z/simpleIAST/wiki/%E6%BC%8F%E6%B4%9E)
 * [设置](https://github.com/keven1z/simpleIAST/wiki/%E8%AE%BE%E7%BD%AE)
 
-## 7. 计划
+## 8. 计划
 - [x] API改造
 - [x] 漏洞检测数量，覆盖[ant-application-security-testing-benchmark](https://github.com/alipay/ant-application-security-testing-benchmark)
 - [x] 服务端交互界面
 - [x] 支持多种中间件
 - [x] sql注入漏洞误报修复
 - [x] 心跳包重构
-- [ ] hook自定义对象
+- [x] hook自定义对象
 
-## 8. 鸣谢
+## 9. 鸣谢
 > [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。
 
 特别感谢 [JetBrains](https://www.jetbrains.com/?from=mirai) 为开源项目提供免费的 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=mirai)授权
 
 ![](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)
 
-## 9. License
+## 10. License
 本项目采用 Apache License 2.0 开源授权许可证。

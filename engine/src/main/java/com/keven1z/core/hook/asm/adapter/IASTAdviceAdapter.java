@@ -9,7 +9,7 @@ import org.objectweb.asm.commons.AdviceAdapter;
 
 /**
  * @author keven1z
- * @since 2023/10/19
+ * @Date 2023/10/19
  */
 public class IASTAdviceAdapter extends AdviceAdapter {
     protected final String methodName;
@@ -19,7 +19,7 @@ public class IASTAdviceAdapter extends AdviceAdapter {
     protected final boolean isStatic;
     private final Type[] argumentTypeArray;
     /**
-     * Creates a HookAdviceAdapter {@link AdviceAdapter}.
+     * Creates a IASTAdviceAdapter {@link IASTAdviceAdapter}.
      *
      * @param api       the ASM API version implemented by this visitor. Must be one
      *                  of {@link Opcodes#ASM4} or {@link Opcodes#ASM5}.
@@ -44,10 +44,12 @@ public class IASTAdviceAdapter extends AdviceAdapter {
             pushNull();
         }
     }
-    final protected boolean isStaticMethod() {
+
+    protected final boolean isStaticMethod() {
         return (methodAccess & ACC_STATIC) != 0;
     }
-    final protected void storeArgArray() {
+
+    protected final void storeArgArray() {
         for (int i = 0; i < argumentTypeArray.length; i++) {
             loadArg(i);
         }
@@ -72,7 +74,7 @@ public class IASTAdviceAdapter extends AdviceAdapter {
         return opcode == ATHROW;
     }
 
-    final protected void pushNull() {
+    protected final void pushNull() {
         push((Type) null);
     }
 }

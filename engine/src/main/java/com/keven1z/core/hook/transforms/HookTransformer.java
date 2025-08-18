@@ -1,6 +1,7 @@
 package com.keven1z.core.hook.transforms;
 
 import com.keven1z.core.EngineController;
+import com.keven1z.core.hook.asm.BeanDetectorVisitor;
 import com.keven1z.core.hook.asm.HardcodedClassVisitor;
 import com.keven1z.core.hook.asm.IASTClassVisitor;
 import com.keven1z.core.hook.server.detectors.*;
@@ -12,6 +13,7 @@ import com.keven1z.core.utils.*;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import static com.keven1z.core.model.Config.IS_DUMP_CLASS;
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 
@@ -104,11 +107,13 @@ public class HookTransformer implements ClassFileTransformer {
         /* 确定hook的className,若该类的接口是hook点,hookClassName和className不一致 */
         String hookClassName = null;
         boolean isUserClass = false;
+        boolean isUserBeanClass = false;
         /*  如果为用户类,统一hook 用户类的array操作方法*/
         if (isUserDefinedClass(loader, protectionDomain)) {
             hookClassName = className;
             logUserDefinedClass(className);
             isUserClass = true;
+            isUserBeanClass = isUserBeanClass(classfileBuffer);
         } else if (IastHookManager.getManager().shouldHookClass(className)) {
             hookClassName = className;
         } else {
@@ -148,7 +153,8 @@ public class HookTransformer implements ClassFileTransformer {
         classReader.accept(new IASTClassVisitor(classWriter,
                         hookClassName,
                         this.nativePrefix
-                        , isUserClass),
+                        , isUserClass,
+                        isUserBeanClass),
                 ClassReader.EXPAND_FRAMES
         );
         // 记录已转换的类名
@@ -219,7 +225,7 @@ public class HookTransformer implements ClassFileTransformer {
             } catch (UnmodifiableClassException e) {
                 // 处理类无法被修改的情况
                 logger.warn("Class " + clazz.getName() + " cannot be reTransformed because it is unmodifiable.");
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 logger.error("Failed to reTransform class " + clazz.getName() + ": " + t.getMessage(), t);
             }
         }
@@ -227,49 +233,53 @@ public class HookTransformer implements ClassFileTransformer {
 
     /**
      * 查找已加载到内存中hook点
+     *
+     * @return 可重新转换的类列表
      */
-    public List<Class<?>>
-    findForReTransform() {
+    private List<Class<?>> findForReTransform() {
         final List<Class<?>> classes = new ArrayList<>();
-
         Class<?>[] loadedClasses = this.instrumentation.getAllLoadedClasses();
         for (Class<?> clazz : loadedClasses) {
             TransformerProtector.instance.enterProtecting();
             try {
-                String normalizeClass = ClassUtils.normalizeClass(clazz.getName());
-                if (ClassUtils.isComeFromIASTFamily(normalizeClass, clazz.getClassLoader())) {
+                String className = clazz.getName();
+                String normalizeClass = ClassUtils.normalizeClass(className);
+
+                if (ClassUtils.isComeFromIASTFamily(normalizeClass, clazz.getClassLoader())
+                        || !instrumentation.isModifiableClass(clazz)
+                        || clazz.getName().startsWith("java.lang.invoke.LambdaForm")
+                        || EngineController.context.isClassNameBlacklisted(normalizeClass)) {
                     continue;
                 }
-                if (!instrumentation.isModifiableClass(clazz)) {
-                    continue;
-                }
-                if (clazz.getName().startsWith("java.lang.invoke.LambdaForm")) {
-                    continue;
-                }
+
                 if (this.hasTransformedClasses.contains(normalizeClass)) {
-                    if (LogTool.isDebugEnabled()) {
-                        logger.warn("Class has been transformed,class name:" + clazz.getName());
+                    if (LogTool.isDebugEnabled()){
+                        logger.debug("Class has been transformed, class name: " + className);
                     }
                     continue;
                 }
+
                 if (ClassUtils.shouldSkipProxyClass(normalizeClass)) {
-                    if (LogTool.isDebugEnabled()) {
-                        logger.warn("Class is proxy,skip proxy class，class name:" + clazz.getName());
+                    if (LogTool.isDebugEnabled()){
+                        logger.debug("Class is proxy, skip proxy class, class name: " + className);
                     }
                     continue;
                 }
-                /*
-                 * 排除在黑名单中的class
-                 */
-                if (EngineController.context.isClassNameBlacklisted(normalizeClass)) {
-                    continue;
-                }
-                if (IastHookManager.getManager().shouldHookClass(CommonUtils.toInternalClassName(clazz.getName()))) {
+                String internalClassName = CommonUtils.toInternalClassName(className);
+                if (IastHookManager.getManager().shouldHookClass(internalClassName)) {
                     classes.add(clazz);
+                } else {
+                    Set<String> ancestors = ClassUtils.getAncestors(clazz.getInterfaces(), clazz.getSuperclass(), clazz.getClassLoader());
+                    if (IastHookManager.getManager().shouldHookAncestors(internalClassName, ancestors)) {
+                        classes.add(clazz);
+                    }
                 }
-            } catch (Exception e) {
-                logger.error("remove from findForReTransform, because loading class:" + clazz.getName() + "occur an exception", e);
-            } finally {
+            } catch (RuntimeException | IOException e) {
+                logger.error("remove from findForReTransform, because loading class: " + clazz.getName() + " occur an exception");
+            }catch (Exception ex){
+                logger.error("unknown error from findForReTransform, because loading class: " + clazz.getName() + " occur an exception");
+            }
+            finally {
                 TransformerProtector.instance.exitProtecting();
             }
         }
@@ -362,5 +372,12 @@ public class HookTransformer implements ClassFileTransformer {
      */
     private void logUserDefinedClass(String className) {
         EngineController.context.addUserClass(className);
+    }
+
+    private boolean isUserBeanClass(byte[] classFileBuffer) {
+        ClassReader cr = new ClassReader(classFileBuffer);
+        BeanDetectorVisitor detector = new BeanDetectorVisitor();
+        cr.accept(detector, ClassReader.SKIP_CODE);
+        return detector.isBean();
     }
 }

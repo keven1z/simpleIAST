@@ -28,26 +28,28 @@ public class IASTClassVisitor extends ClassVisitor {
     /**
      * 策略名称:http body 读取标志hook点
      */
-    private final static String HTTP_BODY = "http_body";
+    private static final String HTTP_BODY = "http_body";
     /**
      * 策略名称:http 入口点
      */
-    private final static String HTTP_ENTER = "http_enter";
+    private static final String HTTP_ENTER = "http_enter";
     /**
      * 策略名称:http body读取hook点
      */
-    private final static String HTTP_BODY_READ = "http_body_read";
+    private static final String HTTP_BODY_READ = "http_body_read";
     private final String nativePrefix;
     private List<ProxyMethod> proxyNativeAsmMethods;
     private final boolean isUserClass;
+    private final boolean isUserBeanClass;
 
     public IASTClassVisitor(ClassVisitor classVisitor,
                             String className,
-                            String nativePrefix, boolean isUserClass) {
+                            String nativePrefix, boolean isUserClass, boolean isUserBeanClass) {
         super(Opcodes.ASM9, classVisitor);
         this.className = className;
         this.nativePrefix = nativePrefix;
         this.isUserClass = isUserClass;
+        this.isUserBeanClass = isUserBeanClass;
     }
 
     @Override
@@ -58,20 +60,36 @@ public class IASTClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        /* 如果是用户代码,仅进行方法中数组操作的hook */
+        /* 处理用户类 */
         if (isUserClass) {
-            MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
-            return new ArrayAdviceAdapter(this.api, methodVisitor, access, this.className, name, descriptor);
+            return handleUserClassMethod(access, name, descriptor, signature, exceptions);
         }
+
         if (!IastHookManager.getManager().shouldHookMethod(this.className, name, descriptor)) {
             return super.visitMethod(access, name, descriptor, signature, exceptions);
         }
-        if (!isNative(access)) {
-            return rewriteNormalMethod(access, name, descriptor, signature, exceptions);
-        } else {
-            return rewriteNativeMethod(access, name, descriptor, signature, exceptions);
-        }
+        return isNative(access)
+                ? rewriteNativeMethod(access, name, descriptor, signature, exceptions)
+                : rewriteNormalMethod(access, name, descriptor, signature, exceptions);
     }
+    /**
+     * 处理用户自定义类的方法
+     *
+     * @param access 方法的访问权限
+     * @param name 方法名
+     * @param descriptor 方法的描述符
+     * @param signature 方法的签名
+     * @param exceptions 方法抛出的异常列表
+     * @return 方法访问器
+     */
+    private MethodVisitor handleUserClassMethod(int access, String name, String descriptor,
+                                                String signature, String[] exceptions) {
+        MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+        return isUserBeanClass
+                ? new UserBeanAdviceAdapter(this.api, methodVisitor, access, this.className, name, descriptor)
+                : new ArrayAdviceAdapter(this.api, methodVisitor, access, this.className, name, descriptor);
+    }
+
 
     /**
      * 重写普通方法
@@ -100,26 +118,6 @@ public class IASTClassVisitor extends ClassVisitor {
             isVisitMethod = true;
             methodVisitor = visitHTTPMethod(access, name, descriptor, methodVisitor, methodHookConfig);
         }
-//        HookPolicy hookPolicy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getSingles());
-//        if (hookPolicy != null) {
-//            isVisitMethod = true;
-//            //打印错误日志
-//            return visitNormalMethod(access, name, descriptor, methodVisitor, hookPolicy);
-//        }
-//
-//        hookPolicy = PolicyUtils.getHookedPolicy(className, name, descriptor, EngineController.context.getPolicy().getHttp());
-//        if (hookPolicy != null) {
-//            isVisitMethod = true;
-//            //打印错误日志
-//            methodVisitor = visitHTTPMethod(access, name, descriptor, methodVisitor, hookPolicy);
-//        }
-//
-//        hookPolicy = PolicyUtils.getHookedPolicyByBisection(className, name, descriptor, EngineController.context.getPolicy().getTaintPolicy());
-//        if (hookPolicy != null) {
-//            isVisitMethod = true;
-//            //打印错误日志
-//            return visitTaintMethod(access, name, descriptor, methodVisitor, hookPolicy);
-//        }
         return methodVisitor;
     }
 

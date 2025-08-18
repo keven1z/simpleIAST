@@ -313,6 +313,11 @@ public class HttpSpy implements SimpleIASTSpy {
     }
 
     @Override
+    public void $_userBeanTaint(Object thisObject, Object[] parameters, Object returnObject, String className, String method, String desc) {
+
+    }
+
+    @Override
     public void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
 
     }

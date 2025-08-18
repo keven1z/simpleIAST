@@ -88,6 +88,11 @@ public class SingleSpy implements SimpleIASTSpy {
     }
 
     @Override
+    public void $_userBeanTaint(Object thisObject, Object[] parameters, Object returnObject, String className, String method, String desc) {
+
+    }
+
+    @Override
     public void $_requestStarted(Object requestObject, Object responseObject) {
 
     }

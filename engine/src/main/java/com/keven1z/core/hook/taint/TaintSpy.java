@@ -16,6 +16,7 @@ import java.lang.spy.SimpleIASTSpy;
 import java.util.Set;
 
 import static com.keven1z.core.consts.PolicyConst.O;
+import static com.keven1z.core.consts.PolicyConst.P;
 import static com.keven1z.core.model.Config.MAX_REPORT_QUEUE_SIZE;
 import static com.keven1z.core.hook.HookThreadLocal.*;
 
@@ -47,13 +48,13 @@ public class TaintSpy implements SimpleIASTSpy {
      */
     @Override
     public void $_taint(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type) {
-        if (enableHookLock.get()) {
+        if (Boolean.TRUE.equals(enableHookLock.get())) {
             return;
         } else {
             enableHookLock.set(true);
         }
         try {
-            if (shouldProceedWithTaintTracking()){
+            if (shouldProceedWithTaintTracking()) {
                 return;
             }
 
@@ -73,52 +74,100 @@ public class TaintSpy implements SimpleIASTSpy {
 
     @Override
     public void $_arrayTaint(Object arrayObject, int index, Object arrayValue, String className, String method, String desc) {
-        if (enableHookLock.get()) {
+        if (Boolean.TRUE.equals(enableHookLock.get())) {
             return;
         } else {
             enableHookLock.set(true);
         }
         try {
-            if (shouldProceedWithTaintTracking()){
+            if (shouldProceedWithTaintTracking()) {
                 return;
             }
-            if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty()){
+            if (TAINT_GRAPH_THREAD_LOCAL.get().isEmpty()) {
                 return;
             }
-            if (arrayObject == null || arrayValue == null){
+            if (arrayObject == null || arrayValue == null) {
                 return;
             }
             TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
             Set<PathNode> parentNodes = PolicyUtils.searchParentNodes(arrayValue, taintGraph);
-            if (parentNodes == null || parentNodes.isEmpty()) {
+            if (parentNodes.isEmpty()) {
                 return;
             }
-            TaintPropagation taintData = new TaintPropagation.Builder()
-                    .className(className)
-                    .method(method)
-                    .desc(desc)
-                    .returnObject(arrayObject)
-                    .thisObject(arrayObject)
-                    .stage(HookType.PROPAGATION)
-                    .addFlowPath(new TaintData.FlowPath(arrayValue, arrayObject))
-                    .build();
+            TaintPropagation taintData = buildTaintPropagation(className, method, desc, arrayObject, arrayObject,
+                    new TaintData.FlowPath(arrayValue, arrayObject));
             for (PathNode parentNode : parentNodes) {
                 PathNode pathNode = taintGraph.addNode(taintData);
                 taintGraph.addEdge(parentNode, pathNode, O);
             }
-
         } finally {
             enableHookLock.set(false);
         }
     }
 
+    @Override
+    public void $_userBeanTaint(Object returnValue, Object[] parameters, Object thisObject, String className, String method, String desc) {
+        if (Boolean.TRUE.equals(enableHookLock.get())) {
+            return;
+        }
+        enableHookLock.set(true);
+
+        try {
+            if (shouldProceedWithTaintTracking() || thisObject == null || returnValue == null) {
+                return;
+            }
+
+            TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
+            if (taintGraph.isEmpty()) {
+                return;
+            }
+
+            PathNode pathNode;
+            if (method.startsWith("set") && parameters != null && parameters.length > 0) {
+                Set<PathNode> parentNodes = PolicyUtils.searchParentNodes(parameters[0], taintGraph);
+                if (!parentNodes.isEmpty()) {
+                    TaintPropagation taintData = buildTaintPropagation(className, method, desc, returnValue, thisObject,
+                            new TaintData.FlowPath(parameters[0], thisObject));
+                    for (PathNode parentNode : parentNodes) {
+                        pathNode = taintGraph.addNode(taintData);
+                        taintGraph.addEdge(parentNode, pathNode, P);
+                    }
+                }
+            } else if (method.startsWith("get")) {
+                Set<PathNode> parentNodes = PolicyUtils.searchParentNodes(thisObject, taintGraph);
+                if (!parentNodes.isEmpty()) {
+                    TaintPropagation taintData = buildTaintPropagation(className, method, desc, returnValue, thisObject,
+                            new TaintData.FlowPath(thisObject, returnValue));
+                    for (PathNode parentNode : parentNodes) {
+                        pathNode = taintGraph.addNode(taintData);
+                        taintGraph.addEdge(parentNode, pathNode, O);
+                    }
+                }
+            }
+        } finally {
+            enableHookLock.set(false);
+        }
+    }
+
+    private TaintPropagation buildTaintPropagation(String className, String method, String desc,
+                                                   Object returnObject, Object thisObject, TaintData.FlowPath flowPath) {
+        return new TaintPropagation.Builder()
+                .className(className)
+                .method(method)
+                .desc(desc)
+                .returnObject(returnObject)
+                .thisObject(thisObject)
+                .stage(HookType.PROPAGATION)
+                .addFlowPath(flowPath)
+                .build();
+    }
 
     /**
      * 判断是否应该继续进行污点追踪
      *
      * @return 如果满足继续污点追踪的条件，则返回true；否则返回false
      */
-    private boolean shouldProceedWithTaintTracking(){
+    private boolean shouldProceedWithTaintTracking() {
         /*
          * 判断agent是否开启，若关闭不进行hook
          */
@@ -155,6 +204,7 @@ public class TaintSpy implements SimpleIASTSpy {
 
         return false;
     }
+
     @Override
     public void $_single(Object returnObject, Object thisObject, Object[] parameters, String className, String method, String desc, String type, String policyName, boolean isRequireHttp) {
 
