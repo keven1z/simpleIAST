@@ -866,9 +866,6 @@
               "source": false,
               "propagator": true,
               "sink": false,
-              "vulnerability_types": [
-                "*"
-              ],
               "tracking_direction": {
                 "from": "O",
                 "to": "R"
@@ -2266,6 +2263,32 @@
       },
       {
         "class": {
+          "name": "java/util/Arrays",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "deepToString",
+            "desc": "([Ljava/lang/Object;)Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
           "name": "java/lang/AbstractStringBuilder",
           "is_interface": false
         },
@@ -2303,6 +2326,24 @@
               "sink": false,
               "tracking_direction": {
                 "from": "O",
+                "to": "R"
+              }
+            }
+          },
+          {
+            "name": "insert",
+            "desc": "(ILjava/lang/String;)Ljava/lang/AbstractStringBuilder;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "P2",
                 "to": "R"
               }
             }

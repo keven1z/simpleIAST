@@ -132,9 +132,9 @@ aTaintCase0022->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系
 aTaintCase0023->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->特殊链路跟踪能力->超长链路追踪->100层:通过
 aTaintCase00931->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->特殊链路跟踪能力->超长链路追踪->1000层:通过
 aTaintCase0024->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->特殊链路跟踪能力->反射调用方法跟踪:通过
-aTaintCase0025->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->特殊链路跟踪能力->调用native方法:漏报
+aTaintCase0025->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->特殊链路跟踪能力->调用native方法:漏报 通过
 aTaintCase0027->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->污点来源识别能力(source)->污点来自http getQueryString:通过
-aTaintCase0033->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->污点来源识别能力(source)->污点来自http body->json/RequestBody:漏报
+aTaintCase0033->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->污点来源识别能力(source)->污点来自http body->json/RequestBody:漏报 通过
 aTaintCase0034->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->污点来源识别能力(source)->污点来自http body->xml/getInputStream:漏报
 aTaintCase0035->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->污点来源识别能力(source)->污点来自http body->multipart/form-data->getPart:漏报
 aTaintCase0036->IAST引擎能力评估体系(JAVA)->IAST引擎能力评估体系(JAVA)->完整度->基础跟踪能力->污点链路完整度->污点来源识别能力(source)->污点来自http body->multipart/form-data->getParts:漏报
