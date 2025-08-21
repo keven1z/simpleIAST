@@ -42,7 +42,7 @@ public class HookTransformer implements ClassFileTransformer {
     /**
      * 设置最大transformer数量防止意外情况，导致出现不可预知的问题
      */
-    private final static int MAX_TRANSFORM_COUNT = 1000;
+    private static final int MAX_TRANSFORM_COUNT = 1000;
     private final Logger logger = Logger.getLogger(HookTransformer.class);
     private final Set<String> hasTransformedClasses;
     private final String nativePrefix;
@@ -104,28 +104,30 @@ public class HookTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
         hardcodedCheckBeforeHook(classReader, className);
-        /* 确定hook的className,若该类的接口是hook点,hookClassName和className不一致 */
+        /* 确定hook的className,若该类的接口是hook点,hookClassName和className不一致
+        * 1. 如果hook一个接口以及接口的实现类,则仅会hook接口的实现类的方法,不会hook接口的方法
+        * 2. 如果用户类实现一个接口类,该接口类同时为hook点,则仅会作为接口类的实现类进行hook,不会作为user class进行hook
+        * */
         String hookClassName = null;
         boolean isUserClass = false;
         boolean isUserBeanClass = false;
-        /*  如果为用户类,统一hook 用户类的array操作方法*/
-        if (isUserDefinedClass(loader, protectionDomain)) {
-            hookClassName = className;
-            logUserDefinedClass(className);
-            isUserClass = true;
-            isUserBeanClass = isUserBeanClass(classfileBuffer);
-        } else if (IastHookManager.getManager().shouldHookClass(className)) {
+        if (IastHookManager.getManager().shouldHookClass(className)) {
             hookClassName = className;
         } else {
             // 判断是否需要hook祖先类
             Set<String> ancestors = ClassUtils.getAncestors(classReader.getInterfaces(), classReader.getSuperName(), loader);
-            if (ancestors.isEmpty()) {
-                return classfileBuffer;
-            }
-            if (IastHookManager.getManager().shouldHookAncestors(className, ancestors)) {
+            if (!ancestors.isEmpty() && IastHookManager.getManager().shouldHookAncestors(className, ancestors)) {
                 hookClassName = IastHookManager.getManager().getMatchingAncestor(ancestors);
             }
         }
+        if (hookClassName == null && isUserDefinedClass(loader, protectionDomain)) {
+            /*  如果未hook到且为用户类,进一步进行用户类的字节码操作*/
+            hookClassName = className;
+            logUserDefinedClass(className);
+            isUserClass = true;
+            isUserBeanClass = isUserBeanClass(classfileBuffer);
+        }
+
         if (hookClassName == null) {
             return classfileBuffer;
         }
@@ -253,14 +255,14 @@ public class HookTransformer implements ClassFileTransformer {
                 }
 
                 if (this.hasTransformedClasses.contains(normalizeClass)) {
-                    if (LogTool.isDebugEnabled()){
+                    if (LogTool.isDebugEnabled()) {
                         logger.debug("Class has been transformed, class name: " + className);
                     }
                     continue;
                 }
 
                 if (ClassUtils.shouldSkipProxyClass(normalizeClass)) {
-                    if (LogTool.isDebugEnabled()){
+                    if (LogTool.isDebugEnabled()) {
                         logger.debug("Class is proxy, skip proxy class, class name: " + className);
                     }
                     continue;
@@ -276,10 +278,9 @@ public class HookTransformer implements ClassFileTransformer {
                 }
             } catch (RuntimeException | IOException e) {
                 logger.error("remove from findForReTransform, because loading class: " + clazz.getName() + " occur an exception");
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 logger.error("unknown error from findForReTransform, because loading class: " + clazz.getName() + " occur an exception");
-            }
-            finally {
+            } finally {
                 TransformerProtector.instance.exitProtecting();
             }
         }

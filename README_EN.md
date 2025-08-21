@@ -7,23 +7,6 @@ A taint‑tracking based gray‑box vulnerability scanning tool for Java web app
 
 ---
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Quick Start](#quick-start)
-  - [Clone the Project](#clone-the-project)
-  - [Start with Docker](#start-with-docker)
-  - [Agent Startup Methods](#agent-startup-methods)
-- [Features & Compatibility](#features--compatibility)
-  - [Supported Middleware](#supported-middleware)
-  - [Supported JDK Versions](#supported-jdk-versions)
-  - [Detected Vulnerability Types](#detected-vulnerability-types)
-- [Demo Interface](#demo-interface)
-- [Further Documentation](#further-documentation)
-- [License](#license)
-
----
-
 ## Introduction
 
 **simpleIAST** is a Java Agent‑based gray‑box vulnerability scanning tool that employs taint tracking to detect runtime security risks in Java web applications. It identifies vulnerabilities such as SQL Injection, Deserialization issues, XSS, XXE, and more. The tool is lightweight, easily integrable, and compatible with mainstream middleware and JDK versions—ideal for DevSecOps workflows.

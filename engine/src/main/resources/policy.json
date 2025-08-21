@@ -2237,6 +2237,32 @@
       },
       {
         "class": {
+          "name": "java/io/Reader",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "readLine",
+            "desc": "()Ljava/lang/String;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": true,
+              "sink": false,
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
           "name": "java/lang/System",
           "is_interface": false
         },
