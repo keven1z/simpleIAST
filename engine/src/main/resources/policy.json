@@ -316,7 +316,7 @@
           {
             "name": "getHeader",
             "desc": "(Ljava/lang/String;)Ljava/lang/String;",
-            "state": false,
+            "state": true,
             "hook_positions": {
               "entry": false,
               "exit": true
