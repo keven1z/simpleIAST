@@ -24,7 +24,7 @@ public class PolicyClient extends BaseHttpClient {
         try {
             String url = baseUrl + Api.POLICY_URL;
             HttpGet request = new HttpGet(url);
-            String response = executeRequest(request);
+            String response = fetchRequestResponseAsString(request);
             return parsePolicies(response);
         } catch (IOException e) {
             throw new PolicyException("获取策略失败", e);

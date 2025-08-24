@@ -1,6 +1,8 @@
 package com.keven1z.core.utils.http;
 
 import com.keven1z.core.consts.Api;
+import com.keven1z.core.error.http.ReportSendException;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -17,15 +19,27 @@ public class ReportClient extends BaseHttpClient {
         super(baseUrl);
     }
 
-    public boolean sendVulnerabilityReport(String report) {
+    public boolean sendVulnerabilityReport(String report) throws ReportSendException {
+        HttpPost request = null;
+        HttpResponse response = null;
         try {
-//            String payload = JsonUtils.toJsonString(report);
-            HttpPost request = buildCompressedRequest(report);
-            executeRequest(request);
-            return true;
+            request = buildCompressedRequest(report);
+            response = fetchRequest(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode >= 200 && statusCode < 300) {
+                if (logger.isDebugEnabled()){
+                    logger.debug("Report sent successfully, status code: " + statusCode);
+                }
+                return true;
+            } else {
+                logger.error("Failed to sent Report, status code:" + statusCode);
+                return false;
+            }
         } catch (IOException e) {
-            LOGGER.error("漏洞报告发送失败", e);
-            return false;
+            logger.debug("Report send IO error: "+e.getMessage(), e);
+            throw new ReportSendException("Report send error", e);
+        } finally {
+            closeResources(response, request);
         }
     }
 

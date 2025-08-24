@@ -974,6 +974,7 @@ javax/xml/transform/sax/SAXTransformerFactory
 javax/xml/catalog/CatalogFeatures
 javax/xml/catalog/CatalogFeatures$Builder
 jdk/internal/math/
+jdk/internal/jimage/ImageBufferCache$
 reactor/core/
 com/fasterxml/jackson/databind/util/SimpleBeanPropertyDefinition
 com/fasterxml/jackson/databind/ext/Java7Support

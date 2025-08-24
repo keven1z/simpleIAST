@@ -43,7 +43,7 @@ public class Config {
     /**
      * 最大上报队列大小
      */
-    public static final int MAX_REPORT_QUEUE_SIZE = 5;
+    public static final int MAX_REPORT_QUEUE_SIZE = 10;
     /**
      * 最大同时检测大小
      */

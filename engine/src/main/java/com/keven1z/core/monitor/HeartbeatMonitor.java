@@ -1,6 +1,7 @@
 package com.keven1z.core.monitor;
 
 
+import com.keven1z.core.error.http.HeartbeatSendException;
 import com.keven1z.core.model.server.HeartbeatMessage;
 import com.keven1z.core.utils.OSUtils;
 import com.keven1z.core.utils.http.HttpClientRegistry;
@@ -51,30 +52,30 @@ public class HeartbeatMonitor extends Monitor {
         }
 
         // 发送心跳包
-        boolean success = sendHeartbeat();
-
-        // 更新熔断器状态
-        if (success) {
-            circuitBreaker.recordSuccess();
-            consecutiveFailures.set(0);
-        } else {
-            consecutiveFailures.incrementAndGet();
-            circuitBreaker.recordFailure();
-            handleHeartbeatFailure();
-        }
+        sendHeartbeat();
 
         // 休眠直到下一个心跳周期
         TimeUnit.MILLISECONDS.sleep(heartbeatInterval);
 
     }
 
-    private boolean sendHeartbeat() {
+    private void sendHeartbeat() {
         try {
             HeartbeatMessage heartbeatMsg = generateHeartbeatMessage();
-            return heartbeatClient.sendMessage(heartbeatMsg);
-        } catch (Exception e) {
-            logger.error("Heartbeat send error", e);
-            return false;
+            boolean success =  heartbeatClient.sendMessage(heartbeatMsg);
+            // 更新熔断器状态
+            if (success) {
+                circuitBreaker.recordSuccess();
+                consecutiveFailures.set(0);
+            } else {
+                consecutiveFailures.incrementAndGet();
+                circuitBreaker.recordFailure();
+                handleHeartbeatFailure();
+            }
+        } catch (HeartbeatSendException e) {
+            consecutiveFailures.incrementAndGet();
+            circuitBreaker.recordFailure();
+            handleHeartbeatFailure();
         }
     }
 
@@ -85,12 +86,10 @@ public class HeartbeatMonitor extends Monitor {
 
     private void handleCircuitBreakerOpen() {
         logger.warn("CircuitBreaker is OPEN. Skipping heartbeat.");
-        // 可选：触发告警或资源释放
     }
 
     private void handleHeartbeatFailure() {
         logger.error("Heartbeat failed. Consecutive failures: " + consecutiveFailures.get());
-        // 可选：重试策略或资源回收
     }
 
 }

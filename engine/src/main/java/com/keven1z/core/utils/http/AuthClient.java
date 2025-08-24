@@ -28,7 +28,7 @@ public class AuthClient extends BaseHttpClient {
         try {
             String payload = JsonUtils.toJsonString(agentDto);
             HttpPost request = buildPostRequest(Api.AGENT_REGISTER_URL, payload);
-            String response = executeRequest(request);
+            String response = fetchRequestResponseAsString(request);
             return parseAuthResponse(response);
         } catch (IOException e) {
             throw new RegistrationException("注册请求失败", e);
@@ -39,10 +39,10 @@ public class AuthClient extends BaseHttpClient {
         try {
             String url = baseUrl + Api.AGENT_DEREGISTER_URL + "?agentId=" + agentId;
             HttpGet request = new HttpGet(url);
-            executeRequest(request);
+            fetchRequestResponseAsString(request);
             return true;
         } catch (IOException e) {
-            LOGGER.warn("注销请求失败", e);
+            logger.warn("注销请求失败", e);
             return false;
         }
     }
@@ -62,14 +62,14 @@ public class AuthClient extends BaseHttpClient {
             // 处理失败响应
             if (!response.isFlag()) {
                 String errorMsg = String.format("Registration failed. Reason: %s", response.getMessage());
-                LOGGER.warn(errorMsg);
+                logger.warn(errorMsg);
                 throw new RegistrationException(errorMsg);
             }
             AuthenticationDto authData = response.getData();
             // 校验响应数据类型
             if (authData == null || authData.getAgentId() == null || authData.getToken() == null) {
                 String errorMsg = "Incomplete authentication data. AgentId or Token is missing.";
-                LOGGER.error(errorMsg);
+                logger.error(errorMsg);
                 throw new RegistrationException(errorMsg);
             }
             return authData;

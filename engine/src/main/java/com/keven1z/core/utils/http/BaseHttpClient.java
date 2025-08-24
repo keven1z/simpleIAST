@@ -18,16 +18,17 @@ import java.nio.charset.StandardCharsets;
  * HTTP客户端基类（抽象公共逻辑）
  */
 public abstract class BaseHttpClient implements Closeable {
-    protected static final Logger LOGGER = Logger.getLogger(BaseHttpClient.class);
+    protected final Logger logger = Logger.getLogger(getClass());
 
-    protected static volatile CloseableHttpClient httpClient;
+    protected volatile CloseableHttpClient httpClient;
     protected String baseUrl;
 
     protected BaseHttpClient(String baseUrl) {
         this.baseUrl = validateBaseUrl(baseUrl);
         httpClient = getOrCreateHttpClient();
     }
-    private static CloseableHttpClient getOrCreateHttpClient() {
+
+    private CloseableHttpClient getOrCreateHttpClient() {
         if (httpClient == null) {
             synchronized (BaseHttpClient.class) {
                 if (httpClient == null) {
@@ -37,6 +38,7 @@ public abstract class BaseHttpClient implements Closeable {
         }
         return httpClient;
     }
+
     private String validateBaseUrl(String url) {
         if (StringUtils.isBlank(url)) {
             throw new IllegalArgumentException("Base URL cannot be null or empty");
@@ -51,7 +53,7 @@ public abstract class BaseHttpClient implements Closeable {
         return HttpClientFactory.createPooledClient();
     }
 
-    protected String executeRequest(HttpRequestBase request) throws IOException {
+    protected String fetchRequestResponseAsString(HttpRequestBase request) throws IOException {
         addCommonHeaders(request);
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             checkResponseStatus(response);
@@ -59,12 +61,20 @@ public abstract class BaseHttpClient implements Closeable {
         }
     }
 
+    protected CloseableHttpResponse fetchRequest(HttpRequestBase request) throws IOException {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+        addCommonHeaders(request);
+        return httpClient.execute(request);
+    }
+
     private void checkResponseStatus(HttpResponse response) throws IOException {
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode < 200 || statusCode >= 300) {
             String errorMsg = String.format("HTTP请求失败，状态码：%d，URL：%s",
                     statusCode, response.getLocale());
-            LOGGER.error(errorMsg);
+            logger.error(errorMsg);
             throw new IOException(errorMsg);
         }
     }
@@ -85,18 +95,38 @@ public abstract class BaseHttpClient implements Closeable {
             return content.toString();
         }
     }
+
     protected void addCommonHeaders(HttpRequest request) {
         request.addHeader("User-Agent", "IAST-Agent/1.0");
         request.addHeader("Accept", "application/json");
         String token = EngineController.context.getToken();
         if (token != null) {
-            request.addHeader("Authorization", String.format("Bearer %s",token));
+            request.addHeader("Authorization", String.format("Bearer %s", token));
         }
     }
+
     @Override
     public void close() throws IOException {
         if (httpClient != null) {
             httpClient.close();
+        }
+    }
+
+    protected void closeResources(HttpResponse httpResponse, HttpRequestBase request) {
+        try {
+            if (httpResponse != null && httpResponse.getEntity() != null) {
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+            }
+        } catch (Exception e) {
+            logger.debug("Error consuming response entity: " + e.getMessage());
+        }
+
+        if (request != null) {
+            try {
+                request.releaseConnection();
+            } catch (Exception e) {
+                logger.debug("Error releasing connection: " + e.getMessage());
+            }
         }
     }
 }

@@ -16,30 +16,31 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class ClassUtils {
     private static final String[] IGNORE_OBJECT_CLASS = new String[]{"java.lang.Object",
-    "java.lang.Cloneable",
-    "java.io.Closeable",
-    "java.io.Serializable",
-    "java.lang.Iterable",
-    "java.io.Flushable",
-    "java.lang.Appendable",
-    "java.lang.Enum",
-    "java.lang.Comparable",
-    "java.rmi.Remote",
-    "javax.servlet.SingleThreadModel",
-    "java.lang.FunctionalInterface"};
+            "java.lang.Cloneable",
+            "java.io.Closeable",
+            "java.io.Serializable",
+            "java.lang.Iterable",
+            "java.io.Flushable",
+            "java.lang.Appendable",
+            "java.lang.Enum",
+            "java.lang.Comparable",
+            "java.rmi.Remote",
+            "javax.servlet.SingleThreadModel",
+            "java.lang.FunctionalInterface"};
     private static final String INTEGER_CLASS = "java.lang.Integer";
     private static final String IAST_FAMILY_CLASS_RES_PREFIX = "com/keven1z/";
     private static final int RECURSION_LIMIT = 3; // 设置递归限制次数
 
     public static Set<String> buildAncestors(String[] interfaces, String superClass) {
         Set<String> ancestors = new HashSet<>();
-        if (superClass != null) {
-            if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(superClass), Arrays.asList(IGNORE_OBJECT_CLASS))) {
-                ancestors.add(superClass);
-            }
+        List<String> ignoreList = Arrays.asList(IGNORE_OBJECT_CLASS);
+
+        if (!ignoreList.contains(CommonUtils.toJavaClassName(superClass))) {
+            ancestors.add(superClass);
         }
+
         for (String inter : interfaces) {
-            if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(inter), Arrays.asList(IGNORE_OBJECT_CLASS))) {
+            if (!ignoreList.contains(CommonUtils.toJavaClassName(inter))) {
                 ancestors.add(inter);
             }
         }
@@ -56,21 +57,24 @@ public class ClassUtils {
         }
         return allInterfaces;
     }
+
     /**
      * 获取给定接口和父类的祖先类集合。
      *
      * @param interfaces 接口数组，可以为空。
      * @param superClass 父类名称，可以为null。
-     * @param loader 类加载器，用于加载类。
+     * @param loader     类加载器，用于加载类。
      * @return 祖先类集合。
      */
     public static Set<String> getAncestors(Class<?>[] interfaces, Class<?> superClass, ClassLoader loader) throws IOException {
-        String[] interfaceArray = Arrays.stream(interfaces)
+        String[] interfaceArray = interfaces == null ? new String[0]
+                : Arrays.stream(interfaces)
                 .map(Class::getName)
                 .toArray(String[]::new);
-        Set<String> ancestors = ClassUtils.buildAncestors(interfaceArray, superClass.getName());
-        return ClassUtils.getAncestors(ancestors, loader, 0);
+        String superClassName = superClass == null ? null : superClass.getName();
+        return getAncestors(interfaceArray, superClassName, loader);
     }
+
     public static Set<String> getAncestors(String[] interfaces, String superClass, ClassLoader loader) throws IOException {
         Set<String> ancestors = ClassUtils.buildAncestors(interfaces, superClass);
         return ClassUtils.getAncestors(ancestors, loader, 0);
@@ -98,17 +102,15 @@ public class ClassUtils {
                 ClassReader classReader = new ClassReader(bufferedInput);
                 String superName = classReader.getSuperName();
                 if (superName != null) {
-                    if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(superName), ignoreList)) {
+                    if (!ignoreList.contains(CommonUtils.toJavaClassName(superName))) {
                         set.add(superName);
                     }
                 }
 
                 String[] interfaces = classReader.getInterfaces();
                 for (String interfaceName : interfaces) {
-                    if (CommonUtils.absentFromCollection(CommonUtils.toJavaClassName(interfaceName), ignoreList)) {
-                        if (set.size() <= 5) {
-                            set.add(interfaceName);
-                        }
+                    if (ignoreList.contains(CommonUtils.toJavaClassName(interfaceName)) && set.size() <= 5) {
+                        set.add(interfaceName);
                     }
                 }
             } finally {
@@ -201,9 +203,11 @@ public class ClassUtils {
         return null != loader
                 && isIASTPrefix(normalizeClass(loader.getClass().getName()));
     }
+
     public static boolean shouldSkipProxyClass(String className) {
         return className.endsWith("$Proxy") || className.endsWith("Proxy$");
     }
+
     private static boolean isIASTPrefix(String className) {
         return className.startsWith(IAST_FAMILY_CLASS_RES_PREFIX);
     }

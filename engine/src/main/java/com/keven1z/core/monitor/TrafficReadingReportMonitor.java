@@ -31,7 +31,7 @@ import static com.keven1z.core.hook.HookThreadLocal.*;
  */
 public class TrafficReadingReportMonitor extends Monitor {
 
-    private final  DetectorFactory detectorFactory = DetectorFactory.getInstance();
+    private final DetectorFactory detectorFactory = DetectorFactory.getInstance();
 
     @Override
     public String getThreadName() {
@@ -49,6 +49,9 @@ public class TrafficReadingReportMonitor extends Monitor {
         try {
             findingReportBo = FINDING_REPORT_QUEUE.take();
             buildAndReport(findingReportBo);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LogTool.error(ErrorType.REPORT_ERROR, "Thread interrupted, stopping queue processing", e);
         } catch (Exception e) {
             LogTool.error(ErrorType.REPORT_ERROR, "Failed to report finding", e);
         } finally {
@@ -120,7 +123,7 @@ public class TrafficReadingReportMonitor extends Monitor {
     /**
      * 判断给定的sink节点是否为重复sink节点
      *
-     * @param sinkNode 待判断的sink节点
+     * @param sinkNode           待判断的sink节点
      * @param processedSinkClass 已处理的sink类集合
      * @return 如果sink节点是重复节点，则返回true；否则返回false
      */

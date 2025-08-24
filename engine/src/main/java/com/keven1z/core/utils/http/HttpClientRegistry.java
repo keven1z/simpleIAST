@@ -32,9 +32,11 @@ public final class HttpClientRegistry implements Closeable {
 
     private HttpClientRegistry() {
     }
+
     private static class Inner {
         private static final HttpClientRegistry clientRegistry = new HttpClientRegistry();
     }
+
     /**
      * 获取单例实例
      */
@@ -59,7 +61,7 @@ public final class HttpClientRegistry implements Closeable {
             getClientInternal(clazz, supplier);
         });
 
-        LOGGER.info("成功初始化{}个HTTP客户端"+clientSuppliers.size());
+        LOGGER.info("成功初始化" + clientSuppliers.size() + "个HTTP客户端");
     }
 
     /**
