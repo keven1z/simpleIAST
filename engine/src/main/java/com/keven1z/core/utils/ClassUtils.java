@@ -29,13 +29,13 @@ public class ClassUtils {
             "java.lang.FunctionalInterface"};
     private static final String INTEGER_CLASS = "java.lang.Integer";
     private static final String IAST_FAMILY_CLASS_RES_PREFIX = "com/keven1z/";
-    private static final int RECURSION_LIMIT = 3; // 设置递归限制次数
+    private static final int RECURSION_LIMIT = 4; // 设置递归限制次数
 
     public static Set<String> buildAncestors(String[] interfaces, String superClass) {
         Set<String> ancestors = new HashSet<>();
         List<String> ignoreList = Arrays.asList(IGNORE_OBJECT_CLASS);
 
-        if (!ignoreList.contains(CommonUtils.toJavaClassName(superClass))) {
+        if (superClass != null && !ignoreList.contains(CommonUtils.toJavaClassName(superClass))) {
             ancestors.add(superClass);
         }
 
@@ -109,7 +109,7 @@ public class ClassUtils {
 
                 String[] interfaces = classReader.getInterfaces();
                 for (String interfaceName : interfaces) {
-                    if (ignoreList.contains(CommonUtils.toJavaClassName(interfaceName)) && set.size() <= 5) {
+                    if (!ignoreList.contains(CommonUtils.toJavaClassName(interfaceName)) && set.size() <= 5) {
                         set.add(interfaceName);
                     }
                 }

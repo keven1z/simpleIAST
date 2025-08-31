@@ -103,7 +103,6 @@ public class HookTransformer implements ClassFileTransformer {
         if (ClassUtils.isInterface(classReader.getAccess())) {
             return classfileBuffer;
         }
-        hardcodedCheckBeforeHook(classReader, className);
         /* 确定hook的className,若该类的接口是hook点,hookClassName和className不一致
         * 1. 如果hook一个接口以及接口的实现类,则仅会hook接口的实现类的方法,不会hook接口的方法
         * 2. 如果用户类实现一个接口类,该接口类同时为hook点,则仅会作为接口类的实现类进行hook,不会作为user class进行hook
@@ -126,6 +125,9 @@ public class HookTransformer implements ClassFileTransformer {
             logUserDefinedClass(className);
             isUserClass = true;
             isUserBeanClass = isUserBeanClass(classfileBuffer);
+            /* 仅在用户类检测硬编码*/
+            hardcodedCheckBeforeHook(classReader, className);
+
         }
 
         if (hookClassName == null) {
@@ -316,7 +318,7 @@ public class HookTransformer implements ClassFileTransformer {
                     boolean detectionSuccessful = hook.processServerInfo(loader, protectionDomain);
                     if (detectionSuccessful) {
                         String serverType = ApplicationModel.getContainerName();
-                        logger.info("Detect server successfully, server type: " + serverType);
+                        logger.info("Detect server successfully - server type =" + serverType);
                         return;
                     } else {
                         LogTool.warn(ErrorType.DETECT_SERVER_ERROR, "Failed to detect server type by " + hook);
@@ -350,8 +352,11 @@ public class HookTransformer implements ClassFileTransformer {
             return false;
         }
         String loaderName = loader.getClass().getName();
-        if (loaderName.startsWith("jdk.internal.") ||  // JDK 内部加载器
-                loaderName.equals("sun.misc.Launcher$ExtClassLoader") || // 扩展类加载器
+        //jdk11 及以上采用jdk.internal.loader.ClassLoaders$AppClassLoader加载用户类
+        if (!ApplicationModel.isJdk9() && loaderName.startsWith("jdk.internal.")){
+            return false;
+        }
+        if (loaderName.equals("sun.misc.Launcher$ExtClassLoader") || // 扩展类加载器
                 loaderName.startsWith("org.apache.")) { // 某些容器级加载器（如 Tomcat 的共享库加载器）)
             return false;
         }

@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.model.server.ReportData;
 import com.keven1z.core.vulnerability.report.ReportBuilder;
-import com.keven1z.core.vulnerability.report.ReportPrinter;
-import com.keven1z.core.vulnerability.report.ReportSender;
+import com.keven1z.core.vulnerability.report.ReportHandler;
 
 import static com.keven1z.core.hook.HookThreadLocal.REPORT_QUEUE;
 
@@ -33,8 +32,8 @@ public class DirectReportMonitor extends Monitor {
             report(reportData);
             //降低漏洞处理频率，减少cpu 持续消耗
             Thread.sleep(1000);
-        } catch (Exception ignore) {
-
+        } catch (Exception e) {
+            logger.error("Failed to process report data", e);
         }
     }
 
@@ -42,9 +41,9 @@ public class DirectReportMonitor extends Monitor {
         String reportJson = ReportBuilder.build(reportData);
         //debug模式 默认打印漏洞信息
         if (IASTContext.getContext().isOfflineEnabled()) {
-            ReportPrinter.print(reportJson);
+            ReportHandler.print(reportJson);
         } else {
-            ReportSender.send(reportJson);
+            ReportHandler.send(reportJson);
         }
     }
 }

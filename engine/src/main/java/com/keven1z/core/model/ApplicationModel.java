@@ -152,6 +152,21 @@ public class ApplicationModel {
     public static String getJdkVersion() {
         return applicationInfo.get("jdk");
     }
+    public static boolean isJdk9(){
+        String javaVersion = applicationInfo.get("jdk");
+        if (javaVersion.startsWith("1.")) {
+            // JDK 8 及以前版本：1.8, 1.7, 1.6 等
+            return false;
+        } else {
+            try {
+                // JDK 9 及以后版本：9, 11, 17 等
+                int majorVersion = Integer.parseInt(javaVersion.split("\\.")[0]);
+                return majorVersion >= 9;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
 
     public static boolean getStartUpInfo() {
         String result = applicationInfo.get("StandardStart");

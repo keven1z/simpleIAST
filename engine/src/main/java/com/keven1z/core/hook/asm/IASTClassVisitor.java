@@ -4,6 +4,7 @@ import com.keven1z.core.hook.asm.adapter.*;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.policy.MethodHookConfig;
+import com.keven1z.core.utils.ClassUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -61,17 +62,20 @@ public class IASTClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         /* 处理用户类 */
-        if (isUserClass) {
+        if (isUserClass && !ClassUtils.isStatic(access)) {
             return handleUserClassMethod(access, name, descriptor, signature, exceptions);
         }
 
+        // 如果不需要对方法进行hook，则调用父类的visitMethod方法
         if (!IastHookManager.getManager().shouldHookMethod(this.className, name, descriptor)) {
             return super.visitMethod(access, name, descriptor, signature, exceptions);
         }
+        // 根据方法是否为native方法，决定调用重写的方法
         return isNative(access)
                 ? rewriteNativeMethod(access, name, descriptor, signature, exceptions)
                 : rewriteNormalMethod(access, name, descriptor, signature, exceptions);
     }
+
     /**
      * 处理用户自定义类的方法
      *

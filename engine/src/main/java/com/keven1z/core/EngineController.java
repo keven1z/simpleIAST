@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static com.keven1z.core.consts.CommonConst.*;
+import static java.lang.Thread.sleep;
 
 
 /**
@@ -196,6 +197,11 @@ public class EngineController {
      * 初始化类字节码的转换器
      */
     private void initTransformer() {
+        try {
+            sleep(5000);
+        } catch (InterruptedException e) {
+
+        }
         Instrumentation instrumentation = context.getInstrumentation();
         HookTransformer hookTransformer = new HookTransformer(instrumentation);
         if (instrumentation.isNativeMethodPrefixSupported()) {
@@ -250,7 +256,7 @@ public class EngineController {
 
             // 策略信息
             logger.debug(String.format("安全策略: 总数=%d, Hook黑名单=%d",
-                    context.getPolicyContainer().getPolicySize(),
+                    context.getIastHookConfig().getHooks().size(),
                     context.getBlackList().size()));
         }
     }

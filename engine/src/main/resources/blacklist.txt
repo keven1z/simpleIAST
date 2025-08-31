@@ -348,7 +348,6 @@ org/springframework/context/i18n/SimpleLocaleContext
 org/apache/commons/lang3/StringUtils
 javax/servlet/http/Cookie
 org/apache/catalina/util/RequestUtil
-org/springframework/web/servlet/FrameworkServlet$RequestBindingInterceptor
 org/springframework/core/log/LogFormatUtils
 org/springframework/web/util/WebUtils
 org/springframework/web/util/UriUtils
@@ -1151,8 +1150,6 @@ javax/activation/MimeType
 javax/mail/
 org/springframework/http/client/support/InterceptingHttpAccessor
 org/springframework/http/client/support/HttpAccessor
-org/springframework/web/servlet/DispatcherServlet
-org/springframework/web/servlet/FrameworkServlet
 org/springframework/web/servlet/HttpServletBean
 org/springframework/web/filter/CharacterEncodingFilter
 org/springframework/web/filter/GenericFilterBean

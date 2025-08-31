@@ -20,10 +20,8 @@ public abstract class Monitor extends Thread {
         /*
          * 如果为server服务的进程且为离线模式，停止运行
          */
-        if (isForServer()) {
-            if (IASTContext.getContext().isOfflineEnabled()) {
-                stopRunning();
-            }
+        if (isForServer() && IASTContext.getContext().isOfflineEnabled()) {
+            stopRunning();
         }
 
         while (isRunning()) {
@@ -32,7 +30,6 @@ public abstract class Monitor extends Thread {
             } catch (Throwable e) {
                 stopRunning();
                 if (ApplicationModel.isRunning()) {
-                    System.err.println("Failed to execute " + getThreadName());
                     logger.error("Failed to execute " + getThreadName(), e);
                 }
             }

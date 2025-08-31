@@ -1,7 +1,6 @@
 package com.keven1z.core.model;
 
 import com.keven1z.core.hook.taint.TaintSpy;
-import com.keven1z.core.policy.HookPolicyContainer;
 import com.keven1z.core.policy.IastHookConfig;
 
 import java.lang.instrument.Instrumentation;
@@ -27,11 +26,6 @@ public class IASTContext {
         private static final IASTContext context = new IASTContext();
     }
 
-    /**
-     * 策略
-     */
-    private HookPolicyContainer hookPolicyContainer;
-
     private Instrumentation instrumentation;
     private Set<String> blackList;
     /**
@@ -51,22 +45,6 @@ public class IASTContext {
      */
     private String serverUrl;
     private final Set<String> userClasses;
-
-    public HookPolicyContainer getPolicy() {
-        return hookPolicyContainer;
-    }
-
-    public void setPolicy(HookPolicyContainer hookPolicyContainer) {
-        this.hookPolicyContainer = hookPolicyContainer;
-    }
-
-    public HookPolicyContainer getPolicyContainer() {
-        return hookPolicyContainer;
-    }
-
-    public void setPolicyContainer(HookPolicyContainer hookPolicyContainer) {
-        this.hookPolicyContainer = hookPolicyContainer;
-    }
 
     public Instrumentation getInstrumentation() {
         return instrumentation;
@@ -89,9 +67,6 @@ public class IASTContext {
     }
 
     public void clear() {
-        if (this.hookPolicyContainer != null) {
-            this.hookPolicyContainer.clear();
-        }
         TaintSpy.getInstance().clear();
         ApplicationModel.clear();
         userClasses.clear();
@@ -123,6 +98,10 @@ public class IASTContext {
 
     public Set<String> getUserClasses() {
         return userClasses;
+    }
+
+    public IastHookConfig getIastHookConfig() {
+        return iastHookConfig;
     }
 
     public void addUserClass(String userClasses) {

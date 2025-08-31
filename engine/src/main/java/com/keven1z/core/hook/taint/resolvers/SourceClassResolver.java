@@ -11,6 +11,7 @@ import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.policy.MethodHookConfig;
 import com.keven1z.core.utils.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
@@ -31,7 +32,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
                         String className,
                         String method,
                         String desc) throws Exception{
-        if (!isReturnObjectFiltered(returnObject)) {
+        if (!isValidSource(returnObject)) {
             return;
         }
 
@@ -80,65 +81,31 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         taintGraph.addNode(taintSource);
     }
 
-
-//    private String getSourceFromName(FlowObject flowObject) {
-//        if ("org.springframework.web.method.HandlerMethod$HandlerMethodParameter".equals(flowObject.getClass().getName())) {
-//            return ReflectionUtils.invokeStringMethod(flowObject, "getParameterName", new Class[]{});
-//        } else {
-//            return flowObject.toString();
-//        }
-//    }
-//
-//    private void resolveBeanHook(String className, String method, String desc, Object returnObject, FlowObject sourceFromPositionObject) {
-//        TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
-//        PathNode parentNode = PolicyUtils.searchParentNode(sourceFromPositionObject.getPathObject(), taintGraph);
-//        if (parentNode == null) {
-//            return;
-//        }
-//        TaintData taintData = new TaintSource.Builder()
-//                .className(className)
-//                .method(method)
-//                .desc(desc)
-//                .build()
-//                ;
-//        taintGraph.addEdge(parentNode.getTaintData(), taintData, sourceFromPositionObject.getPathFlag());
-//
-////        searchAndFillSourceFromReturnObject(returnObject, taintData);
-//        taintData.setToObject(returnObject);
-//        TaintUtils.buildTaint(returnObject, taintData, PolicyType.SOURCE, true);
-//    }
-//
-
-//
-
-//
-
-//
-
     /**
      * @param returnObject 返回污染源
      * @return 判断源是否可以视为污染源，false表示无法作为污染源，true表示可以作为污染源
      */
-    private boolean isReturnObjectFiltered(Object returnObject) {
-        if (returnObject == null || returnObject.equals("")) {
+    private boolean isValidSource(Object returnObject) {
+        if (returnObject == null) {
             return false;
-        } else if (returnObject instanceof Collection) {
-            if (((Collection<?>) returnObject).isEmpty()) {
-                return false;
-            }
-        } else if (returnObject instanceof Map) {
-            if (((Map<?, ?>) returnObject).isEmpty()) {
-                return false;
-            }
+        }
+
+        if ((returnObject instanceof String && ((String) returnObject).isEmpty())
+                || (returnObject instanceof Collection && ((Collection<?>) returnObject).isEmpty())
+                || (returnObject instanceof Map && ((Map<?, ?>) returnObject).isEmpty())
+                || (returnObject.getClass().isArray() && Array.getLength(returnObject) == 0)) {
+            return false;
         }
         /*
-          过滤HandlerMethodArgumentResolverComposite初始包装request对象
+         * 过滤HandlerMethodArgumentResolverComposite初始包装request对象
+         * 注释原因:由于文件上传时返回的为org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile 会被误过滤
+         *
          */
-        for (String blackReturnObject : BLACK_SPRINGFRAMEWORK_RETURN_OBJECT) {
-            if (returnObject.toString().startsWith(blackReturnObject)) {
-                return false;
-            }
-        }
+//        for (String blackReturnObject : BLACK_SPRINGFRAMEWORK_RETURN_OBJECT) {
+//            if (returnObject.toString().startsWith(blackReturnObject)) {
+//                return false;
+//            }
+//        }
         return true;
     }
 }

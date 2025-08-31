@@ -13,6 +13,7 @@ import com.keven1z.core.utils.TransformerProtector;
 import org.apache.log4j.Logger;
 
 import java.lang.spy.SimpleIASTSpy;
+import java.util.Arrays;
 import java.util.Set;
 
 import static com.keven1z.core.consts.PolicyConst.O;
@@ -94,7 +95,7 @@ public class TaintSpy implements SimpleIASTSpy {
             if (parentNodes.isEmpty()) {
                 return;
             }
-            TaintPropagation taintData = buildTaintPropagation(className, method, desc, arrayObject, arrayObject,
+            TaintPropagation taintData = buildTaintPropagation(String.class.getName(), "[]", Arrays.toString((String[])arrayObject).replace("null",arrayValue.toString()), arrayObject, arrayObject,
                     new TaintData.FlowPath(arrayValue, arrayObject));
             for (PathNode parentNode : parentNodes) {
                 PathNode pathNode = taintGraph.addNode(taintData);

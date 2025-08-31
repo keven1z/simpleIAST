@@ -64,6 +64,9 @@ public class HttpSpy implements SimpleIASTSpy {
             if (filterHttp(abstractRequest.getRequestURLString())) {
                 return;
             }
+            if (logger.isDebugEnabled()){
+                logger.debug(String.format("Request Enter |request id=%s| URL=%s | 方法=%s | 协议=%s ",abstractRequest.getRequestId(),abstractRequest.getRequestURLString(),abstractRequest.getMethod(),abstractRequest.getProtocol()));
+            }
             DETECT_LIMIT_SET.add(abstractRequest.getRequestId());
             isRequestStart.set(true);
             SANITIZER_RESOLVER_CACHE.set(new HashSet<>());
@@ -74,9 +77,6 @@ public class HttpSpy implements SimpleIASTSpy {
             REQUEST_THREAD_LOCAL.set(httpContext);
             TAINT_GRAPH_THREAD_LOCAL.set(new TaintGraph());
             SINGLE_FINDING_THREADLOCAL.set(new ArrayList<>());
-            if (LogTool.isDebugEnabled()) {
-                logger.info("[" + REQUEST_THREAD_LOCAL.get().getRequest().getRequestId() + "] Request Enter,URL:" + abstractRequest.getRequestURLString());
-            }
         } catch (Exception e) {
             LogTool.error(ErrorType.REQUEST_START_ERROR, "", e);
         } finally {
@@ -106,13 +106,13 @@ public class HttpSpy implements SimpleIASTSpy {
             if (isRequestEnded.get() || requestData  == null) {
                 return;
             }
-            if (!requestData .isHttpExit(requestObject, responseObject)) {
+            if (!requestData.isHttpExit(requestObject, responseObject)) {
                 return;
             }
             System.out.println("[SimpleIAST] 请求消耗时间:" + (System.currentTimeMillis() - REQUEST_TIME_CONSUMED.get()) + "ms");
             REQUEST_TIME_CONSUMED.remove();
-            if (LogTool.isDebugEnabled()) {
-                logger.info("[" + requestData .getRequest().getRequestId() + "] Request exit,URL:" + REQUEST_THREAD_LOCAL.get().getRequest().getRequestURLString());
+            if (logger.isDebugEnabled()){
+                logger.debug(String.format("Request Exit |request id=%s| URL=%s | 方法=%s | 协议=%s ",requestData.getRequest().getRequestId(),requestData.getRequest().getRequestURLString(),requestData.getRequest().getMethod(),requestData.getRequest().getProtocol()));
             }
             isRequestEnded.set(true);
             DetectorFactory.getInstance().processAndReportFindings();

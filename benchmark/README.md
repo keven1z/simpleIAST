@@ -58,6 +58,7 @@ mvn test -PsimpleIAST
 analysis -v SIMPLEIAST -p [your-path]/report-2025-07-29.json  -c 1753800501479 #-c 后为4步骤中生成的case关键字,-p 后为导出json报告路径
 ```
 ## 分析结果
+### 
 2025-07-29 分析结果如下：
 ```text
 ------------------------------------------------------------------------------------
@@ -93,7 +94,25 @@ TOTAL:0 通过:0
 污点准确度能力检测
 TOTAL:34 漏报:15 通过:19 
 ```
-详情
+### java-sec-code
+| 名称                  | 结果 |
+|-----------------------|----|
+| Swagger               | ❌  |
+| CmdInject             | ✅  |
+| JSONP                 | ❌  |
+| Picture Upload        | ❓  |
+| File Upload           | ✅  |
+| Cors                  | ❌  |
+| PathTraversal         | ✅  |
+| SqlInject             | ✅  |
+| SSRF                  | ✅  |
+| RCE                   | ✅  |
+| ooxml XXE             | ❌  |
+| xlsx-streamer XXE     | ❌  |
+| actuator env          | ❌  |
+| JWTCreateToken        | ❌  |
+| GetUserFromJWTToken   | ❌  |
+## 详情
 ```
 测试详情:
 污点对象完整度能力检测-----------------------------------------------------------------

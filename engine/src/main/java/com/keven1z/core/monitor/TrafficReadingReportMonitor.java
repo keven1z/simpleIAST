@@ -19,8 +19,7 @@ import com.keven1z.core.vulnerability.DetectContext;
 import com.keven1z.core.vulnerability.Detector;
 import com.keven1z.core.vulnerability.DetectorFactory;
 import com.keven1z.core.vulnerability.report.ReportBuilder;
-import com.keven1z.core.vulnerability.report.ReportPrinter;
-import com.keven1z.core.vulnerability.report.ReportSender;
+import com.keven1z.core.vulnerability.report.ReportHandler;
 
 import java.util.*;
 
@@ -49,9 +48,8 @@ public class TrafficReadingReportMonitor extends Monitor {
         try {
             findingReportBo = FINDING_REPORT_QUEUE.take();
             buildAndReport(findingReportBo);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LogTool.error(ErrorType.REPORT_ERROR, "Thread interrupted, stopping queue processing", e);
+        } catch (InterruptedException ignore) {
+
         } catch (Exception e) {
             LogTool.error(ErrorType.REPORT_ERROR, "Failed to report finding", e);
         } finally {
@@ -166,11 +164,14 @@ public class TrafficReadingReportMonitor extends Monitor {
         reportData.setResponseData(findingReportBo.getResponseData());
         reportData.setFindingDataList(findingDataList);
         String reportJson = ReportBuilder.build(reportData);
+
+        String reportLog = ReportHandler.buildReportLog(reportData);
+        logger.info(reportLog);
         //debug模式 默认打印漏洞信息
         if (IASTContext.getContext().isOfflineEnabled()) {
-            ReportPrinter.print(reportJson);
+            ReportHandler.print(reportJson);
         } else {
-            ReportSender.send(reportJson);
+            ReportHandler.send(reportJson);
         }
     }
 }
