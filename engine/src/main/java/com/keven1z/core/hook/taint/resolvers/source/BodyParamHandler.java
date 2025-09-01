@@ -6,10 +6,9 @@ import java.util.List;
 
 public class BodyParamHandler implements SourceHandler{
     @Override
-    public List<TaintData.FlowPath> handle(Object thisObject,
-                                           Object[] parameters, Object returnObject) {
+    public List<TaintData.FlowPath> handle(Object fromObject,Object returnObject) {
         ArrayList<TaintData.FlowPath> flowPaths = new ArrayList<>();
-        flowPaths.add(new TaintData.FlowPath(thisObject,returnObject));
+        flowPaths.add(new TaintData.FlowPath(fromObject,returnObject));
         return flowPaths;
     }
 }

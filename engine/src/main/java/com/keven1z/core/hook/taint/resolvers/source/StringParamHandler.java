@@ -7,9 +7,9 @@ import java.util.*;
 
 public class StringParamHandler implements SourceHandler {
     @Override
-    public List<TaintData.FlowPath> handle(Object thisObject,
-                                           Object[] parameters, Object returnObject) throws Exception {
-        return analyzeSource(thisObject, returnObject);
+    public List<TaintData.FlowPath> handle(Object fromObject,Object returnObject) throws Exception {
+
+        return analyzeSource(fromObject, returnObject);
     }
 
     public List<TaintData.FlowPath> analyzeSource(Object fromObject, Object returnObject) {

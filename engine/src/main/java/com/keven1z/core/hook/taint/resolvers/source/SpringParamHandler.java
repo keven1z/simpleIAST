@@ -3,6 +3,7 @@ package com.keven1z.core.hook.taint.resolvers.source;
 import com.keven1z.core.model.taint.TaintData;
 import com.keven1z.core.utils.CommonUtils;
 import com.keven1z.core.utils.ReflectionUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +12,7 @@ public class SpringParamHandler extends StringParamHandler {
     private static final String CLASS_HANDLER_METHOD = "org.springframework.web.method.HandlerMethod$HandlerMethodParameter";
 
     @Override
-    public List<TaintData.FlowPath> handle(Object thisObject,
-                                           Object[] parameters, Object returnObject) throws Exception {
+    public List<TaintData.FlowPath> handle(Object thisObject, Object returnObject) throws Exception {
         if (!CommonUtils.isStartsWithElementInArray(returnObject.getClass().getName(), USER_PACKAGE_PREFIX)) {
             ArrayList<TaintData.FlowPath> flowPaths = new ArrayList<>();
             String sourceFromName = getSourceFromName(thisObject);

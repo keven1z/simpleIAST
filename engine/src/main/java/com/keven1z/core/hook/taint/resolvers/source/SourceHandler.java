@@ -13,5 +13,5 @@ public interface SourceHandler {
      * @param object hook对象
      * @return 提取的污点数据
      */
-    List<TaintData.FlowPath> handle(Object returnObject, Object[] parameters, Object object) throws Exception;
+    List<TaintData.FlowPath> handle(Object fromObject, Object object) throws Exception;
 }

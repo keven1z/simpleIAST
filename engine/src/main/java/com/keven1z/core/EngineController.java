@@ -7,7 +7,6 @@ import com.keven1z.core.hook.normal.SingleSpy;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.model.IASTContext;
 import com.keven1z.core.monitor.*;
-
 import com.keven1z.core.model.server.AuthenticationDto;
 import com.keven1z.core.policy.IastHookConfig;
 import com.keven1z.core.policy.IastHookManager;
@@ -25,9 +24,7 @@ import java.lang.spy.SimpleIASTSpyManager;
 import java.lang.instrument.Instrumentation;
 import java.util.*;
 import java.util.function.Supplier;
-
 import static com.keven1z.core.consts.CommonConst.*;
-import static java.lang.Thread.sleep;
 
 
 /**
@@ -197,11 +194,6 @@ public class EngineController {
      * 初始化类字节码的转换器
      */
     private void initTransformer() {
-        try {
-            sleep(5000);
-        } catch (InterruptedException e) {
-
-        }
         Instrumentation instrumentation = context.getInstrumentation();
         HookTransformer hookTransformer = new HookTransformer(instrumentation);
         if (instrumentation.isNativeMethodPrefixSupported()) {

@@ -1,6 +1,7 @@
 package com.keven1z.core.hook.taint.resolvers;
 
 import com.keven1z.core.consts.SourceType;
+import com.keven1z.core.model.server.FlowObject;
 import com.keven1z.core.model.taint.TaintData;
 import com.keven1z.core.model.taint.TaintSource;
 import com.keven1z.core.model.taint.TaintGraph;
@@ -49,10 +50,12 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         if (handler == null) {
             return;
         }
-
-        List<TaintData.FlowPath> flowPaths;
-        flowPaths = handler.handle(thisObject,
-                parameters,returnObject);
+        String from = methodHookConfig.getTaintTracking().getTrackingDirection().getFrom();
+        FlowObject flowObject = PolicyUtils.getSourceAndSinkFromPositionObject(from, parameters, returnObject, thisObject);
+        if (flowObject == null) {
+            return;
+        }
+        List<TaintData.FlowPath> flowPaths= handler.handle(flowObject.getPathObject(), returnObject);
         if (flowPaths.isEmpty()) {
             return;
         }

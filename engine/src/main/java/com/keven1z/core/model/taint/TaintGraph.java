@@ -1,6 +1,7 @@
 package com.keven1z.core.model.taint;
 
 import com.keven1z.core.consts.HookType;
+
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -33,6 +34,7 @@ public class TaintGraph {
         this.taintAggregation = new HashSet<>(1024);
         this.pathMap = new HashMap<>(100);
     }
+
     public List<PathNode> getSinkNodes() {
         ArrayList<PathNode> sinkNodes = new ArrayList<>(pathNodeList.size());
         for (PathNode node : pathNodeList) {
@@ -46,6 +48,7 @@ public class TaintGraph {
     public int getNodeSize() {
         return this.pathNodeList.size();
     }
+
     /**
      * 添加taint node
      */
@@ -54,7 +57,7 @@ public class TaintGraph {
         addNode(node);
         List<TaintData.FlowPath> flowPaths = taintData.getFlowPaths();
         for (int i = 0; i < flowPaths.size(); i++) {
-            taintAggregation.add(new TaintIdentity(taintData.getInvokeId(),i,flowPaths.get(i).getHashcode()));
+            taintAggregation.add(new TaintIdentity(taintData.getInvokeId(), i, flowPaths.get(i).getHashcode()));
         }
         return node;
     }

@@ -182,7 +182,11 @@
               "http_stage": "http_body",
               "vulnerability_types": [
                 "*"
-              ]
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           },
           {
@@ -200,7 +204,11 @@
               "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
-              ]
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           },
           {
@@ -218,7 +226,11 @@
               "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
-              ]
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
             }
           },
           {
@@ -238,7 +250,11 @@
               "http_stage": "http_body",
               "vulnerability_types": [
                 "*"
-              ]
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           },
           {
@@ -256,7 +272,11 @@
               "source_type": "http_string_param",
               "vulnerability_types": [
                 "*"
-              ]
+              ],
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           },
           {
@@ -274,7 +294,11 @@
               "source_type": "http_multipart_param",
               "vulnerability_types": [
                 "*"
-              ]
+              ],
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
             }
           },
           {
@@ -292,7 +316,11 @@
               "vulnerability_types": [
                 "*"
               ],
-              "source_type": "http_multipart_param"
+              "source_type": "http_multipart_param",
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           },
           {
@@ -310,7 +338,11 @@
               "vulnerability_types": [
                 "*"
               ],
-              "source_type": "http_string_param"
+              "source_type": "http_string_param",
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           },
           {
@@ -328,7 +360,11 @@
               "vulnerability_types": [
                 "*"
               ],
-              "source_type": "http_header_param"
+              "source_type": "http_header_param",
+              "tracking_direction": {
+                "from": "P1",
+                "to": "R"
+              }
             }
           }
         ]
@@ -354,7 +390,11 @@
               "vulnerability_types": [
                 "*"
               ],
-              "source_type": "http_spring_param"
+              "source_type": "http_spring_param",
+              "tracking_direction": {
+                "from": "O",
+                "to": "R"
+              }
             }
           }
         ]

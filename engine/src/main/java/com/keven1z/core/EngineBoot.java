@@ -6,6 +6,8 @@ import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.monitor.MonitorManager;
 import com.keven1z.core.utils.ClassUtils;
 import com.keven1z.core.utils.IASTHttpClient;
+import com.keven1z.core.utils.http.AuthClient;
+import com.keven1z.core.utils.http.HttpClientRegistry;
 import net.bytebuddy.agent.VirtualMachine;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
@@ -44,12 +46,14 @@ public class EngineBoot {
         Logger logger = Logger.getLogger(getClass());
         try {
             if (!EngineController.context.isOfflineEnabled()) {
-                if (IASTHttpClient.getClient().deregister()) {
+                AuthClient authClient = HttpClientRegistry.getInstance().getClient(AuthClient.class);
+
+                if (authClient.deregister(ApplicationModel.getAgentId())) {
                     logger.info("Agent deregister successfully,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
                 } else {
                     logger.warn("Agent deregister failed,hostName:" + ApplicationModel.getHostName() + ",id:" + ApplicationModel.getAgentId());
                 }
-                IASTHttpClient.getClient().close();
+                HttpClientRegistry.getInstance().close();
             }
             ApplicationModel.stop();
             logger.info("[SimpleIAST] Stop Hook Successfully");

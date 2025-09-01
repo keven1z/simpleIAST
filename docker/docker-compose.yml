@@ -1,4 +1,5 @@
-version: '3'
+name : "simpleIAST"
+version: '0.4.0'
 services:
   redis:
     image: redis:latest
@@ -16,7 +17,7 @@ services:
       - MYSQL_DATABASE=iast
       - TZ=Asia/Shanghai
     volumes:
-      - ./mysql/:/docker-entrypoint-initdb.d/
+      - ./mysql/iast.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
   backend:
     image: openjdk:11
