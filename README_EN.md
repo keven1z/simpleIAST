@@ -98,17 +98,18 @@ Example of vulnerability detail view:
 ![Vulnerability Detail Example](img/detail.png)
 
 ---
+## benchmark
+[benchmark](./benchmark/benchmark.md)
 
 ## Further Documentation
 
 More guides and official documentation are available in the project Wiki:
 
-- Quick Start  
-- Project Architecture  
-- Application Integration  
-- Vulnerability Types & Display  
-- Configuration Guide  
-
+- [Quick Start]((https://github.com/keven1z/simpleIAST/wiki/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)) 
+- [Project Architecture](https://github.com/keven1z/simpleIAST/wiki/项目)  
+- [Application Integration](https://github.com/keven1z/simpleIAST/wiki/%E5%BA%94%E7%94%A8) 
+- [Vulnerability Types & Display](https://github.com/keven1z/simpleIAST/wiki/%E6%BC%8F%E6%B4%9E) 
+- [Configuration Guide](https://github.com/keven1z/simpleIAST/wiki/%E8%AE%BE%E7%BD%AE)
 ---
 
 ## License

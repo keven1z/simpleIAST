@@ -64,18 +64,14 @@ public class HandlerHookClassResolverInitializer {
 
         HandlerHookClassResolver resolver = resolverMap.get(HookType.valueOf(type.toUpperCase()));
         if (resolver == null) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.warn(ErrorType.RESOLVE_ERROR, "Not found resolver,policy type is " + type);
-            }
+            LogTool.error(ErrorType.RESOLVE_ERROR, "Not found resolver,policy type is " + type);
             return;
         }
 
         try {
             resolver.resolve(returnValue, thisObject, parameters, className, method, desc);
         } catch (Exception e) {
-            if (LogTool.isDebugEnabled()) {
-                LogTool.warn(ErrorType.RESOLVE_ERROR, "Resolver error", e);
-            }
+            LogTool.error(ErrorType.RESOLVE_ERROR, "Resolver error", e);
         }
     }
 

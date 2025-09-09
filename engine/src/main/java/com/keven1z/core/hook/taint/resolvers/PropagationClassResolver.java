@@ -10,6 +10,7 @@ import com.keven1z.core.model.taint.TaintPropagation;
 import com.keven1z.core.policy.IastHookManager;
 import com.keven1z.core.policy.MethodHookConfig;
 import com.keven1z.core.utils.PolicyUtils;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,15 @@ import static com.keven1z.core.hook.HookThreadLocal.TAINT_GRAPH_THREAD_LOCAL;
  * @since 2023/01/15
  */
 public class PropagationClassResolver implements HandlerHookClassResolver {
+    protected final Logger logger = Logger.getLogger(getClass());
+
     @Override
     public void resolve(Object returnObject,
                         Object thisObject,
                         Object[] parameters,
                         String className,
                         String method,
-                        String desc) throws Exception {
+                        String desc) {
         MethodHookConfig methodHookConfig = IastHookManager.getManager().getHookMethod(className, method, desc);
         MethodHookConfig.TaintTracking taintTracking = methodHookConfig.getTaintTracking();
         if (taintTracking == null) {
@@ -47,7 +50,7 @@ public class PropagationClassResolver implements HandlerHookClassResolver {
         for (FlowObject flowObject : fromPositionObjects) {
             Object fromObject = flowObject.getPathObject();
             Set<PathNode> parentNodes = PolicyUtils.searchParentNodes(fromObject, taintGraph);
-            if (parentNodes == null || parentNodes.isEmpty()) {
+            if (parentNodes.isEmpty()) {
                 continue;
             }
             Object toObject = PolicyUtils.getToPositionObject(taintTracking.getTrackingDirection().getTo(), parameters, returnObject, thisObject);

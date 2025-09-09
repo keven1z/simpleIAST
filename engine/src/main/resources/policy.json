@@ -1629,6 +1629,34 @@
       },
       {
         "class": {
+          "name": "java/lang/ProcessImpl",
+          "is_interface": false
+        },
+        "methods": [
+          {
+            "name": "start",
+            "desc": "([Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;[Ljava/lang/ProcessBuilder$Redirect;Z)Ljava/lang/Process;",
+            "state": true,
+            "hook_positions": {
+              "entry": false,
+              "exit": true
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "tracking_direction": {
+                "from": "P1"
+              },
+              "vulnerability_types": [
+                "cmd_injection"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "class": {
           "name": "java/lang/ProcessBuilder",
           "is_interface": false
         },
@@ -2188,7 +2216,7 @@
           {
             "name": "iterator",
             "desc": "()Ljava/util/Iterator;",
-            "state": true,
+            "state": false,
             "hook_positions": {
               "entry": false,
               "exit": true
@@ -2478,7 +2506,7 @@
           },
           {
             "name": "executeUpdate",
-            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "desc": "(Ljava/lang/String;)I",
             "state": true,
             "hook_positions": {
               "entry": true,
@@ -2489,7 +2517,67 @@
               "propagator": false,
               "sink": true,
               "vulnerability_types": [
-                "*"
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "executeUpdate",
+            "desc": "(Ljava/lang/String;I)I",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "executeUpdate",
+            "desc": "(Ljava/lang/String;[I)I",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "executeUpdate",
+            "desc": "(Ljava/lang/String;[Ljava/lang/String;)I ",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
               ],
               "tracking_direction": {
                 "from": "P1"
@@ -2498,7 +2586,7 @@
           },
           {
             "name": "executeLargeUpdate",
-            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "desc": "(Ljava/lang/String;)J",
             "state": true,
             "hook_positions": {
               "entry": true,
@@ -2509,7 +2597,7 @@
               "propagator": false,
               "sink": true,
               "vulnerability_types": [
-                "*"
+                "sql_injection"
               ],
               "tracking_direction": {
                 "from": "P1"
@@ -2518,7 +2606,7 @@
           },
           {
             "name": "execute",
-            "desc": "(Ljava/lang/String;)Ljava/sql/ResultSet;",
+            "desc": "(Ljava/lang/String;)Z",
             "state": true,
             "hook_positions": {
               "entry": true,
@@ -2529,7 +2617,67 @@
               "propagator": false,
               "sink": true,
               "vulnerability_types": [
-                "*"
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "execute",
+            "desc": "(Ljava/lang/String;I)Z",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "execute",
+            "desc": "(Ljava/lang/String;[I)Z",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
+              ],
+              "tracking_direction": {
+                "from": "P1"
+              }
+            }
+          },
+          {
+            "name": "execute",
+            "desc": "(Ljava/lang/String;[Ljava/lang/String;)Z",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "sql_injection"
               ],
               "tracking_direction": {
                 "from": "P1"
@@ -2570,10 +2718,12 @@
         "class": {
           "name": "java/sql/Connection",
           "is_interface": true,
-          "exclude_classes": ["org/springframework/jdbc/datasource/ConnectionProxy",
+          "exclude_classes": [
+            "org/springframework/jdbc/datasource/ConnectionProxy",
             "com/microsoft/sqlserver/jdbc/SQLServerConnection43",
             "com/microsoft/sqlserver/jdbc/SQLServerConnection",
-            "com/mysql/cj/jdbc/JdbcConnection"]
+            "com/mysql/cj/jdbc/JdbcConnection"
+          ]
         },
         "methods": [
           {
@@ -3512,7 +3662,7 @@
           {
             "name": "write",
             "desc": "([BII)V",
-            "state": true,
+            "state": false,
             "hook_positions": {
               "entry": true,
               "exit": false
@@ -3526,6 +3676,34 @@
               ],
               "tracking_direction": {
                 "from": "P1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "class": {
+          "name": "org/springframework/web/multipart/MultipartFile",
+          "is_interface": true
+        },
+        "methods": [
+          {
+            "name": "transferTo",
+            "desc": "(Ljava/io/File;)V",
+            "state": true,
+            "hook_positions": {
+              "entry": true,
+              "exit": false
+            },
+            "taint_tracking": {
+              "source": false,
+              "propagator": false,
+              "sink": true,
+              "vulnerability_types": [
+                "file_upload"
+              ],
+              "tracking_direction": {
+                "from": "O"
               }
             }
           }

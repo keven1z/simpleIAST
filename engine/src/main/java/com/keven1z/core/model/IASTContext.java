@@ -3,6 +3,7 @@ package com.keven1z.core.model;
 import com.keven1z.core.hook.taint.TaintSpy;
 import com.keven1z.core.policy.IastHookConfig;
 
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class IASTContext {
     private static class Inner {
         private static final IASTContext context = new IASTContext();
     }
-
+    private ClassFileTransformer transformer;
     private Instrumentation instrumentation;
     private Set<String> blackList;
     /**
@@ -62,15 +63,19 @@ public class IASTContext {
         this.bindProjectName = bindProjectName;
     }
 
+    public ClassFileTransformer getTransformer() {
+        return transformer;
+    }
+
+    public void setTransformer(ClassFileTransformer transformer) {
+        this.transformer = transformer;
+    }
+
     public boolean isOfflineEnabled() {
         return Config.getConfig().isOfflineStart();
     }
 
-    public void clear() {
-        TaintSpy.getInstance().clear();
-        ApplicationModel.clear();
-        userClasses.clear();
-    }
+
 
     public void setBlackList(Set<String> blackList) {
         this.blackList = blackList;
@@ -149,5 +154,20 @@ public class IASTContext {
     }
     public void setHookConfig(IastHookConfig iastHookConfig) {
         this.iastHookConfig = iastHookConfig;
+    }
+    /**
+     * 清除所有注入的钩子
+     *
+     * 该方法会执行以下操作：
+     * 1. 调用 TaintSpy 的 clear 方法，清除所有注入的钩子。
+     * 2. 移除之前通过 getInstrumentation().addTransformer 添加的 Transformer。
+     * 3. 调用 ApplicationModel 的 clear 方法，清除应用模型中的所有信息。
+     * 4. 清除 userClasses 集合中的所有元素。
+     */
+    public void clear() {
+        TaintSpy.getInstance().clear();
+        this.getInstrumentation().removeTransformer(this.getTransformer());
+        ApplicationModel.clear();
+        userClasses.clear();
     }
 }

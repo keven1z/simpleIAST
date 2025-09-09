@@ -62,7 +62,7 @@ public class SourceClassResolver implements HandlerHookClassResolver {
         TaintGraph taintGraph = TAINT_GRAPH_THREAD_LOCAL.get();
         //去除重复的污染源
         for (TaintData.FlowPath flowPath : flowPaths) {
-            if (taintGraph.isTaint(flowPath.getHashcode())) {
+            if (TaintTracker.containsTaint(flowPath.getHashcode())) {
                 return;
             }
         }

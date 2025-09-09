@@ -95,9 +95,9 @@ public class TrafficReadingReportMonitor extends Monitor {
                 continue;
             }
 
-            LinkedList<TaintData> flowLinks = taintGraph.bfs(sinkNode);
+            List<TaintData> flowLinks = taintGraph.bfs(sinkNode);
             DetectContext taintContext = new DetectContext.Builder()
-                    .flowLinks(flowLinks)
+                    .flowLinks((LinkedList<TaintData>) flowLinks)
                     .requestData(findingReportBo.getRequestData())
                     .responseData(findingReportBo.getResponseData())
                     .build();
@@ -167,7 +167,6 @@ public class TrafficReadingReportMonitor extends Monitor {
 
         String reportLog = ReportHandler.buildReportLog(reportData);
         logger.info(reportLog);
-        //debug模式 默认打印漏洞信息
         if (IASTContext.getContext().isOfflineEnabled()) {
             ReportHandler.print(reportJson);
         } else {

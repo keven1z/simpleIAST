@@ -103,12 +103,8 @@ public class PathNode {
      */
     public boolean isToObject(int fromObjectHashCode) {
         List<TaintData.FlowPath> flowPaths = this.taintData.getFlowPaths();
-        for (TaintData.FlowPath flowPath : flowPaths) {
-            if(flowPath.getHashcode() == fromObjectHashCode){
-                return true;
-            }
-        }
-        return false;
+        return flowPaths.parallelStream()
+                .anyMatch(flowPath -> flowPath.getHashcode() == fromObjectHashCode);
     }
 
     public void clear() {

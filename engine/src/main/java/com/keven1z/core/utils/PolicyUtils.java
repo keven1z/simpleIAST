@@ -10,14 +10,14 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.policy.HookPolicy;
 import com.keven1z.core.policy.HookPolicyContainer;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.keven1z.core.consts.CommonConst.OFF;
 
 public class PolicyUtils {
-    private final static ConcurrentHashMap<String, Boolean> superClassCache = new ConcurrentHashMap<>(1024);
-
+    private static final  ConcurrentHashMap<String, Boolean> superClassCache = new ConcurrentHashMap<>(1024);
 
 
     public static boolean isHook(HookPolicyContainer hookPolicyContainer, Class<?> clazz) {
@@ -170,11 +170,12 @@ public class PolicyUtils {
         }
         return null;
     }
+
     /**
      *
      */
     public static HookPolicy getHookedPolicyByBisection(String className, String method, String desc, List<HookPolicy> policies) {
-        HookPolicy target =HookPolicy.builder()
+        HookPolicy target = HookPolicy.builder()
                 .className(className)
                 .method(method)
                 .desc(desc)
@@ -191,6 +192,7 @@ public class PolicyUtils {
         }
         return null;
     }
+
     /**
      * 获取对应from、to、conditions的对象
      *
@@ -202,7 +204,7 @@ public class PolicyUtils {
      */
     public static List<FlowObject> getFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
         if (position == null) {
-            return null;
+            return Collections.emptyList();
         }
         ArrayList<FlowObject> flowObjects = new ArrayList<>();
         String[] paths = position.split(PolicyConst.PATH_SPLIT_SEPARATOR);
@@ -214,6 +216,7 @@ public class PolicyUtils {
         }
         return flowObjects;
     }
+
     public static FlowObject getSourceAndSinkFromPositionObject(String position, Object[] parameters, Object returnObject, Object thisObject) {
         List<FlowObject> fromPositionObjects = getFromPositionObject(position, parameters, returnObject, thisObject);
         if (fromPositionObjects.isEmpty()) {
@@ -249,20 +252,23 @@ public class PolicyUtils {
     }
 
     /**
-     * 查找来源的节点,来源不仅仅是source阶段的节点
+     * 查找来源的节点
+     *
+     * @param fromObject 查找的源对象，不能为null
+     * @param taintGraph 污点图对象，不能为null
+     * @return 匹配的PathNode或null
      */
     public static PathNode searchParentNode(Object fromObject, TaintGraph taintGraph) {
-        int fromObjectHashCode = System.identityHashCode(fromObject);
-        if (taintGraph.isTaint(fromObjectHashCode)) {
+        if (fromObject == null || taintGraph == null) {
             return null;
         }
-        List<PathNode> allNode = taintGraph.getAllNode();
-        //倒序查询，符合代码执行的流程
-        for (int i = allNode.size() - 1; i >= 0; i--) {
-            /*
-             * 是否为污点对象，eg: fromObject= "sql",传播方法为StringBuilder.toString,污点传出方向为返回值，返回值为sql，则判定为污点
-             */
-            PathNode node = allNode.get(i);
+
+        int fromObjectHashCode = System.identityHashCode(fromObject);
+        if (!TaintTracker.containsTaint(fromObjectHashCode)) {
+            return null;
+        }
+
+        for (PathNode node : taintGraph.getAllNode()) {
             if (node.isToObject(fromObjectHashCode)) {
                 return node;
             }
@@ -275,7 +281,7 @@ public class PolicyUtils {
      */
     public static Set<PathNode> searchParentNodes(Object fromObject, TaintGraph taintGraph) {
         int fromObjectHashCode = System.identityHashCode(fromObject);
-        if (taintGraph.isTaint(fromObjectHashCode)) {
+        if (!TaintTracker.containsTaint(fromObjectHashCode)) {
             return Collections.emptySet();
         }
         List<PathNode> allNode = taintGraph.getAllNode();

@@ -99,6 +99,8 @@ java -jar iast-engine.jar -m uninstall -p [pid] # 卸载 Agent
 ![漏洞详情展示示例](img/detail.png)
 
 ---
+## benchmark
+[benchmark说明文档](./benchmark/benchmark.md)
 
 ## 进一步文档
 

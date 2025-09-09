@@ -1,6 +1,7 @@
 package com.keven1z.core.model.taint;
 
 import com.keven1z.core.consts.HookType;
+import com.keven1z.core.utils.TaintTracker;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -21,17 +22,12 @@ public class TaintGraph {
      * 由to到from的路径map
      */
     private final Map<Integer, Set<Integer>> pathMap;
-    /**
-     * 污点汇聚集合,用于快速定位污点
-     */
-    private final Set<TaintIdentity> taintAggregation;
 
     /**
      * 初始化有向图
      */
     public TaintGraph() {
         this.pathNodeList = new ArrayList<>(1024);
-        this.taintAggregation = new HashSet<>(1024);
         this.pathMap = new HashMap<>(100);
     }
 
@@ -56,19 +52,10 @@ public class TaintGraph {
         PathNode node = new PathNode(taintData);
         addNode(node);
         List<TaintData.FlowPath> flowPaths = taintData.getFlowPaths();
-        for (int i = 0; i < flowPaths.size(); i++) {
-            taintAggregation.add(new TaintIdentity(taintData.getInvokeId(), i, flowPaths.get(i).getHashcode()));
+        for (TaintData.FlowPath flowPath : flowPaths) {
+            TaintTracker.addTaint(flowPath.getHashcode());
         }
         return node;
-    }
-
-    /**
-     * 判定是否是污点，通过与之前缓存的污点比较
-     *
-     * @param systemCode 对象的hashcode
-     */
-    public boolean isTaint(int systemCode) {
-        return taintAggregation.contains(systemCode);
     }
 
     public void addNode(PathNode node) {
@@ -103,18 +90,18 @@ public class TaintGraph {
         }
 
         if (!this.pathMap.containsKey(to.getInvokeId())) {
-            return null;
+            return Collections.emptySet();
         }
 
         Set<Integer> invokeIds = this.pathMap.get(to.getInvokeId());
-        Set<PathNode> PathNodes = new LinkedHashSet<>();
+        Set<PathNode> pathNodes = new LinkedHashSet<>();
         for (Integer invokeId : invokeIds) {
             PathNode node = findNodeByInvokeId(invokeId);
             if (node != null) {
-                PathNodes.add(node);
+                pathNodes.add(node);
             }
         }
-        return PathNodes;
+        return pathNodes;
     }
 
     private PathNode findNodeByInvokeId(Integer invokeId) {
@@ -129,7 +116,7 @@ public class TaintGraph {
      *
      * @param from 开始节点
      */
-    public HashSet<TaintEdge> getFromEdges(TaintData from) {
+    public Set<TaintEdge> getFromEdges(TaintData from) {
         HashSet<TaintEdge> taintEdges = new HashSet<>();
         for (TaintEdge taintEdge : this.getEdges()) {
             TaintData dest = taintEdge.getFrom().getTaintData();
@@ -162,7 +149,6 @@ public class TaintGraph {
     public void clear() {
         this.clearEdges();
         this.pathNodeList.clear();
-        this.taintAggregation.clear();
     }
 
     public void addEdge(PathNode from, PathNode to, String direction) {
@@ -194,7 +180,7 @@ public class TaintGraph {
      *
      * @return 返回遍历过的taintData集合
      */
-    public LinkedList<TaintData> bfs(PathNode start) {
+    public List<TaintData> bfs(PathNode start) {
         if (start == null) {
             throw new IllegalArgumentException("Start node cannot be null.");
         }
@@ -210,9 +196,7 @@ public class TaintGraph {
             TaintData poll = queue.poll();
             taintDataList.add(poll);
             Set<PathNode> fromNodes = this.getFromNodes(poll);
-            if (fromNodes == null) {
-                continue;
-            }
+
             for (PathNode fromNode : fromNodes) {
                 TaintData fromNodeTaintData = fromNode.getTaintData();
                 if (!visitedNodeInvokeIds.contains(fromNodeTaintData.getInvokeId())) {
@@ -248,7 +232,7 @@ public class TaintGraph {
         LinkedBlockingQueue<TaintData> queue = new LinkedBlockingQueue<>(this.getNodeSize());
         queue.add(taintData);
         while (!queue.isEmpty()) {
-            HashSet<TaintEdge> fromEdges = this.getFromEdges(queue.poll());
+            Set<TaintEdge> fromEdges = this.getFromEdges(queue.poll());
             for (TaintEdge edge : fromEdges) {
                 PathNode toNode = edge.getTo();
                 TaintData toTaintData = edge.getTo().getTaintData();

@@ -11,6 +11,7 @@ import com.keven1z.core.log.ErrorType;
 import com.keven1z.core.log.LogTool;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.hook.taint.TaintSpy;
+import com.keven1z.core.utils.TaintTracker;
 import com.keven1z.core.vulnerability.DetectorFactory;
 import org.apache.log4j.Logger;
 
@@ -93,7 +94,7 @@ public class HttpSpy implements SimpleIASTSpy {
      */
     @Override
     public void $_requestEnded(Object requestObject, Object responseObject) {
-        if (enableHookLock.get()) {
+        if (Boolean.TRUE.equals(enableHookLock.get())) {
             return;
         } else {
             enableHookLock.set(true);
@@ -103,7 +104,7 @@ public class HttpSpy implements SimpleIASTSpy {
                 return;
             }
             HttpContext requestData  = REQUEST_THREAD_LOCAL.get();
-            if (isRequestEnded.get() || requestData  == null) {
+            if (Boolean.TRUE.equals(isRequestEnded.get()) || requestData  == null) {
                 return;
             }
             if (!requestData.isHttpExit(requestObject, responseObject)) {
@@ -119,12 +120,13 @@ public class HttpSpy implements SimpleIASTSpy {
 
         } finally {
             enableHookLock.set(false);
-            if (isRequestEnded.get()) {
+            if (Boolean.TRUE.equals(isRequestEnded.get())) {
                 HttpContext requestData = REQUEST_THREAD_LOCAL.get();
                 if (requestData != null) {
                     DETECT_LIMIT_SET.remove(requestData.getRequest().getRequestId());
                 }
                 TaintSpy.getInstance().clear();
+                TaintTracker.clear();
             }
         }
     }
