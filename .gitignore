@@ -8,3 +8,5 @@ agent/dependency-reduced-pom.xml
 /agent/target/*
 /engine/target/*
 *.log
+.env
+.vscode

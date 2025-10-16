@@ -26,7 +26,8 @@ cd simpleIAST
 
 ```bash
 cd docker/
-docker-compose up -d
+chmod +x ./deploy.sh
+./deploy.sh
 ```
 
 - **Frontend Access**: `http://[your_ip]:8443/`  

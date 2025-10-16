@@ -27,7 +27,8 @@ cd simpleIAST
 
 ```bash
 cd docker/
-docker-compose up -d
+chmod +x ./deploy.sh
+./deploy.sh
 ```
 
 - **前端访问地址**：`http://[your_ip]:8443/`
