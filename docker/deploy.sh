@@ -192,7 +192,7 @@ EOF
 if [ "$redis_mode" = "containerized" ]; then
     cat >> docker-compose.yml << EOF
   redis:
-    image: redis:latest
+    image: redis:7.2-alpine
     environment:
       - TZ=Asia/Shanghai
     command: ["redis-server", "--requirepass", "$redis_password"]
@@ -239,7 +239,7 @@ fi
 # Backend
 cat >> docker-compose.yml << EOF
   backend:
-    image: openjdk:11
+    image: eclipse-temurin:11-jdk
     container_name: iast-server
     environment:
       - TZ=Asia/Shanghai
@@ -273,7 +273,9 @@ EOF
 # Frontend
 cat >> docker-compose.yml << EOF
   frontend:
-    image: ziizhuwy/simpleiast-frontend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
     container_name: iast-view
     volumes:
       - ./frontend/web/dist:/usr/share/nginx/html

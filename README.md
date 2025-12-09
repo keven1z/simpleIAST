@@ -28,7 +28,7 @@ cd simpleIAST
 ```bash
 cd docker/
 chmod +x ./deploy.sh
-./deploy.sh
+sudo ./deploy.sh
 ```
 
 - **前端访问地址**：`http://[your_ip]:8443/`
@@ -93,12 +93,6 @@ java -jar iast-engine.jar -m uninstall -p [pid] # 卸载 Agent
 
 ---
 
-## 演示界面
-
-漏洞详情展示示例：
-
-![漏洞详情展示示例](img/detail.png)
-
 ---
 ## benchmark
 [benchmark说明文档](./benchmark/benchmark.md)
@@ -108,10 +102,6 @@ java -jar iast-engine.jar -m uninstall -p [pid] # 卸载 Agent
 更多使用指南与文档内容请访问项目 Wiki：
 
 - [快速开始](https://github.com/keven1z/simpleIAST/wiki/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
-- [项目](https://github.com/keven1z/simpleIAST/wiki/项目)
-- [应用](https://github.com/keven1z/simpleIAST/wiki/%E5%BA%94%E7%94%A8)
-- [漏洞](https://github.com/keven1z/simpleIAST/wiki/%E6%BC%8F%E6%B4%9E)
-- [设置](https://github.com/keven1z/simpleIAST/wiki/%E8%AE%BE%E7%BD%AE)
 
 ---
 
