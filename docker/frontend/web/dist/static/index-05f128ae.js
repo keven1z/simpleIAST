@@ -1,1 +1,0 @@
-import{j as t}from"./index-7d92c181.js";function o(){return t({url:"/notify/unread/count",method:"get"})}function u(){return t({url:"/notify/unread/list",method:"get"})}function n(e){return t({url:"/notify/all",method:"get",params:e})}function i(e){return t({url:`/notify/read/set?id=${e}`,method:"get"})}export{o as a,u as b,n as c,i as r};
