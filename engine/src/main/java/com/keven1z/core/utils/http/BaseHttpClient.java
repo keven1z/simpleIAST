@@ -56,7 +56,7 @@ public abstract class BaseHttpClient implements Closeable {
     protected String fetchRequestResponseAsString(HttpRequestBase request) throws IOException {
         addCommonHeaders(request);
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            checkResponseStatus(response);
+            checkResponseStatus(response, request);
             return parseResponseContent(response);
         }
     }
@@ -69,11 +69,11 @@ public abstract class BaseHttpClient implements Closeable {
         return httpClient.execute(request);
     }
 
-    private void checkResponseStatus(HttpResponse response) throws IOException {
+    private void checkResponseStatus(HttpResponse response, HttpRequestBase request) throws IOException {
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode < 200 || statusCode >= 300) {
             String errorMsg = String.format("HTTP请求失败，状态码：%d，URL：%s",
-                    statusCode, response.getLocale());
+                    statusCode, request.getRequestLine().getUri());
             logger.error(errorMsg);
             throw new IOException(errorMsg);
         }

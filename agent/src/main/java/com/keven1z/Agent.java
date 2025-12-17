@@ -31,14 +31,14 @@ public class Agent {
     /**
      * attack 机制加载 agent
      *
-     * @param appName 应用名称
+     * @param projectName 项目名称
      * @param inst    {@link Instrumentation}
      */
-    public static synchronized void init(String action, String appName, boolean isDebug, Instrumentation inst) {
+    public static synchronized void init(String action, String projectName, boolean isDebug, Instrumentation inst) {
         try {
             JarFileHelper.addJarToBootstrap(inst);
             readVersion();
-            ModuleLoader.load(action, appName, isDebug, inst);
+            ModuleLoader.load(action, projectName, isDebug, inst);
         }
         catch (Exception e) {
             System.err.println("[SimpleIAST] Failed to initialize agent, will continue without simpleIAST.");
@@ -48,7 +48,7 @@ public class Agent {
 
 
     public static String getAgentBindAppName() {
-        return System.getProperty("iast.app.name", DEFAULT_APP_NAME);
+        return System.getProperty("iast.project.name", DEFAULT_APP_NAME);
     }
 
     public static boolean isDebugMode() {

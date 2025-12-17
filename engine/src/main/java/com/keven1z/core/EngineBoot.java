@@ -5,7 +5,6 @@ import com.keven1z.JarFileHelper;
 import com.keven1z.core.model.ApplicationModel;
 import com.keven1z.core.monitor.MonitorManager;
 import com.keven1z.core.utils.ClassUtils;
-import com.keven1z.core.utils.IASTHttpClient;
 import com.keven1z.core.utils.http.AuthClient;
 import com.keven1z.core.utils.http.HttpClientRegistry;
 import net.bytebuddy.agent.VirtualMachine;
@@ -28,12 +27,12 @@ import static com.keven1z.Agent.*;
 public class EngineBoot {
     EngineController engineController = null;
 
-    public void start(Instrumentation inst, String appName, Boolean enableDetailedLogging, String projectVersion) {
+    public void start(Instrumentation inst, String projectName, Boolean enableDetailedLogging, String projectVersion) {
 
         try {
             addShutdownHook();
             engineController = new EngineController();
-            engineController.start(inst, appName, enableDetailedLogging, projectVersion);
+            engineController.start(inst, projectName, enableDetailedLogging, projectVersion);
         } catch (Exception e) {
             throw new RuntimeException("Engine load error," + e.getMessage());
         }

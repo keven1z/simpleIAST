@@ -122,10 +122,10 @@ public class ModuleLoader {
      * @param action 启动模式
      * @param inst   {@link java.lang.instrument.Instrumentation}
      */
-    public static synchronized void load(String action, String appName, boolean isDebug, Instrumentation inst) throws Exception {
+    public static synchronized void load(String action, String projectName, boolean isDebug, Instrumentation inst) throws Exception {
         if (Module.START_ACTION_INSTALL.equals(action)) {
             if (instance == null) {
-                instance = new ModuleLoader(appName, isDebug);
+                instance = new ModuleLoader(projectName, isDebug);
                 instance.start(inst);
             } else {
                 System.err.println("[SimpleIAST] The SimpleIAST has bean initialized and cannot be initialized again");
